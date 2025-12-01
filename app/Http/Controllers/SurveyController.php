@@ -16,19 +16,36 @@ class SurveyController extends Controller
 
     public function store(Request $request)
     {
+        // Validasi data (sesuai name di form html kamu)
         $validated = $request->validate([
-            'nama_bisnis' => 'required|string|max:255',
-            'status_bisnis' => 'required|string',
-            'kategori_bisnis' => 'required|string',
-            'masalah_utama' => 'nullable|string',
-            'channel_penjualan' => 'required|string',
-            'range_omset' => 'required|string',
-            'target_pasar' => 'required|string',
-            'jumlah_tim' => 'required|string',
-            'tujuan_utama' => 'required|string',
+            'nama_bisnis' => 'required|string',
+            'status_bisnis' => 'required',
+            'kategori_bisnis' => 'required',
+            'kategori_manual' => 'nullable|string', // Handle input "Lainnya"
+            'channel_penjualan' => 'required',
+            'target_pasar' => 'required',
+            'range_omset' => 'required',
+            'jumlah_tim' => 'required',
+            'tujuan_utama' => 'required',
         ]);
 
-        $request->user()->business()->create($validated);
+        // Logic untuk Kategori Lainnya
+        $kategoriFinal = $validated['kategori_bisnis'];
+        if ($kategoriFinal === 'Lainnya' && !empty($validated['kategori_manual'])) {
+            $kategoriFinal = $validated['kategori_manual'];
+        }
+
+        // Simpan ke Database via Relasi User
+        Auth::user()->business()->create([
+            'nama_bisnis' => $validated['nama_bisnis'],
+            'status_bisnis' => $validated['status_bisnis'],
+            'kategori_bisnis' => $kategoriFinal,
+            'channel_penjualan' => $validated['channel_penjualan'],
+            'target_pasar' => $validated['target_pasar'],
+            'range_omset' => $validated['range_omset'],
+            'jumlah_tim' => $validated['jumlah_tim'],
+            'tujuan_utama' => $validated['tujuan_utama'],
+        ]);
 
         return redirect()->route('dashboard');
     }
