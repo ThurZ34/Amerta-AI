@@ -5,23 +5,44 @@
         createModalOpen: {{ $errors->any() && !session('success') ? 'true' : 'false' }},
         editModalOpen: false,
         deleteModalOpen: false,
-        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' }, // Default Object
+        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' }, // Default TIDAK BOLEH NULL
         search: '',
 
+        // Fungsi Helper untuk Reset Form
+        resetForm() {
+            this.selectedProduk = {
+                id: null,
+                nama_produk: '',
+                modal: 0,
+                harga_jual: 0,
+                inventori: 0,
+                jenis_produk: ''
+            };
+        },
+
         openCreateModal() {
-            // Reset ke object kosong (jangan null)
-            this.selectedProduk = { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' };
+            this.resetForm(); // Panggil fungsi reset
             this.createModalOpen = true;
         },
 
         openEditModal(produk) {
-            // Clone object agar reaktif
+            // Copy object agar tidak reaktif langsung ke list (deep copy sederhana)
             this.selectedProduk = JSON.parse(JSON.stringify(produk));
             this.editModalOpen = true;
         },
+
         openDeleteModal(produk) {
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
+        },
+
+        closeModals() {
+            this.createModalOpen = false;
+            this.editModalOpen = false;
+            this.deleteModalOpen = false;
+            // JANGAN set selectedProduk = null.
+            // Biarkan sisa data terakhir atau reset ke kosong, tapi tetap object.
+            this.resetForm();
         }
     }">
 
@@ -307,8 +328,7 @@
                                 class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
                                 <span x-text="editModalOpen ? 'Simpan Perubahan' : 'Simpan Produk'"></span>
                             </button>
-                            <button type="button"
-                                @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
+                            <button type="button" @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
                                 class="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-5 py-2.5 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
                                 Batal
                             </button>
