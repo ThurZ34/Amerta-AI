@@ -19,11 +19,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/setup-bisnis', [SurveyController::class, 'store'])->name('setup-bisnis.store');
 
     Route::middleware(['ensure.business.complete'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('dashboard');
-        })->name('dashboard');
+        Route::get('/amerta', function () {
+            return view('amerta');
+        })->name('amerta');
     });
-    Route::get('/finance', function () {
-    return view('finance');
-})->name('finance');
+    Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
 });
