@@ -6,51 +6,80 @@ use Livewire\Component;
 use App\Services\GeminiService;
 use App\Models\ChatHistory;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 
 class DashboardChat extends Component
 {
-    public $message = '';
+    public $isThinking = false;
+    public $limit = 4;
+    public $totalChats = 0;
 
-    public function sendMessage(GeminiService $gemini)
+    public function mount()
     {
-        $this->validate(['message' => 'required|string']);
+        $this->totalChats = ChatHistory::where('user_id', Auth::id())->count();
+    }
 
-        $userMessage = $this->message;
+    public function loadMore()
+    {
+        $this->limit += 4;
+    }
 
-        // 1. Simpan Chat User ke DB
+    public function sendMessage($messageText)
+    {
+        if (empty(trim($messageText))) {
+            return;
+        }
+
         ChatHistory::create([
             'user_id' => Auth::id(),
             'role' => 'user',
-            'message' => $userMessage
+            'message' => $messageText
         ]);
 
-        // 2. Reset Input (Ini memperbaiki bug input nyangkut)
-        $this->reset('message');
+        $this->totalChats++;
 
-        // 3. Ambil Data Bisnis
+        $this->isThinking = true;
+
+        $this->dispatch('process-ai-reply');
+    }
+
+    #[On('process-ai-reply')]
+    public function generateAiReply(GeminiService $gemini)
+    {
         $business = Auth::user()->business;
 
-        // 4. Panggil AI
+        $lastUserChat = ChatHistory::where('user_id', Auth::id())
+            ->where('role', 'user')
+            ->latest()
+            ->first();
+
+        $userMessage = $lastUserChat ? $lastUserChat->message : '';
+
         try {
-            // Ambil 5 chat terakhir sebagai konteks tambahan (supaya AI ingat obrolan sebelumnya)
-            // Opsional, tapi bagus untuk UX. Untuk sekarang kita kirim pesan baru saja.
             $aiReply = $gemini->sendChat($userMessage, $business);
         } catch (\Exception $e) {
             $aiReply = "Maaf Bos, koneksi terputus. Coba lagi ya.";
         }
 
-        // 5. Simpan Balasan AI ke DB
         ChatHistory::create([
             'user_id' => Auth::id(),
             'role' => 'ai',
             'message' => $aiReply
         ]);
+
+        $this->totalChats++;
+        $this->isThinking = false;
+
+        $this->dispatch('chat-updated');
     }
 
     public function render()
     {
-        // Load semua history punya user ini
-        $chats = ChatHistory::where('user_id', Auth::id())->get();
+        $chats = ChatHistory::where('user_id', Auth::id())
+            ->latest()
+            ->take($this->limit)
+            ->get()
+            ->sortBy('id');
 
         return view('livewire.chatbot', [
             'chats' => $chats
