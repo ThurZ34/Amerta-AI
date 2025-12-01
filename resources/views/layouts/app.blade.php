@@ -239,11 +239,6 @@
         </div>
     </div>
 
-    <!-- Chat Content -->
-    <div class="flex-1 relative overflow-hidden flex flex-col">
-        @livewire('dashboard-chat')
-    </div>
-
     <!-- Resize Handle (Visual Only - Native CSS resize used) -->
     <div x-show="!isFullscreen"
         class="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize pointer-events-none opacity-50">
