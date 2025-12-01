@@ -4,52 +4,56 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Services\GeminiService;
+use App\Models\ChatHistory;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardChat extends Component
 {
     public $message = '';
-    public $chatHistory = []; // Menyimpan chat sesi ini
-    public $isLoading = false;
 
-    // Fungsi ini dipanggil saat tombol kirim ditekan
     public function sendMessage(GeminiService $gemini)
     {
         $this->validate(['message' => 'required|string']);
 
         $userMessage = $this->message;
-        $this->message = ''; // Reset input field
-        $this->isLoading = true;
 
-        // 1. Tampilkan chat user dulu di UI
-        $this->chatHistory[] = [
+        // 1. Simpan Chat User ke DB
+        ChatHistory::create([
+            'user_id' => Auth::id(),
             'role' => 'user',
-            'message' => $userMessage,
-            'time' => now()->format('H:i')
-        ];
+            'message' => $userMessage
+        ]);
 
-        // 2. Ambil Data Bisnis User Login
+        // 2. Reset Input (Ini memperbaiki bug input nyangkut)
+        $this->reset('message');
+
+        // 3. Ambil Data Bisnis
         $business = Auth::user()->business;
 
-        // 3. Panggil AI dengan Konteks Bisnis
+        // 4. Panggil AI
         try {
+            // Ambil 5 chat terakhir sebagai konteks tambahan (supaya AI ingat obrolan sebelumnya)
+            // Opsional, tapi bagus untuk UX. Untuk sekarang kita kirim pesan baru saja.
             $aiReply = $gemini->sendChat($userMessage, $business);
         } catch (\Exception $e) {
-            $aiReply = "Error: Gagal terhubung ke AI.";
+            $aiReply = "Maaf Bos, koneksi terputus. Coba lagi ya.";
         }
 
-        // 4. Masukkan jawaban AI ke UI
-        $this->chatHistory[] = [
+        // 5. Simpan Balasan AI ke DB
+        ChatHistory::create([
+            'user_id' => Auth::id(),
             'role' => 'ai',
-            'message' => $aiReply,
-            'time' => now()->format('H:i')
-        ];
-
-        $this->isLoading = false;
+            'message' => $aiReply
+        ]);
     }
 
     public function render()
     {
-        return view('livewire.dashboard-chat');
+        // Load semua history punya user ini
+        $chats = ChatHistory::where('user_id', Auth::id())->get();
+
+        return view('livewire.dashboard-chat', [
+            'chats' => $chats
+        ]);
     }
 }
