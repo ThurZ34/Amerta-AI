@@ -88,36 +88,21 @@
         isDragging: false,
         pos: { x: 0, y: 0 },
         start: { x: 0, y: 0 },
-        limits: { minX: 0, maxX: 0, minY: 0, maxY: 0 }, // Variabel untuk simpan batas
+        limits: { minX: 0, maxX: 0, minY: 0, maxY: 0 },
 
         startDrag(e) {
             if (this.isFullscreen) return;
             this.isDragging = true;
-
-            // Hitung offset mouse terhadap posisi elemen saat ini
             this.start.x = e.clientX - this.pos.x;
             this.start.y = e.clientY - this.pos.y;
 
-            // --- LOGIKA PEMBATAS (BOUNDARY) ---
-            // Kita hitung seberapa jauh panel boleh digeser berdasarkan ukuran layar saat ini.
-
             const winW = window.innerWidth;
             const winH = window.innerHeight;
-
-            // Ambil ukuran panel chat saat ini (lebar & tinggi)
-            // Menggunakan $refs.chatModal yang kita pasang di div panel
             const rect = this.$refs.chatModal.getBoundingClientRect();
 
-            // Jarak margin CSS awal (sesuai class: right-6 bottom-24)
-            // right-6 = 24px, bottom-24 = 96px (24px button + jarak)
+            // Margin aman
             const baseRight = 24;
             const baseBottom = 96;
-
-            // RUMUS BATAS:
-            // Max X (Kanan): Boleh geser ke kanan maksimal sejarak margin kanan (24px) sampai mentok layar.
-            // Min X (Kiri): Boleh geser ke kiri sejarak (Lebar Layar - Lebar Panel - Margin Kanan).
-            // Max Y (Bawah): Boleh geser ke bawah maksimal sejarak margin bawah (96px).
-            // Min Y (Atas): Boleh geser ke atas sejarak (Tinggi Layar - Tinggi Panel - Margin Bawah).
 
             this.limits = {
                 maxX: baseRight,
@@ -129,14 +114,8 @@
 
         doDrag(e) {
             if (this.isDragging) {
-                // Hitung posisi mentah berdasarkan mouse
                 let rawX = e.clientX - this.start.x;
                 let rawY = e.clientY - this.start.y;
-
-                // APIT (CLAMP) POSISI AGAR TIDAK LEWAT BATAS
-                // Math.min(..., maxX) -> Mencegah lewat kanan/bawah
-                // Math.max(..., minX) -> Mencegah lewat kiri/atas
-
                 this.pos.x = Math.max(this.limits.minX, Math.min(rawX, this.limits.maxX));
                 this.pos.y = Math.max(this.limits.minY, Math.min(rawY, this.limits.maxY));
             }
@@ -148,7 +127,7 @@
 
         toggleFullscreen() {
             this.isFullscreen = !this.isFullscreen;
-            this.pos = { x: 0, y: 0 }; // Reset posisi saat fullscreen
+            this.pos = { x: 0, y: 0 };
         }
     }" @mousemove.window="doDrag($event)" @mouseup.window="stopDrag()"
         class="fixed z-50 inset-0 pointer-events-none overflow-hidden">
@@ -226,42 +205,21 @@
 
         <div class="absolute bottom-6 right-6 pointer-events-auto" x-show="!isFullscreen">
             <button @click="chatOpen = !chatOpen"
-                class="w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group z-50">
+                class="w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group z-50 relative">
+
                 <span x-show="!chatOpen"
                     class="text-xl font-bold transition-transform duration-300 group-hover:rotate-12">AI</span>
+
                 <svg x-show="chatOpen" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     style="display: none;">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
+
                 <span
                     class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white dark:border-gray-900 animate-pulse"></span>
             </button>
         </div>
-    </div>
 
-    <!-- Resize Handle (Visual Only - Native CSS resize used) -->
-    <div x-show="!isFullscreen"
-        class="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize pointer-events-none opacity-50">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-4 h-4 text-gray-400">
-            <path d="M19 5v14H5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-    </div>
-    </div>
-
-    <!-- TOGGLE BUTTON (BUBBLE) -->
-    <!-- Tombol ini akan sembunyi jika Fullscreen aktif -->
-    <button @click="chatOpen = !chatOpen" x-show="!isFullscreen"
-        class="absolute bottom-0 right-0 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 active:scale-95 group z-50">
-        <span x-show="!chatOpen" class="text-xl font-bold">AI</span>
-        <svg x-show="chatOpen" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            style="display: none;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-
-        <!-- Notification Badge -->
-        <span
-            class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white dark:border-gray-900"></span>
-    </button>
     </div>
 
     <style>
