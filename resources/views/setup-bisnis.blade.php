@@ -185,7 +185,7 @@
                 step: 1,
                 totalSteps: 3,
                 errors: {}, // Object untuk menyimpan error validasi
-            
+
                 formData: {
                     nama_bisnis: '',
                     status_bisnis: '',
@@ -197,18 +197,18 @@
                     jumlah_tim: '',
                     tujuan_utama: ''
                 },
-            
+
                 images: [
                     'https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
                     'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
                     'https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
                 ],
-            
+
                 // Fungsi Validasi
                 validateStep() {
                     this.errors = {}; // Reset errors
                     let isValid = true;
-            
+
                     if (this.step === 1) {
                         if (!this.formData.nama_bisnis.trim()) {
                             this.errors.nama_bisnis = true;
@@ -249,21 +249,21 @@
                             isValid = false;
                         }
                     }
-            
+
                     return isValid;
                 },
-            
+
                 nextStep() {
                     // Cek validasi sebelum lanjut
                     if (this.validateStep()) {
                         if (this.step < this.totalSteps) this.step++;
                     }
                 },
-            
+
                 prevStep() { if (this.step > 1) this.step-- },
-            
+
                 get activeImage() { return this.images[this.step - 1]; },
-            
+
                 get stepTitle() {
                     switch (this.step) {
                         case 1:
@@ -276,7 +276,7 @@
                             return '';
                     }
                 },
-            
+
                 get stepDesc() {
                     switch (this.step) {
                         case 1:
@@ -289,24 +289,24 @@
                             return '';
                     }
                 },
-            
+
                 submitForm() {
                     if (!this.validateStep()) {
                         return;
                     }
-            
+
                     // Create a form element and submit it
                     const form = document.createElement('form');
                     form.method = 'POST';
                     form.action = '{{ route('setup-bisnis.store') }}';
-            
+
                     // Add CSRF token
                     const csrfInput = document.createElement('input');
                     csrfInput.type = 'hidden';
                     csrfInput.name = '_token';
                     csrfInput.value = '{{ csrf_token() }}';
                     form.appendChild(csrfInput);
-            
+
                     // Add all form data
                     Object.keys(this.formData).forEach(key => {
                         const input = document.createElement('input');
@@ -315,7 +315,7 @@
                         input.value = this.formData[key];
                         form.appendChild(input);
                     });
-            
+
                     // Append to body and submit
                     document.body.appendChild(form);
                     form.submit();
