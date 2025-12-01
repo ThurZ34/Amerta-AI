@@ -29,5 +29,7 @@ Route::middleware(['auth'])->group(function () {
             return view('dashboard');
         })->name('dashboard');
 
+        Route::resource('produk', \App\Http\Controllers\ProdukController::class);
+
     });
 });
