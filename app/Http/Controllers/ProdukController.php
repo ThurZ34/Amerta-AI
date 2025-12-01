@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
+ 
+use App\Models\Produk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -9,7 +10,7 @@ class ProdukController extends Controller
 {
     public function index()
     {
-        $produks = \App\Models\Produk::latest()->get();
+        $produks = Produk::latest()->get();
         return view('produk.index', compact('produks'));
     }
 
@@ -33,14 +34,14 @@ class ProdukController extends Controller
         // Set business_id (adjust based on your auth logic)
         $validated['business_id'] = auth()->user()->business_id ?? 1;
 
-        \App\Models\Produk::create($validated);
+        Produk::create($validated);
 
         return redirect()->route('produk.index')->with('success', 'Produk created successfully.');
     }
 
     public function update(Request $request, $id)
     {
-        $produk = \App\Models\Produk::findOrFail($id);
+        $produk = Produk::findOrFail($id);
         
         $validated = $request->validate([
             'nama_produk' => 'required|string|max:255',
@@ -69,7 +70,7 @@ class ProdukController extends Controller
 
     public function destroy($id)
     {
-        $produk = \App\Models\Produk::findOrFail($id);
+        $produk = Produk::findOrFail($id);
         
         // Delete image file if exists
         if ($produk->gambar) {
