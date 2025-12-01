@@ -55,10 +55,13 @@
                 <div class="flex items-start gap-4 max-w-[85%] fade-in-up">
                     <div
                         class="w-8 h-8 rounded-full bg-indigo-600 shrink-0 flex items-center justify-center text-white text-xs font-bold shadow-md">
-                        AI</div>
-                    <div
-                        class="bg-white dark:bg-gray-800 p-5 rounded-2xl rounded-tl-none border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 shadow-sm text-sm leading-relaxed prose prose-sm prose-indigo dark:prose-invert max-w-none">
+                        AI
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 px-4 py-3 rounded-2xl rounded-tl-none border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 shadow-sm text-sm leading-relaxed prose prose-sm prose-indigo dark:prose-invert max-w-none
+                                prose-p:my-1 prose-p:first:mt-0 prose-ul:my-1 prose-li:my-0 prose-headings:mb-2 prose-headings:mt-3">
+
                         <div x-data x-html="marked.parse(@js($chat->message))"></div>
+
                     </div>
                 </div>
             @endif
@@ -101,10 +104,10 @@
             <button type="submit"
                 class="p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1"
                 :disabled="userMessage.trim() === '' || @js($isThinking)">
-                <svg wire:loading.remove wire:target="sendMessage" class="w-6 h-6 transform rotate-90" fill="none"
+                <svg wire:loading.remove wire:target="sendMessage" class="w-6 h-6 text-white" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
                 </svg>
 
                 <svg wire:loading wire:target="sendMessage" class="animate-spin w-6 h-6 text-white"
