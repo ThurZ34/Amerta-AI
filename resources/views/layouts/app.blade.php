@@ -47,6 +47,10 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 
@@ -67,7 +71,7 @@
             @include('layouts.partials.header')
 
             <main
-                class="flex-1 h-full overflow-hidden bg-gray-50 dark:bg-gray-950 relative flex flex-col transition-colors duration-300">
+                class="flex-1 h-full overflow-y-auto bg-gray-50 dark:bg-gray-950 relative flex flex-col transition-colors duration-300">
                 @yield('content')
             </main>
         </div>
@@ -79,7 +83,7 @@
         isDragging: false,
         pos: { x: 0, y: 0 },
         start: { x: 0, y: 0 },
-
+    
         // Fungsi Mulai Geser (Drag)
         startDrag(e) {
             if (this.isFullscreen) return; // Jangan geser kalau lagi fullscreen
