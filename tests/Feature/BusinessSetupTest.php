@@ -42,21 +42,26 @@ class BusinessSetupTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post(route('setup-bisnis.store'), [
-            'nama_bisnis' => 'New Business',
-            'status_bisnis' => 'Baru Mulai',
-            'kategori_bisnis' => 'Retail',
-            'channel_penjualan' => 'Offline',
-            'range_omset' => '10-50 Juta',
-            'target_pasar' => 'General',
-            'jumlah_tim' => '1-5',
-            'tujuan_utama' => 'Profit',
-        ]);
+        $response = $this->actingAs($user)
+            ->post(route('setup-bisnis.store'), [
+                'nama_bisnis' => 'My Business',
+                'status_bisnis' => 'Baru Mulai',
+                'kategori_bisnis' => 'Teknologi',
+                'channel_penjualan' => 'Online',
+                'target_pasar' => 'UMKM',
+                'range_omset' => '< 10 Juta',
+                'jumlah_tim' => '1 (Sendiri)',
+                'tujuan_utama' => 'Scale Up',
+                'masalah_utama' => 'Modal',
+            ]);
 
         $response->assertRedirect(route('dashboard'));
+
         $this->assertDatabaseHas('businesses', [
             'user_id' => $user->id,
-            'nama_bisnis' => 'New Business',
+            'nama_bisnis' => 'My Business',
+            'status_bisnis' => 'Baru Mulai',
+            'kategori_bisnis' => 'Teknologi',
         ]);
     }
 }
