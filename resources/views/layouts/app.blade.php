@@ -22,33 +22,24 @@
     </style>
 </head>
 
-<body class="h-full antialiased text-gray-900">
-    <div x-data="{ sidebarOpen: false }" class="min-h-screen flex flex-col md:flex-row">
+<body class="h-full antialiased text-gray-900 bg-gray-50">
+    <div x-data="{ sidebarOpen: false }" class="h-screen flex flex-col md:flex-row overflow-hidden">
 
-        <!-- Mobile Sidebar Overlay -->
         <div x-show="sidebarOpen" @click="sidebarOpen = false"
             x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
             class="fixed inset-0 bg-gray-900/80 z-40 md:hidden" style="display: none;"></div>
 
-        <!-- Sidebar -->
         @include('layouts.partials.sidebar')
 
-        <!-- Main Content Wrapper -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div class="flex-1 flex flex-col min-w-0 h-full">
 
-            <!-- Header -->
-            @include('layouts.partials.header')
-
-            <!-- Main Content -->
-            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+            <main class="flex-1 h-full overflow-hidden bg-gray-50 relative flex flex-col">
                 @yield('content')
             </main>
         </div>
     </div>
-
-    <!-- Alpine.js is injected by Livewire v3 automatically -->
 </body>
 
 </html>
