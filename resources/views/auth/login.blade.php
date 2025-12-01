@@ -14,10 +14,10 @@
 <body class="bg-white">
 
     <div class="flex min-h-screen">
-        
+
         <div class="w-full md:w-1/2 flex items-center justify-center p-8 bg-white text-gray-800">
             <div class="w-full max-w-md space-y-6">
-                
+
                 <div class="text-left">
                     <h1 class="text-3xl font-bold mb-2">Selamat Datang Kembali</h1>
                     <p class="text-gray-500">Silakan masukkan detail akun anda.</p>
@@ -36,10 +36,10 @@
 
                 <form method="POST" action="{{ route('login') }}" class="space-y-4">
                     @csrf
-                    
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" name="email" required autofocus
+                        <input autocomplete="off" type="email" name="email" required autofocus
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
                             placeholder="nama@email.com">
                         @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -57,21 +57,21 @@
                             placeholder="••••••••">
                     </div>
 
-                    <button type="submit" 
+                    <button type="submit"
                         class="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-800 transition duration-300">
                         Masuk
                     </button>
                 </form>
 
                 <div class="text-center text-sm text-gray-600">
-                    Belum punya akun? 
+                    Belum punya akun?
                     <a href="{{ route('register') }}" class="font-semibold text-black hover:underline">Daftar Sekarang</a>
                 </div>
 
             </div>
         </div>
 
-        <div class="hidden md:block w-1/2 bg-cover bg-center relative" 
+        <div class="hidden md:block w-1/2 bg-cover bg-center relative"
              style="background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
             <div class="absolute inset-0 bg-black bg-opacity-10"></div>
         </div>

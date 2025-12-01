@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50" x-data="{
-    darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+    // Ambil state dari DOM/Class yang sudah di-set di skrip HEAD
+    darkMode: document.documentElement.classList.contains('dark'),
     toggleTheme() {
         this.darkMode = !this.darkMode;
         localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
-        if (this.darkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        document.documentElement.classList.toggle('dark', this.darkMode);
     }
-}"
-    x-init="$watch('darkMode', val => val ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark'));
-    if (darkMode) document.documentElement.classList.add('dark');" :class="{ 'dark': darkMode }">
+}">
 
 <head>
     <meta charset="utf-8">
@@ -21,7 +16,25 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Fonts -->
+    <script>
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            let themeToApply = (savedTheme === 'dark' || (!savedTheme && prefersDark)) ? 'dark' : 'light';
+
+            if (themeToApply === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            if (!savedTheme) {
+                localStorage.setItem('theme', themeToApply);
+            }
+        }
+        initializeTheme();
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -60,7 +73,6 @@
         </div>
     </div>
 
-    <!-- Floating Chat Logic Wrapper -->
     <div x-data="{
         chatOpen: false,
         isFullscreen: false,
@@ -97,7 +109,6 @@
     }" @mousemove.window="doDrag($event)" @mouseup.window="stopDrag()" class="fixed z-50"
         :class="isFullscreen ? 'inset-0' : 'bottom-6 right-6'">
 
-        <!-- CHAT MODAL WINDOW -->
         <div x-show="chatOpen" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-10 scale-95"
             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -114,8 +125,6 @@
             class="bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-75 ease-out relative"
             style="display: none;">
 
-            <!-- HEADER MODAL (DRAGGABLE AREA) -->
-            <!-- Tambahkan cursor-move agar user tau ini bisa digeser -->
             <div @mousedown="startDrag($event)"
                 class="h-14 bg-indigo-600 flex items-center justify-between px-4 shrink-0 cursor-move select-none"
                 :class="isFullscreen ? '' : 'rounded-t-2xl'">
@@ -158,12 +167,10 @@
                 </div>
             </div>
 
-            <!-- Chat Content -->
             <div class="flex-1 relative overflow-hidden flex flex-col">
                 @livewire('dashboard-chat')
             </div>
 
-            <!-- Resize Handle (Visual Only - Native CSS resize used) -->
             <div x-show="!isFullscreen"
                 class="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize pointer-events-none opacity-50">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-4 h-4 text-gray-400">
@@ -172,8 +179,6 @@
             </div>
         </div>
 
-        <!-- TOGGLE BUTTON (BUBBLE) -->
-        <!-- Tombol ini akan sembunyi jika Fullscreen aktif -->
         <button @click="chatOpen = !chatOpen" x-show="!isFullscreen"
             class="absolute bottom-0 right-0 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 active:scale-95 group z-50">
             <span x-show="!chatOpen" class="text-xl font-bold">AI</span>
@@ -182,7 +187,6 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
 
-            <!-- Notification Badge -->
             <span
                 class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white dark:border-gray-900"></span>
         </button>
