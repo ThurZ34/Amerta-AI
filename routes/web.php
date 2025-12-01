@@ -17,4 +17,7 @@ Route::middleware(['auth'])->group(function () {
             return view('dashboard');
         })->name('dashboard');
     });
+    Route::get('/finance', function () {
+    return view('finance');
+})->name('finance');
 });
