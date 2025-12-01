@@ -1,80 +1,89 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
+<html lang="id">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register - Amerta AI</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Akun</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
+<body class="bg-white">
 
-<body class="bg-gray-50 font-sans antialiased">
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
-        <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-            <div class="mb-6 text-center">
-                <h2 class="text-2xl font-bold text-gray-900">Register</h2>
-            </div>
-
-            <form method="POST" action="{{ route('register') }}">
-                @csrf
-
-                <!-- Name -->
-                <div>
-                    <label for="name" class="block font-medium text-sm text-gray-700">Name</label>
-                    <input id="name"
-                        class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                        type="text" name="name" value="{{ old('name') }}" required autofocus
-                        autocomplete="name" />
-                    @error('name')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
+    <div class="flex min-h-screen">
+        
+        <div class="w-full md:w-1/2 flex items-center justify-center p-8 bg-white text-gray-800">
+            <div class="w-full max-w-md space-y-6">
+                
+                <div class="text-left">
+                    <h1 class="text-3xl font-bold mb-2">Buat Akun Baru</h1>
+                    <p class="text-gray-500">Mulai perjalanan anda bersama kami.</p>
                 </div>
 
-                <!-- Email Address -->
-                <div class="mt-4">
-                    <label for="email" class="block font-medium text-sm text-gray-700">Email</label>
-                    <input id="email"
-                        class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                        type="email" name="email" value="{{ old('email') }}" required autocomplete="username" />
-                    @error('email')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
+                <button class="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg p-3 hover:bg-gray-50 transition">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
+                    <span class="text-sm font-medium text-gray-700">Daftar dengan Google</span>
+                </button>
+
+                <div class="relative flex py-2 items-center">
+                    <div class="grow border-t border-gray-200"></div>
+                    <span class="shrink-0 mx-4 text-gray-400 text-sm">atau dengan email</span>
+                    <div class="grow border-t border-gray-200"></div>
                 </div>
 
-                <!-- Password -->
-                <div class="mt-4">
-                    <label for="password" class="block font-medium text-sm text-gray-700">Password</label>
-                    <input id="password"
-                        class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                        type="password" name="password" required autocomplete="new-password" />
-                    @error('password')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                <form method="POST" action="{{ route('register') }}" class="space-y-4">
+                    @csrf
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                        <input type="text" name="name" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
+                            placeholder="Masukkan Nama Anda">
+                    </div>
 
-                <!-- Confirm Password -->
-                <div class="mt-4">
-                    <label for="password_confirmation" class="block font-medium text-sm text-gray-700">Confirm
-                        Password</label>
-                    <input id="password_confirmation"
-                        class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                        type="password" name="password_confirmation" required autocomplete="new-password" />
-                </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" name="email" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
+                            placeholder="Masukkan Email Anda">
+                        @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
 
-                <div class="flex items-center justify-end mt-4">
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        href="{{ route('login') }}">
-                        Already registered?
-                    </a>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" name="password" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
+                            placeholder="Minimal 8 karakter">
+                        @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
 
-                    <button type="submit"
-                        class="ml-4 inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                        Register
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ulangi Password</label>
+                        <input type="password" name="password_confirmation" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
+                            placeholder="Ketik ulang password">
+                    </div>
+
+                    <button type="submit" 
+                        class="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-800 transition duration-300">
+                        Daftar
                     </button>
+                </form>
+
+                <div class="text-center text-sm text-gray-600">
+                    Sudah punya akun? 
+                    <a href="{{ route('login') }}" class="font-semibold text-black hover:underline">Masuk disini</a>
                 </div>
-            </form>
+
+            </div>
         </div>
+
+        <div class="hidden md:block w-1/2 bg-cover bg-center" 
+             style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
+        </div>
+
     </div>
 </body>
-
 </html>
