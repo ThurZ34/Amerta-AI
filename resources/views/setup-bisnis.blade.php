@@ -185,7 +185,7 @@
                 step: 1,
                 totalSteps: 3,
                 errors: {}, // Object untuk menyimpan error validasi
-
+            
                 formData: {
                     nama_bisnis: '',
                     status_bisnis: '',
@@ -197,18 +197,18 @@
                     jumlah_tim: '',
                     tujuan_utama: ''
                 },
-
+            
                 images: [
                     'https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
                     'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
                     'https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
                 ],
-
+            
                 // Fungsi Validasi
                 validateStep() {
                     this.errors = {}; // Reset errors
                     let isValid = true;
-
+            
                     if (this.step === 1) {
                         if (!this.formData.nama_bisnis.trim()) {
                             this.errors.nama_bisnis = true;
@@ -249,21 +249,21 @@
                             isValid = false;
                         }
                     }
-
+            
                     return isValid;
                 },
-
+            
                 nextStep() {
                     // Cek validasi sebelum lanjut
                     if (this.validateStep()) {
                         if (this.step < this.totalSteps) this.step++;
                     }
                 },
-
+            
                 prevStep() { if (this.step > 1) this.step-- },
-
+            
                 get activeImage() { return this.images[this.step - 1]; },
-
+            
                 get stepTitle() {
                     switch (this.step) {
                         case 1:
@@ -276,7 +276,7 @@
                             return '';
                     }
                 },
-
+            
                 get stepDesc() {
                     switch (this.step) {
                         case 1:
@@ -289,24 +289,24 @@
                             return '';
                     }
                 },
-
+            
                 submitForm() {
                     if (!this.validateStep()) {
                         return;
                     }
-
+            
                     // Create a form element and submit it
                     const form = document.createElement('form');
                     form.method = 'POST';
                     form.action = '{{ route('setup-bisnis.store') }}';
-
+            
                     // Add CSRF token
                     const csrfInput = document.createElement('input');
                     csrfInput.type = 'hidden';
                     csrfInput.name = '_token';
                     csrfInput.value = '{{ csrf_token() }}';
                     form.appendChild(csrfInput);
-
+            
                     // Add all form data
                     Object.keys(this.formData).forEach(key => {
                         const input = document.createElement('input');
@@ -315,7 +315,7 @@
                         input.value = this.formData[key];
                         form.appendChild(input);
                     });
-
+            
                     // Append to body and submit
                     document.body.appendChild(form);
                     form.submit();
@@ -329,7 +329,7 @@
                 <div class="px-8 pt-8 pb-4 flex justify-between items-center">
                     <a href="#" class="flex items-center gap-3 group">
                         <div
-                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-600 to-secondary-600 text-white flex items-center justify-center shadow-lg shadow-secondary-500/30 group-hover:scale-105 transition-all duration-300">
+                            class="w-10 h-10 rounded-xl bg-linear-to-br from-primary-600 to-secondary-600 text-white flex items-center justify-center shadow-lg shadow-secondary-500/30 group-hover:scale-105 transition-all duration-300">
                             <!-- SVG Logo Modern -->
                             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12 2L2 19H22L12 2Z" class="fill-white/20" />
@@ -369,7 +369,7 @@
                         <span x-text="Math.round((step / 3) * 100) + '%'"></span>
                     </div>
                     <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-primary-600 to-secondary-600 transition-all duration-500 ease-out rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+                        <div class="h-full bg-linear-to-r from-primary-600 to-secondary-600 transition-all duration-500 ease-out rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]"
                             :style="'width: ' + ((step / 3) * 100) + '%'"></div>
                     </div>
                 </div>
@@ -590,7 +590,7 @@
                         <div x-show="step === 1" class="flex-1"></div> <!-- Spacer -->
 
                         <button type="button" x-show="step < totalSteps" @click="nextStep()"
-                            class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white transition-all duration-200 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-xl hover:shadow-lg hover:shadow-secondary-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600">
+                            class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white transition-all duration-200 bg-linear-to-r from-primary-600 to-secondary-600 rounded-xl hover:shadow-lg hover:shadow-secondary-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600">
                             Lanjut
                             <svg class="w-5 h-5 ml-2 -mr-1 transition-transform group-hover:translate-x-1"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -600,7 +600,7 @@
                         </button>
 
                         <button type="button" x-show="step === totalSteps" @click="submitForm()" x-cloak
-                            class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white transition-all duration-200 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-xl hover:shadow-lg hover:shadow-secondary-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600">
+                            class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white transition-all duration-200 bg-linear-to-r from-primary-600 to-secondary-600 rounded-xl hover:shadow-lg hover:shadow-secondary-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600">
                             Selesai
                         </button>
                     </div>
@@ -634,7 +634,7 @@
 
                         <!-- Modern Overlay Gradient (Purple Tinted) -->
                         <div
-                            class="absolute inset-0 bg-gradient-to-t from-gray-900 via-secondary-900/40 to-transparent opacity-90">
+                            class="absolute inset-0 bg-linear-to-t from-gray-900 via-secondary-900/40 to-transparent opacity-90">
                         </div>
 
                         <!-- Floating Text/Quote per Step -->
@@ -677,9 +677,9 @@
                         class="absolute inset-0 w-full h-full object-cover opacity-60">
                 </template>
                 <!-- Purple Overlay for mobile banner -->
-                <div class="absolute inset-0 bg-gradient-to-r from-secondary-900/80 to-primary-900/80"></div>
+                <div class="absolute inset-0 bg-linear-to-r from-secondary-900/80 to-primary-900/80"></div>
 
-                <div class="absolute inset-0 flex items-center justify-center relative z-10">
+                <div class="absolute inset-0 flex items-center justify-center z-10">
                     <h1 class="text-white font-bold text-2xl tracking-wide">Amerta<span
                             class="text-secondary-400">.AI</span></h1>
                 </div>
