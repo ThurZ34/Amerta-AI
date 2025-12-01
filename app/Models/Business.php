@@ -18,6 +18,8 @@ class Business extends Model
         'target_pasar',
         'jumlah_tim',
         'tujuan_utama',
+        'alamat',
+        'telepon'
     ];
 
     public function user()
