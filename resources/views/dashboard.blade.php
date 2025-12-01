@@ -105,16 +105,16 @@
                         </select>
                     </div>
                     <div class="relative h-64 w-full" x-data="{ mode: document.documentElement.classList.contains('dark') ? 'dark' : 'light' }" x-init="const ctx = $el.querySelector('canvas').getContext('2d');
-                    
+
                     // Setup Warna sesuai mode
                     const isDark = document.documentElement.classList.contains('dark');
                     const gridColor = isDark ? '#374151' : '#f3f4f6';
                     const textColor = isDark ? '#9ca3af' : '#6b7280';
-                    
+
                     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
                     gradient.addColorStop(0, 'rgba(79, 70, 229, 0.3)');
                     gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
-                    
+
                     new Chart(ctx, {
                         type: 'line',
                         data: {
@@ -168,12 +168,7 @@
                                 y: { duration: 1500, easing: 'easeOutElastic', from: 200 }
                             }
                         }
-                    });
-                    
-                    // Listener untuk ganti tema otomatis
-                    new MutationObserver(() => {
-                        window.location.reload(); // Reload simple untuk refresh chart color
-                    }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });">
+                    });">
                         <canvas></canvas>
                     </div>
                 </div>
@@ -185,7 +180,7 @@
 
                     <div class="relative h-48 w-full flex justify-center" x-data x-init="const isDark = document.documentElement.classList.contains('dark');
                     const textColor = isDark ? '#e5e7eb' : '#374151';
-                    
+
                     new Chart($el.querySelector('canvas').getContext('2d'), {
                         type: 'doughnut',
                         data: {
