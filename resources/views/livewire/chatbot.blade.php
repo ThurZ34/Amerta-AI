@@ -1,7 +1,4 @@
 <div class="flex flex-col h-full relative bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-
-
-
     <div class="flex-1 overflow-y-auto chat-scroll p-4 pb-20 space-y-4" id="chat-container">
 
         <div class="flex items-start gap-4 max-w-[85%]">
