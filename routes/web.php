@@ -22,8 +22,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/amerta', function () {
             return view('amerta');
         })->name('amerta');
-    });
-    Route::get('/dashboard', function () {
+        Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
+    });
 });
