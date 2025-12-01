@@ -5,25 +5,23 @@
         createModalOpen: {{ $errors->any() && !session('success') ? 'true' : 'false' }},
         editModalOpen: false,
         deleteModalOpen: false,
-        selectedProduk: null,
+        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' }, // Default Object
         search: '',
 
-        // TAMBAHKAN FUNGSI INI
         openCreateModal() {
-            this.selectedProduk = null; // <--- INI KUNCINYA (Reset Data)
+            // Reset ke object kosong (jangan null)
+            this.selectedProduk = { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' };
             this.createModalOpen = true;
         },
 
         openEditModal(produk) {
-            this.selectedProduk = produk;
+            // Clone object agar reaktif
+            this.selectedProduk = JSON.parse(JSON.stringify(produk));
             this.editModalOpen = true;
         },
         openDeleteModal(produk) {
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
-        },
-        filterProduk() {
-            return document.querySelectorAll('.product-card');
         }
     }">
 
@@ -124,7 +122,7 @@
                                             d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                     </svg>
                                 </button>
-                                <button @click='openDeleteModal(@json($produk))'"
+                                <button @click="openDeleteModal({{ $produk }})"
                                     class="p-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 shadow-sm border border-gray-200 dark:border-gray-700 transition-colors"
                                     title="Hapus">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -221,7 +219,8 @@
                             class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white"
                                 x-text="editModalOpen ? 'Edit Produk' : 'Tambah Produk Baru'"></h3>
-                            <button type="button" @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
+                            <button type="button"
+                                @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
                                 class="text-gray-400 hover:text-gray-500 transition-colors">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -256,7 +255,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nama
                                     Produk</label>
-                                <input type="text" name="nama_produk" x-model="selectedProduk?.nama_produk" required
+                                <input type="text" name="nama_produk" x-model="selectedProduk.nama_produk" required
                                     placeholder="Contoh: Kopi Susu Aren"
                                     class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                             </div>
@@ -268,7 +267,7 @@
                                     <div class="relative">
                                         <span
                                             class="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">Rp</span>
-                                        <input type="number" name="modal" x-model="selectedProduk?.modal" required
+                                        <input type="number" name="modal" x-model="selectedProduk.modal" required
                                             class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                     </div>
                                 </div>
@@ -278,7 +277,7 @@
                                     <div class="relative">
                                         <span
                                             class="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">Rp</span>
-                                        <input type="number" name="harga_jual" x-model="selectedProduk?.harga_jual"
+                                        <input type="number" name="harga_jual" x-model="selectedProduk.harga_jual"
                                             required
                                             class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                     </div>
@@ -289,13 +288,13 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Stok
                                         Awal</label>
-                                    <input type="number" name="inventori" x-model="selectedProduk?.inventori" required
+                                    <input type="number" name="inventori" x-model="selectedProduk.inventori" required
                                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Jenis
                                         Produk</label>
-                                    <input type="text" name="jenis_produk" x-model="selectedProduk?.jenis_produk"
+                                    <input type="text" name="jenis_produk" x-model="selectedProduk.jenis_produk"
                                         required placeholder="Cth: Makanan"
                                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                 </div>
@@ -308,7 +307,8 @@
                                 class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
                                 <span x-text="editModalOpen ? 'Simpan Perubahan' : 'Simpan Produk'"></span>
                             </button>
-                            <button type="button" @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
+                            <button type="button"
+                                @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
                                 class="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-5 py-2.5 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
                                 Batal
                             </button>
