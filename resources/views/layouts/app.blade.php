@@ -88,41 +88,83 @@
         isDragging: false,
         pos: { x: 0, y: 0 },
         start: { x: 0, y: 0 },
+        limits: { minX: 0, maxX: 0, minY: 0, maxY: 0 }, // Variabel untuk simpan batas
 
         startDrag(e) {
             if (this.isFullscreen) return;
             this.isDragging = true;
+
+            // Hitung offset mouse terhadap posisi elemen saat ini
             this.start.x = e.clientX - this.pos.x;
             this.start.y = e.clientY - this.pos.y;
+
+            // --- LOGIKA PEMBATAS (BOUNDARY) ---
+            // Kita hitung seberapa jauh panel boleh digeser berdasarkan ukuran layar saat ini.
+
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
+
+            // Ambil ukuran panel chat saat ini (lebar & tinggi)
+            // Menggunakan $refs.chatModal yang kita pasang di div panel
+            const rect = this.$refs.chatModal.getBoundingClientRect();
+
+            // Jarak margin CSS awal (sesuai class: right-6 bottom-24)
+            // right-6 = 24px, bottom-24 = 96px (24px button + jarak)
+            const baseRight = 24;
+            const baseBottom = 96;
+
+            // RUMUS BATAS:
+            // Max X (Kanan): Boleh geser ke kanan maksimal sejarak margin kanan (24px) sampai mentok layar.
+            // Min X (Kiri): Boleh geser ke kiri sejarak (Lebar Layar - Lebar Panel - Margin Kanan).
+            // Max Y (Bawah): Boleh geser ke bawah maksimal sejarak margin bawah (96px).
+            // Min Y (Atas): Boleh geser ke atas sejarak (Tinggi Layar - Tinggi Panel - Margin Bawah).
+
+            this.limits = {
+                maxX: baseRight,
+                minX: -(winW - rect.width - baseRight),
+                maxY: baseBottom,
+                minY: -(winH - rect.height - baseBottom)
+            };
         },
+
         doDrag(e) {
             if (this.isDragging) {
-                this.pos.x = e.clientX - this.start.x;
-                this.pos.y = e.clientY - this.start.y;
+                // Hitung posisi mentah berdasarkan mouse
+                let rawX = e.clientX - this.start.x;
+                let rawY = e.clientY - this.start.y;
+
+                // APIT (CLAMP) POSISI AGAR TIDAK LEWAT BATAS
+                // Math.min(..., maxX) -> Mencegah lewat kanan/bawah
+                // Math.max(..., minX) -> Mencegah lewat kiri/atas
+
+                this.pos.x = Math.max(this.limits.minX, Math.min(rawX, this.limits.maxX));
+                this.pos.y = Math.max(this.limits.minY, Math.min(rawY, this.limits.maxY));
             }
         },
+
         stopDrag() {
             this.isDragging = false;
         },
+
         toggleFullscreen() {
             this.isFullscreen = !this.isFullscreen;
-            // Reset posisi drag agar animasi selalu mulus dari anchor kanan bawah
-            this.pos = { x: 0, y: 0 };
+            this.pos = { x: 0, y: 0 }; // Reset posisi saat fullscreen
         }
     }" @mousemove.window="doDrag($event)" @mouseup.window="stopDrag()"
         class="fixed z-50 inset-0 pointer-events-none overflow-hidden">
 
-        <div x-show="chatOpen" x-transition:enter="transition-all ease-[cubic-bezier(0.19,1,0.22,1)] duration-500"
+        <div x-ref="chatModal" x-show="chatOpen"
+            x-transition:enter="transition-all ease-[cubic-bezier(0.19,1,0.22,1)] duration-500"
             x-transition:enter-start="opacity-0 translate-y-10 scale-95"
             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
             x-transition:leave="transition-all ease-[cubic-bezier(0.19,1,0.22,1)] duration-300"
             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-            x-transition:leave-end="opacity-0 translate-y-10 scale-95" {{--
+            x-transition:leave-end="opacity-0 translate-y-10 scale-95"
             :class="isFullscreen
                 ?
                 'fixed right-0 bottom-0 w-full h-full rounded-none' :
                 'fixed right-6 bottom-24 w-[350px] md:w-[400px] h-[500px] md:h-[600px] rounded-2xl shadow-2xl'"
-            {{-- Handle posisi Drag --}} :style="!isFullscreen ? `transform: translate(${pos.x}px, ${pos.y}px);` : ''"
+            :style="!isFullscreen ? `transform: translate(${pos.x}px, ${pos.y}px);` : ''"
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex flex-col pointer-events-auto origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] will-change-[width,height,border-radius,transform]"
             style="display: none;">
 
@@ -146,14 +188,12 @@
                 <div class="flex items-center gap-2">
                     <button @click.stop="toggleFullscreen()"
                         class="text-white/70 hover:text-white transition p-2 hover:bg-white/10 rounded-lg group">
-
                         <svg x-show="!isFullscreen" class="w-4 h-4 transform group-hover:scale-110 transition-transform"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4">
                             </path>
                         </svg>
-
                         <svg x-show="isFullscreen" class="w-4 h-4 transform group-hover:scale-110 transition-transform"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
