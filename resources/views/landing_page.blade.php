@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth" x-data="{
     darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
-    toggleTheme() {
-        this.darkMode = !this.darkMode;
-        localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
-        if (this.darkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
+        toggleTheme() {
+            this.darkMode = !this.darkMode;
+            localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+            if (this.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
         }
-    }
-}"
+    }"
     x-init="$watch('darkMode', val => val ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark'));
     if (darkMode) document.documentElement.classList.add('dark');">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,67 +29,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Custom Scroll Animations */
-        .fade-in-section {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .fade-in-left {
-            opacity: 0;
-            transform: translateX(-50px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .fade-in-right {
-            opacity: 0;
-            transform: translateX(50px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-            will-change: opacity, transform;
-        }
-
-        .is-visible {
-            opacity: 1 !important;
-            transform: none !important;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in-section { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; will-change: opacity, transform; }
+        .fade-in-left { opacity: 0; transform: translateX(-50px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; will-change: opacity, transform; }
+        .fade-in-right { opacity: 0; transform: translateX(50px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; will-change: opacity, transform; }
+        .is-visible { opacity: 1 !important; transform: none !important; }
 
         /* Parallax Blob Animation */
-        @keyframes blob {
-            0% {
-                transform: translate(0px, 0px) scale(1);
-            }
-
-            33% {
-                transform: translate(30px, -50px) scale(1.1);
-            }
-
-            66% {
-                transform: translate(-20px, 20px) scale(0.9);
-            }
-
-            100% {
-                transform: translate(0px, 0px) scale(1);
-            }
-        }
-
-        .animate-blob {
-            animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-            animation-delay: 4s;
-        }
+        @keyframes blob { 0% { transform: translate(0px, 0px) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } 100% { transform: translate(0px, 0px) scale(1); } }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
     </style>
 </head>
 
@@ -113,13 +62,39 @@
                 </div>
                 <div class="hidden md:flex space-x-8 items-center">
                     <a href="#about"
-                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">About</a>
+                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('About') }}</a>
                     <a href="#problem-solution"
-                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">Solutions</a>
+                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Solutions') }}</a>
                     <a href="#features"
-                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">Features</a>
+                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Features') }}</a>
                     <a href="#pricing"
-                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">Pricing</a>
+                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Pricing') }}</a>
+
+                    <!-- Language Switcher -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" type="button"
+                            class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
+                            <span class="sr-only">Switch Language</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                            </svg>
+                        </button>
+                        <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                            role="menu" aria-orientation="vertical" tabindex="-1" style="display: none;">
+                            <a href="{{ route('lang.switch', 'en') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == 'en' ? 'bg-gray-100 dark:bg-gray-700 font-bold' : '' }}"
+                                role="menuitem">English</a>
+                            <a href="{{ route('lang.switch', 'id') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == 'id' ? 'bg-gray-100 dark:bg-gray-700 font-bold' : '' }}"
+                                role="menuitem">Bahasa Indonesia</a>
+                        </div>
+                    </div>
 
                     <!-- Theme Toggle Button -->
                     <button @click="toggleTheme()"
@@ -164,26 +139,45 @@
                                 style="display: none;">
                                 <a href="{{ url('/dashboard') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                    role="menuitem" tabindex="-1" id="user-menu-item-0">Dashboard</a>
+                                    role="menuitem" tabindex="-1" id="user-menu-item-0">{{ __('Dashboard') }}</a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
                                         class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                        role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</button>
+                                        role="menuitem" tabindex="-1" id="user-menu-item-2">{{ __('Sign out') }}</button>
                                 </form>
                             </div>
                         </div>
                     @else
                         <a href="{{ route('login') }}"
-                            class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">Log
-                            in</a>
+                            class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Log in') }}</a>
                         <a href="{{ route('register') }}"
-                            class="bg-indigo-600 text-white px-5 py-2 rounded-full font-medium hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 text-sm">Get
-                            Started</a>
+                            class="bg-indigo-600 text-white px-5 py-2 rounded-full font-medium hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 text-sm">{{ __('Get Started') }}</a>
                     @endauth
                 </div>
                 <!-- Mobile menu button -->
                 <div class="md:hidden flex items-center gap-4">
+                    <!-- Mobile Language Switcher -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" type="button"
+                            class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
+                            <span class="sr-only">Switch Language</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                            </svg>
+                        </button>
+                        <div x-show="open"
+                            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                            role="menu" aria-orientation="vertical" tabindex="-1" style="display: none;">
+                            <a href="{{ route('lang.switch', 'en') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == 'en' ? 'bg-gray-100 dark:bg-gray-700 font-bold' : '' }}"
+                                role="menuitem">English</a>
+                            <a href="{{ route('lang.switch', 'id') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == 'id' ? 'bg-gray-100 dark:bg-gray-700 font-bold' : '' }}"
+                                role="menuitem">Bahasa Indonesia</a>
+                        </div>
+                    </div>
+
                     <!-- Mobile Theme Toggle -->
                     <button @click="toggleTheme()"
                         class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
@@ -219,23 +213,21 @@
             <div
                 class="inline-flex items-center px-4 py-2 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium mb-8 animate-fade-in-up border border-indigo-100 dark:border-indigo-800">
                 <span class="flex h-2 w-2 rounded-full bg-indigo-600 dark:bg-indigo-400 mr-2"></span>
-                New Feature: AI-Powered Analytics
+                {{ __('New Feature: AI-Powered Analytics') }}
             </div>
             <h1
                 class="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-8 leading-tight">
-                Build your dream <br>
+                {{ __('Build your dream') }} <br>
                 <span
-                    class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">with
-                    Amerta</span>
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">{{ __('with Amerta') }}</span>
             </h1>
             <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-600 dark:text-gray-400 mb-10 leading-relaxed">
-                A powerful platform designed to help you achieve your goals faster and more efficiently. Start your
-                journey today with our comprehensive suite of tools.
+                {{ __('A powerful platform designed to help you achieve your goals faster and more efficiently. Start your journey today with our comprehensive suite of tools.') }}
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-4">
                 <a href="{{ route('register') }}"
                     class="px-8 py-4 bg-indigo-600 text-white rounded-full font-semibold text-lg hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-200 dark:shadow-indigo-900/30 transform hover:-translate-y-1 flex items-center justify-center gap-2">
-                    Start Free Trial
+                    {{ __('Start Free Trial') }}
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
@@ -243,7 +235,7 @@
                 </a>
                 <a href="#about"
                     class="px-8 py-4 bg-white dark:bg-gray-800 text-slate-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-full font-semibold text-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:border-gray-300 dark:hover:border-gray-600 flex items-center justify-center gap-2">
-                    Learn More
+                    {{ __('Learn More') }}
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
                         </path>
@@ -295,28 +287,24 @@
                 <div class="fade-in-right">
                     <h2
                         class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase mb-2">
-                        About Amerta</h2>
+                        {{ __('About Amerta') }}</h2>
                     <h3 class="text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl mb-6">
-                        Empowering businesses to reach new heights
+                        {{ __('Empowering businesses to reach new heights') }}
                     </h3>
                     <p class="text-lg text-slate-600 dark:text-gray-400 mb-6 leading-relaxed">
-                        Founded in 2024, Amerta was born from a simple idea: that powerful technology should be
-                        accessible to everyone. We believe in democratizing digital transformation, making
-                        enterprise-grade tools available to startups and growing businesses.
+                        {{ __('Founded in 2025, Amerta was born from a simple idea: that powerful technology should be accessible to everyone. We believe in democratizing digital transformation, making enterprise-grade tools available to startups and growing businesses.') }}
                     </p>
                     <p class="text-lg text-slate-600 dark:text-gray-400 mb-8 leading-relaxed">
-                        Our team of dedicated engineers and designers work tirelessly to create intuitive, robust, and
-                        scalable solutions that grow with you. We are not just a service provider; we are your partner
-                        in success.
+                        {{ __('Our team of dedicated engineers and designers work tirelessly to create intuitive, robust, and scalable solutions that grow with you. We are not just a service provider; we are your partner in success.') }}
                     </p>
                     <div class="grid grid-cols-2 gap-6">
                         <div class="border-l-4 border-indigo-500 pl-4">
-                            <p class="text-3xl font-bold text-slate-900 dark:text-white">500+</p>
-                            <p class="text-sm text-slate-500 dark:text-gray-400">Happy Clients</p>
+                            <p class="text-3xl font-bold text-slate-900 dark:text-white">0</p>
+                            <p class="text-sm text-slate-500 dark:text-gray-400">{{ __('Happy Clients') }}</p>
                         </div>
                         <div class="border-l-4 border-purple-500 pl-4">
                             <p class="text-3xl font-bold text-slate-900 dark:text-white">99.9%</p>
-                            <p class="text-sm text-slate-500 dark:text-gray-400">Uptime Guarantee</p>
+                            <p class="text-sm text-slate-500 dark:text-gray-400">{{ __('Uptime Guarantee') }}</p>
                         </div>
                     </div>
                 </div>
@@ -328,14 +316,13 @@
     <div id="problem-solution" class="py-24 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16 fade-in-section">
-                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">Why
-                    Choose Us</h2>
+                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">{{ __('Why Choose Us') }}</h2>
                 <p
                     class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                    Solving real-world challenges
+                    {{ __('Solving real-world challenges') }}
                 </p>
                 <p class="mt-4 max-w-2xl text-xl text-slate-600 dark:text-gray-400 mx-auto">
-                    We understand the hurdles you face. Here is how Amerta bridges the gap between problems and success.
+                    {{ __('We understand the hurdles you face. Here is how Amerta bridges the gap between problems and success.') }}
                 </p>
             </div>
 
@@ -353,11 +340,10 @@
                                     </path>
                                 </svg>
                             </div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">The Problem</h3>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('The Problem') }}</h3>
                         </div>
                         <p class="text-gray-600 dark:text-gray-300 text-lg">
-                            Managing multiple disconnected tools leads to data silos, inefficiency, and lost
-                            productivity. Teams struggle to stay aligned.
+                            {{ __('Managing multiple disconnected tools leads to data silos, inefficiency, and lost productivity. Teams struggle to stay aligned.') }}
                         </p>
                     </div>
                     <div
@@ -370,11 +356,10 @@
                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">The Solution</h3>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('The Solution') }}</h3>
                         </div>
                         <p class="text-gray-600 dark:text-gray-300 text-lg">
-                            Amerta provides a unified all-in-one platform. Centralize your data, streamline workflows,
-                            and keep your entire team in sync effortlessly.
+                            {{ __('Amerta provides a unified all-in-one platform. Centralize your data, streamline workflows, and keep your entire team in sync effortlessly.') }}
                         </p>
                     </div>
                 </div>
@@ -391,11 +376,10 @@
                                         d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                 </svg>
                             </div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">The Problem</h3>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('The Problem') }}</h3>
                         </div>
                         <p class="text-gray-600 dark:text-gray-300 text-lg">
-                            Slow, clunky interfaces frustrate users and increase churn. Complexity becomes a barrier to
-                            adoption for new employees.
+                            {{ __('Slow, clunky interfaces frustrate users and increase churn. Complexity becomes a barrier to adoption for new employees.') }}
                         </p>
                     </div>
                     <div
@@ -409,11 +393,10 @@
                                     </path>
                                 </svg>
                             </div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">The Solution</h3>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('The Solution') }}</h3>
                         </div>
                         <p class="text-gray-600 dark:text-gray-300 text-lg">
-                            We prioritize User Experience (UX) above all. Our lightning-fast, intuitive interface
-                            ensures high adoption rates and user satisfaction from day one.
+                            {{ __('We prioritize User Experience (UX) above all. Our lightning-fast, intuitive interface ensures high adoption rates and user satisfaction from day one.') }}
                         </p>
                     </div>
                 </div>
@@ -426,17 +409,17 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16 fade-in-section">
                 <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">
-                    Features</h2>
+                    {{ __('Features') }}</h2>
                 <p
                     class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                    Everything you need to succeed
+                    {{ __('Everything you need to succeed') }}
                 </p>
                 <p class="mt-4 max-w-2xl text-xl text-slate-600 dark:text-gray-400 mx-auto">
-                    A comprehensive suite of powerful tools designed to scale with your business.
+                    {{ __('A comprehensive suite of powerful tools designed to scale with your business.') }}
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
                 <!-- Feature 1 -->
                 <div
                     class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section">
@@ -447,10 +430,9 @@
                                 d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Lightning Fast</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Lightning Fast') }}</h3>
                     <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
-                        Optimized for speed and performance, ensuring your users have the best experience possible
-                        without any lag.
+                        {{ __('Optimized for speed and performance, ensuring your users have the best experience possible without any lag.') }}
                     </p>
                 </div>
 
@@ -465,10 +447,9 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Secure by Design</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Secure by Design') }}</h3>
                     <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
-                        Built with security in mind from the ground up. Your data is protected with enterprise-grade
-                        encryption.
+                        {{ __('Built with security in mind from the ground up. Your data is protected with enterprise-grade encryption.') }}
                     </p>
                 </div>
 
@@ -482,9 +463,9 @@
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Easy to Use</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Easy to Use') }}</h3>
                     <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
-                        Intuitive interface that requires no training. Get up and running in minutes, not days.
+                        {{ __('Intuitive interface that requires no training. Get up and running in minutes, not days.') }}
                     </p>
                 </div>
 
@@ -499,9 +480,9 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Analytics</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Analytics') }}</h3>
                     <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
-                        Gain deep insights into your performance with our advanced analytics dashboard.
+                        {{ __('Gain deep insights into your performance with our advanced analytics dashboard.') }}
                     </p>
                 </div>
 
@@ -516,9 +497,9 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Team Collaboration</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Team Collaboration') }}</h3>
                     <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
-                        Built for teams. Share, comment, and collaborate in real-time to get work done faster.
+                        {{ __('Built for teams. Share, comment, and collaborate in real-time to get work done faster.') }}
                     </p>
                 </div>
 
@@ -533,9 +514,9 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">24/7 Support</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('24/7 Support') }}</h3>
                     <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
-                        Our dedicated support team is always available to help you resolve any issues quickly.
+                        {{ __('Our dedicated support team is always available to help you resolve any issues quickly.') }}
                     </p>
                 </div>
             </div>
@@ -546,24 +527,24 @@
     <div id="pricing" class="py-24 bg-gray-50 dark:bg-gray-950 text-slate-900 dark:text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16 fade-in-section">
-                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">Pricing</h2>
+                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">{{ __('Pricing') }}</h2>
                 <p class="mt-2 text-3xl leading-8 font-extrabold text-slate-900 dark:text-white sm:text-4xl">
-                    Simple, transparent pricing
+                    {{ __('Simple, transparent pricing') }}
                 </p>
                 <p class="mt-4 max-w-2xl text-xl text-slate-600 dark:text-gray-400 mx-auto">
-                    Choose the plan that fits your needs. No hidden fees.
+                    {{ __('Choose the plan that fits your needs. No hidden fees.') }}
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Basic Plan -->
                 <div
                     class="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 transition-colors relative fade-in-left">
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Starter</h3>
-                    <p class="text-slate-600 dark:text-gray-400 mb-6">Perfect for individuals and small projects.</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ __('Starter') }}</h3>
+                    <p class="text-slate-600 dark:text-gray-400 mb-6">{{ __('Perfect for individuals and small projects.') }}</p>
                     <div class="flex items-baseline mb-8">
                         <span class="text-4xl font-extrabold text-slate-900 dark:text-white">Rp. 1.000.000</span>
-                        <span class="text-slate-500 dark:text-gray-400 ml-2">/month</span>
+                        <span class="text-slate-500 dark:text-gray-400 ml-2">{{ __('/month') }}</span>
                     </div>
                     <ul class="space-y-4 mb-8 text-slate-600 dark:text-gray-300">
                         <li class="flex items-center">
@@ -572,7 +553,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
-                            5 Projects
+                            {{ __('5 Projects') }}
                         </li>
                         <li class="flex items-center">
                             <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
@@ -580,7 +561,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
-                            Basic Analytics
+                            {{ __('Basic Analytics') }}
                         </li>
                         <li class="flex items-center">
                             <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
@@ -588,12 +569,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
-                            Email Support
+                            {{ __('Email Support') }}
                         </li>
                     </ul>
                     <a href="{{ route('register') }}"
-                        class="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-slate-900 dark:text-white font-medium rounded-lg text-center transition-colors">Get
-                        Started</a>
+                        class="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-slate-900 dark:text-white font-medium rounded-lg text-center transition-colors">{{ __('Get Started') }}</a>
                 </div>
 
                 <!-- Pro Plan -->
@@ -602,11 +582,11 @@
                     <div
                         class="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase tracking-wider">
                         Popular</div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Professional</h3>
-                    <p class="text-indigo-600 dark:text-indigo-200 mb-6">For growing teams and businesses.</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ __('Professional') }}</h3>
+                    <p class="text-indigo-600 dark:text-indigo-200 mb-6">{{ __('For growing teams and businesses.') }}</p>
                     <div class="flex items-baseline mb-8">
                         <span class="text-4xl font-extrabold text-slate-900 dark:text-white">Rp.2.000.000</span>
-                        <span class="text-indigo-600 dark:text-indigo-200 ml-2">/month</span>
+                        <span class="text-indigo-600 dark:text-indigo-200 ml-2">{{ __('/month') }}</span>
                     </div>
                     <ul class="space-y-4 mb-8 text-indigo-700 dark:text-indigo-100">
                         <li class="flex items-center">
@@ -615,7 +595,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
-                            Unlimited Projects
+                            {{ __('Unlimited Projects') }}
                         </li>
                         <li class="flex items-center">
                             <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
@@ -623,7 +603,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
-                            Advanced Analytics
+                            {{ __('Advanced Analytics') }}
                         </li>
                         <li class="flex items-center">
                             <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
@@ -631,7 +611,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
-                            Priority Support
+                            {{ __('Priority Support') }}
                         </li>
                         <li class="flex items-center">
                             <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
@@ -639,21 +619,20 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
-                            Team Collaboration
+                            {{ __('Team Collaboration') }}
                         </li>
                     </ul>
                     <a href="{{ route('register') }}"
-                        class="block w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-center transition-colors shadow-lg">Get
-                        Started</a>
+                        class="block w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-center transition-colors shadow-lg">{{ __('Get Started') }}</a>
                 </div>
 
                 <!-- Enterprise Plan -->
                 <div
                     class="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 transition-colors relative fade-in-right">
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Enterprise</h3>
-                    <p class="text-slate-600 dark:text-gray-400 mb-6">Custom solutions for large organizations.</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ __('Enterprise') }}</h3>
+                    <p class="text-slate-600 dark:text-gray-400 mb-6">{{ __('Custom solutions for large organizations.') }}</p>
                     <div class="flex items-baseline mb-8">
-                        <span class="text-4xl font-extrabold text-slate-900 dark:text-white">Custom</span>
+                        <span class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ __('Custom') }}</span>
                     </div>
                     <ul class="space-y-4 mb-8 text-slate-600 dark:text-gray-300">
                         <li class="flex items-center">
@@ -662,7 +641,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
-                            Dedicated Infrastructure
+                            {{ __('Dedicated Infrastructure') }}
                         </li>
                         <li class="flex items-center">
                             <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
@@ -670,7 +649,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
-                            Custom Integrations
+                            {{ __('Custom Integrations') }}
                         </li>
                         <li class="flex items-center">
                             <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
@@ -678,12 +657,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
-                            24/7 Dedicated Support
+                            {{ __('24/7 Dedicated Support') }}
                         </li>
                     </ul>
                     <a href="#"
-                        class="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-slate-900 dark:text-white font-medium rounded-lg text-center transition-colors">Contact
-                        Sales</a>
+                        class="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-slate-900 dark:text-white font-medium rounded-lg text-center transition-colors">{{ __('Contact Sales') }}</a>
                 </div>
             </div>
         </div>
@@ -694,15 +672,14 @@
         <div class="absolute inset-0 bg-pattern opacity-10"></div>
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <h2 class="text-3xl font-extrabold text-white sm:text-4xl mb-6">
-                Ready to transform your business?
+                {{ __('Ready to transform your business?') }}
             </h2>
             <p class="text-xl text-indigo-100 mb-10">
-                Join thousands of satisfied users who have transformed their workflow with Amerta. Start your 14-day
-                free trial today.
+                {{ __('Join thousands of satisfied users who have transformed their workflow with Amerta. Start your 14-day free trial today.') }}
             </p>
             <a href="{{ route('register') }}"
                 class="inline-block bg-white text-indigo-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-indigo-50 transition-colors shadow-xl">
-                Create Free Account
+                {{ __('Create Free Account') }}
             </a>
         </div>
     </div>
@@ -722,32 +699,32 @@
                     </p>
                 </div>
                 <div>
-                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">Product</h3>
+                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Product') }}</h3>
                     <ul class="space-y-3">
-                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">Features</a>
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">{{ __('Features') }}</a>
                         </li>
-                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">Pricing</a>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">{{ __('Pricing') }}</a>
                         </li>
                         <li><a href="#"
-                                class="text-gray-400 hover:text-white transition-colors">Integrations</a></li>
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Integrations') }}</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">Company</h3>
+                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Company') }}</h3>
                     <ul class="space-y-3">
-                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">About</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Careers</a>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">{{ __('About') }}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ __('Blog') }}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ __('Careers') }}</a>
                         </li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">Legal</h3>
+                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Legal') }}</h3>
                     <ul class="space-y-3">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy</a>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ __('Privacy') }}</a>
                         </li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Security</a>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ __('Terms') }}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ __('Security') }}</a>
                         </li>
                     </ul>
                 </div>
