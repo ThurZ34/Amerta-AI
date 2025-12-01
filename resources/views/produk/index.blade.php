@@ -7,7 +7,13 @@
         deleteModalOpen: false,
         selectedProduk: null,
         search: '',
-    
+
+        // TAMBAHKAN FUNGSI INI
+        openCreateModal() {
+            this.selectedProduk = null; // <--- INI KUNCINYA (Reset Data)
+            this.createModalOpen = true;
+        },
+
         openEditModal(produk) {
             this.selectedProduk = produk;
             this.editModalOpen = true;
@@ -16,7 +22,6 @@
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
         },
-        // Logika sederhana untuk filter frontend
         filterProduk() {
             return document.querySelectorAll('.product-card');
         }
@@ -45,7 +50,7 @@
                             class="pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full transition-all shadow-sm">
                     </div>
 
-                    <button @click="createModalOpen = true"
+                    <button @click="openCreateModal()"
                         class="inline-flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-sm hover:shadow transition-all active:scale-95 text-sm whitespace-nowrap">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -216,7 +221,7 @@
                             class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white"
                                 x-text="editModalOpen ? 'Edit Produk' : 'Tambah Produk Baru'"></h3>
-                            <button type="button" @click="createModalOpen = false; editModalOpen = false"
+                            <button type="button" @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
                                 class="text-gray-400 hover:text-gray-500 transition-colors">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -303,7 +308,7 @@
                                 class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
                                 <span x-text="editModalOpen ? 'Simpan Perubahan' : 'Simpan Produk'"></span>
                             </button>
-                            <button type="button" @click="createModalOpen = false; editModalOpen = false"
+                            <button type="button" @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
                                 class="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-5 py-2.5 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
                                 Batal
                             </button>
