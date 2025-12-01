@@ -94,10 +94,10 @@
     </style>
 </head>
 
-<body class="antialiased bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+<body class="antialiased bg-gray-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100 transition-colors duration-300">
 
     <!-- Navigation -->
-    <nav class="fixed w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 transition-all duration-300"
+    <nav class="fixed w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-all duration-300"
         x-data="{ scrolled: false }"
         :class="{ 'bg-white/90 dark:bg-gray-900/90 shadow-sm': scrolled, 'bg-white/80 dark:bg-gray-900/80': !scrolled }"
         @scroll.window="scrolled = (window.pageYOffset > 20)">
@@ -140,12 +140,47 @@
                         </svg>
                     </button>
 
-                    <a href="{{ route('login') }}"
-                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">Log
-                        in</a>
-                    <a href="{{ route('register') }}"
-                        class="bg-indigo-600 text-white px-5 py-2 rounded-full font-medium hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 text-sm">Get
-                        Started</a>
+                    @auth
+                        <!-- Profile Dropdown -->
+                        <div class="relative ml-3" x-data="{ open: false }">
+                            <div>
+                                <button @click="open = !open" @click.away="open = false" type="button"
+                                    class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                    <span class="sr-only">Open user menu</span>
+                                    <img class="h-8 w-8 rounded-full"
+                                        src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&color=7F9CF5&background=EBF4FF"
+                                        alt="{{ Auth::user()->name }}">
+                                </button>
+                            </div>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1"
+                                style="display: none;">
+                                <a href="{{ url('/dashboard') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    role="menuitem" tabindex="-1" id="user-menu-item-0">Dashboard</a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</button>
+                                </form>
+                            </div>
+                        </div>
+                    @else
+                        <a href="{{ route('login') }}"
+                            class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">Log
+                            in</a>
+                        <a href="{{ route('register') }}"
+                            class="bg-indigo-600 text-white px-5 py-2 rounded-full font-medium hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 text-sm">Get
+                            Started</a>
+                    @endauth
                 </div>
                 <!-- Mobile menu button -->
                 <div class="md:hidden flex items-center gap-4">
@@ -187,13 +222,13 @@
                 New Feature: AI-Powered Analytics
             </div>
             <h1
-                class="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-8 leading-tight">
+                class="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-8 leading-tight">
                 Build your dream <br>
                 <span
                     class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">with
                     Amerta</span>
             </h1>
-            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400 mb-10 leading-relaxed">
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-600 dark:text-gray-400 mb-10 leading-relaxed">
                 A powerful platform designed to help you achieve your goals faster and more efficiently. Start your
                 journey today with our comprehensive suite of tools.
             </p>
@@ -207,7 +242,7 @@
                     </svg>
                 </a>
                 <a href="#about"
-                    class="px-8 py-4 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-full font-semibold text-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:border-gray-300 dark:hover:border-gray-600 flex items-center justify-center gap-2">
+                    class="px-8 py-4 bg-white dark:bg-gray-800 text-slate-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-full font-semibold text-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:border-gray-300 dark:hover:border-gray-600 flex items-center justify-center gap-2">
                     Learn More
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
@@ -218,7 +253,7 @@
 
             <!-- Hero Image Placeholder -->
             <div
-                class="mt-16 relative mx-auto max-w-5xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-gray-100 dark:bg-gray-800 aspect-video flex items-center justify-center group fade-in-section">
+                class="mt-16 relative mx-auto max-w-5xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-800 aspect-video flex items-center justify-center group fade-in-section">
                 <div class="absolute inset-0 bg-gradient-to-t from-gray-900/10 to-transparent pointer-events-none">
                 </div>
                 <p
@@ -253,7 +288,7 @@
                         class="absolute -bottom-4 -right-4 w-32 h-32 bg-purple-100 dark:bg-purple-900/30 rounded-full z-0">
                     </div>
                     <div
-                        class="relative z-10 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 aspect-square flex items-center justify-center">
+                        class="relative z-10 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 aspect-square flex items-center justify-center">
                         <p class="text-gray-400 dark:text-gray-600 font-medium">About Us Image</p>
                     </div>
                 </div>
@@ -261,27 +296,27 @@
                     <h2
                         class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase mb-2">
                         About Amerta</h2>
-                    <h3 class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl mb-6">
+                    <h3 class="text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl mb-6">
                         Empowering businesses to reach new heights
                     </h3>
-                    <p class="text-lg text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
+                    <p class="text-lg text-slate-600 dark:text-gray-400 mb-6 leading-relaxed">
                         Founded in 2024, Amerta was born from a simple idea: that powerful technology should be
                         accessible to everyone. We believe in democratizing digital transformation, making
                         enterprise-grade tools available to startups and growing businesses.
                     </p>
-                    <p class="text-lg text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+                    <p class="text-lg text-slate-600 dark:text-gray-400 mb-8 leading-relaxed">
                         Our team of dedicated engineers and designers work tirelessly to create intuitive, robust, and
                         scalable solutions that grow with you. We are not just a service provider; we are your partner
                         in success.
                     </p>
                     <div class="grid grid-cols-2 gap-6">
                         <div class="border-l-4 border-indigo-500 pl-4">
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white">500+</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Happy Clients</p>
+                            <p class="text-3xl font-bold text-slate-900 dark:text-white">500+</p>
+                            <p class="text-sm text-slate-500 dark:text-gray-400">Happy Clients</p>
                         </div>
                         <div class="border-l-4 border-purple-500 pl-4">
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white">99.9%</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Uptime Guarantee</p>
+                            <p class="text-3xl font-bold text-slate-900 dark:text-white">99.9%</p>
+                            <p class="text-sm text-slate-500 dark:text-gray-400">Uptime Guarantee</p>
                         </div>
                     </div>
                 </div>
@@ -296,10 +331,10 @@
                 <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">Why
                     Choose Us</h2>
                 <p
-                    class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+                    class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
                     Solving real-world challenges
                 </p>
-                <p class="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-400 mx-auto">
+                <p class="mt-4 max-w-2xl text-xl text-slate-600 dark:text-gray-400 mx-auto">
                     We understand the hurdles you face. Here is how Amerta bridges the gap between problems and success.
                 </p>
             </div>
@@ -307,7 +342,7 @@
             <div class="space-y-12">
                 <!-- Problem/Solution 1 -->
                 <div
-                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden lg:grid lg:grid-cols-2 transform hover:scale-[1.01] transition-transform duration-300 fade-in-left">
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden lg:grid lg:grid-cols-2 transform hover:scale-[1.01] transition-transform duration-300 fade-in-left">
                     <div class="p-8 lg:p-12 flex flex-col justify-center bg-red-50/50 dark:bg-red-900/10">
                         <div class="flex items-center gap-3 mb-4">
                             <div
@@ -326,7 +361,7 @@
                         </p>
                     </div>
                     <div
-                        class="p-8 lg:p-12 flex flex-col justify-center bg-green-50/50 dark:bg-green-900/10 border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-gray-700">
+                        class="p-8 lg:p-12 flex flex-col justify-center bg-green-50/50 dark:bg-green-900/10 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-700">
                         <div class="flex items-center gap-3 mb-4">
                             <div
                                 class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
@@ -346,7 +381,7 @@
 
                 <!-- Problem/Solution 2 -->
                 <div
-                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden lg:grid lg:grid-cols-2 transform hover:scale-[1.01] transition-transform duration-300 fade-in-right">
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden lg:grid lg:grid-cols-2 transform hover:scale-[1.01] transition-transform duration-300 fade-in-right">
                     <div class="p-8 lg:p-12 flex flex-col justify-center bg-red-50/50 dark:bg-red-900/10">
                         <div class="flex items-center gap-3 mb-4">
                             <div
@@ -364,7 +399,7 @@
                         </p>
                     </div>
                     <div
-                        class="p-8 lg:p-12 flex flex-col justify-center bg-green-50/50 dark:bg-green-900/10 border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-gray-700">
+                        class="p-8 lg:p-12 flex flex-col justify-center bg-green-50/50 dark:bg-green-900/10 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-700">
                         <div class="flex items-center gap-3 mb-4">
                             <div
                                 class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
@@ -393,10 +428,10 @@
                 <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">
                     Features</h2>
                 <p
-                    class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+                    class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
                     Everything you need to succeed
                 </p>
-                <p class="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-400 mx-auto">
+                <p class="mt-4 max-w-2xl text-xl text-slate-600 dark:text-gray-400 mx-auto">
                     A comprehensive suite of powerful tools designed to scale with your business.
                 </p>
             </div>
@@ -404,7 +439,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
                 <!-- Feature 1 -->
                 <div
-                    class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:-translate-y-1 fade-in-section">
+                    class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section">
                     <div
                         class="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center mb-6 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -412,15 +447,15 @@
                                 d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Lightning Fast</h3>
-                    <p class="text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Lightning Fast</h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
                         Optimized for speed and performance, ensuring your users have the best experience possible
                         without any lag.
                     </p>
                 </div>
 
                 <!-- Feature 2 -->
-                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
+                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
                     style="transition-delay: 100ms;">
                     <div
                         class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center mb-6 text-purple-600 dark:text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors">
@@ -430,15 +465,15 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Secure by Design</h3>
-                    <p class="text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Secure by Design</h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
                         Built with security in mind from the ground up. Your data is protected with enterprise-grade
                         encryption.
                     </p>
                 </div>
 
                 <!-- Feature 3 -->
-                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
+                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
                     style="transition-delay: 200ms;">
                     <div
                         class="w-14 h-14 bg-pink-100 dark:bg-pink-900/30 rounded-2xl flex items-center justify-center mb-6 text-pink-600 dark:text-pink-400 group-hover:bg-pink-600 group-hover:text-white transition-colors">
@@ -447,15 +482,15 @@
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Easy to Use</h3>
-                    <p class="text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Easy to Use</h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
                         Intuitive interface that requires no training. Get up and running in minutes, not days.
                     </p>
                 </div>
 
                 <!-- Feature 4 -->
                 <div
-                    class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:-translate-y-1 fade-in-section">
+                    class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section">
                     <div
                         class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-6 text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -464,14 +499,14 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Analytics</h3>
-                    <p class="text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Analytics</h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
                         Gain deep insights into your performance with our advanced analytics dashboard.
                     </p>
                 </div>
 
                 <!-- Feature 5 -->
-                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
+                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
                     style="transition-delay: 100ms;">
                     <div
                         class="w-14 h-14 bg-orange-100 dark:bg-orange-900/30 rounded-2xl flex items-center justify-center mb-6 text-orange-600 dark:text-orange-400 group-hover:bg-orange-600 group-hover:text-white transition-colors">
@@ -481,14 +516,14 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Team Collaboration</h3>
-                    <p class="text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Team Collaboration</h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
                         Built for teams. Share, comment, and collaborate in real-time to get work done faster.
                     </p>
                 </div>
 
                 <!-- Feature 6 -->
-                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
+                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
                     style="transition-delay: 200ms;">
                     <div
                         class="w-14 h-14 bg-teal-100 dark:bg-teal-900/30 rounded-2xl flex items-center justify-center mb-6 text-teal-600 dark:text-teal-400 group-hover:bg-teal-600 group-hover:text-white transition-colors">
@@ -498,8 +533,8 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">24/7 Support</h3>
-                    <p class="text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">24/7 Support</h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
                         Our dedicated support team is always available to help you resolve any issues quickly.
                     </p>
                 </div>
@@ -508,14 +543,14 @@
     </div>
 
     <!-- 5. Pricing Section -->
-    <div id="pricing" class="py-24 bg-gray-900 dark:bg-gray-950 text-white">
+    <div id="pricing" class="py-24 bg-gray-50 dark:bg-gray-950 text-slate-900 dark:text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16 fade-in-section">
-                <h2 class="text-base text-indigo-400 font-semibold tracking-wide uppercase">Pricing</h2>
-                <p class="mt-2 text-3xl leading-8 font-extrabold text-white sm:text-4xl">
+                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">Pricing</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold text-slate-900 dark:text-white sm:text-4xl">
                     Simple, transparent pricing
                 </p>
-                <p class="mt-4 max-w-2xl text-xl text-gray-400 mx-auto">
+                <p class="mt-4 max-w-2xl text-xl text-slate-600 dark:text-gray-400 mx-auto">
                     Choose the plan that fits your needs. No hidden fees.
                 </p>
             </div>
@@ -523,16 +558,16 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Basic Plan -->
                 <div
-                    class="bg-gray-800 dark:bg-gray-900 rounded-2xl p-8 border border-gray-700 hover:border-indigo-500 transition-colors relative fade-in-left">
-                    <h3 class="text-xl font-bold text-white mb-4">Starter</h3>
-                    <p class="text-gray-400 mb-6">Perfect for individuals and small projects.</p>
+                    class="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 transition-colors relative fade-in-left">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Starter</h3>
+                    <p class="text-slate-600 dark:text-gray-400 mb-6">Perfect for individuals and small projects.</p>
                     <div class="flex items-baseline mb-8">
-                        <span class="text-4xl font-extrabold text-white">Rp. 1.000.000</span>
-                        <span class="text-gray-400 ml-2">/month</span>
+                        <span class="text-4xl font-extrabold text-slate-900 dark:text-white">Rp. 1.000.000</span>
+                        <span class="text-slate-500 dark:text-gray-400 ml-2">/month</span>
                     </div>
-                    <ul class="space-y-4 mb-8 text-gray-300">
+                    <ul class="space-y-4 mb-8 text-slate-600 dark:text-gray-300">
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -540,7 +575,7 @@
                             5 Projects
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -548,7 +583,7 @@
                             Basic Analytics
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -557,25 +592,25 @@
                         </li>
                     </ul>
                     <a href="{{ route('register') }}"
-                        class="block w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg text-center transition-colors">Get
+                        class="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-slate-900 dark:text-white font-medium rounded-lg text-center transition-colors">Get
                         Started</a>
                 </div>
 
                 <!-- Pro Plan -->
-                <div class="bg-indigo-900/50 dark:bg-indigo-900/30 rounded-2xl p-8 border-2 border-indigo-500 relative transform md:-translate-y-4 shadow-2xl fade-in-section"
+                <div class="bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl p-8 border-2 border-indigo-500 relative transform md:-translate-y-4 shadow-2xl fade-in-section"
                     style="transition-delay: 100ms;">
                     <div
                         class="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase tracking-wider">
                         Popular</div>
-                    <h3 class="text-xl font-bold text-white mb-4">Professional</h3>
-                    <p class="text-indigo-200 mb-6">For growing teams and businesses.</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Professional</h3>
+                    <p class="text-indigo-600 dark:text-indigo-200 mb-6">For growing teams and businesses.</p>
                     <div class="flex items-baseline mb-8">
-                        <span class="text-4xl font-extrabold text-white">Rp. 2.000.000</span>
-                        <span class="text-indigo-200 ml-2">/month</span>
+                        <span class="text-4xl font-extrabold text-slate-900 dark:text-white">Rp.2.000.000</span>
+                        <span class="text-indigo-600 dark:text-indigo-200 ml-2">/month</span>
                     </div>
-                    <ul class="space-y-4 mb-8 text-indigo-100">
+                    <ul class="space-y-4 mb-8 text-indigo-700 dark:text-indigo-100">
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-indigo-300 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -583,7 +618,7 @@
                             Unlimited Projects
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-indigo-300 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -591,7 +626,7 @@
                             Advanced Analytics
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-indigo-300 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -599,7 +634,7 @@
                             Priority Support
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-indigo-300 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -614,15 +649,15 @@
 
                 <!-- Enterprise Plan -->
                 <div
-                    class="bg-gray-800 dark:bg-gray-900 rounded-2xl p-8 border border-gray-700 hover:border-indigo-500 transition-colors relative fade-in-right">
-                    <h3 class="text-xl font-bold text-white mb-4">Enterprise</h3>
-                    <p class="text-gray-400 mb-6">Custom solutions for large organizations.</p>
+                    class="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 transition-colors relative fade-in-right">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Enterprise</h3>
+                    <p class="text-slate-600 dark:text-gray-400 mb-6">Custom solutions for large organizations.</p>
                     <div class="flex items-baseline mb-8">
-                        <span class="text-4xl font-extrabold text-white">Custom</span>
+                        <span class="text-4xl font-extrabold text-slate-900 dark:text-white">Custom</span>
                     </div>
-                    <ul class="space-y-4 mb-8 text-gray-300">
+                    <ul class="space-y-4 mb-8 text-slate-600 dark:text-gray-300">
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -630,7 +665,7 @@
                             Dedicated Infrastructure
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -638,7 +673,7 @@
                             Custom Integrations
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -647,7 +682,7 @@
                         </li>
                     </ul>
                     <a href="#"
-                        class="block w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg text-center transition-colors">Contact
+                        class="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-slate-900 dark:text-white font-medium rounded-lg text-center transition-colors">Contact
                         Sales</a>
                 </div>
             </div>
