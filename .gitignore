@@ -18,7 +18,6 @@ Homestead.yaml
 
 docker-compose.yml
 Dockerfile
-vite.config.js
 docker/nginx/default.conf
 
 .DS_Store

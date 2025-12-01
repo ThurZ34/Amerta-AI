@@ -52,7 +52,7 @@ class DashboardChat extends Component
         // Load semua history punya user ini
         $chats = ChatHistory::where('user_id', Auth::id())->get();
 
-        return view('livewire.dashboard-chat', [
+        return view('livewire.chatbot', [
             'chats' => $chats
         ]);
     }

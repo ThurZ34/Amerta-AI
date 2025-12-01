@@ -52,7 +52,7 @@
         @scroll.window="scrolled = (window.pageYOffset > 20)">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <div class="flex-shrink-0 flex items-center">
+                <div class="shrink-0 flex items-center">
                     <a href="#"
                         class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight flex items-center gap-2">
                         <span
@@ -219,7 +219,8 @@
                 class="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-8 leading-tight">
                 {{ __('Build your dream') }} <br>
                 <span
-                    class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">{{ __('with Amerta') }}</span>
+                    class="text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">with
+                    Amerta</span>
             </h1>
             <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-600 dark:text-gray-400 mb-10 leading-relaxed">
                 {{ __('A powerful platform designed to help you achieve your goals faster and more efficiently. Start your journey today with our comprehensive suite of tools.') }}
@@ -245,8 +246,8 @@
 
             <!-- Hero Image Placeholder -->
             <div
-                class="mt-16 relative mx-auto max-w-5xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-800 aspect-video flex items-center justify-center group fade-in-section">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-900/10 to-transparent pointer-events-none">
+                class="mt-16 relative mx-auto max-w-5xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-gray-100 dark:bg-gray-800 aspect-video flex items-center justify-center group fade-in-section">
+                <div class="absolute inset-0 bg-linear-to-t from-gray-900/10 to-transparent pointer-events-none">
                 </div>
                 <p
                     class="text-gray-400 dark:text-gray-500 font-medium text-lg group-hover:scale-105 transition-transform duration-300">
