@@ -7,6 +7,12 @@ use App\Http\Controllers\SurveyController;
 Route::get('/', function () {
     return view('landing_page');
 });
+Route::get('lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'id'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/setup-bisnis', [SurveyController::class, 'index'])->name('setup-bisnis');
