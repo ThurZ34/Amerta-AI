@@ -14,5 +14,6 @@ class produk extends Model
         'harga_jual',
         'inventori',
         'jenis_produk',
+        'gambar',
     ];
 }

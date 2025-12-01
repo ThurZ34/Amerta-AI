@@ -47,6 +47,9 @@
                                         No
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        {{ __('Gambar') }}
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         {{ __('Nama Produk') }}
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -71,6 +74,13 @@
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                             {{ $index + 1 }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                            @if($produk->gambar)
+                                                <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}" class="h-16 w-16 object-cover rounded">
+                                            @else
+                                                <span class="text-gray-400">No image</span>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                             {{ $produk->nama_produk }}
@@ -118,13 +128,17 @@
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
                 <div x-show="createModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative z-10 inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                    <form action="{{ route('produk.store') }}" method="POST">
+                        <form action="{{ route('produk.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
                                 {{ __('Add New Product') }}
                             </h3>
                             <div class="mt-4 space-y-4">
+                                <div>
+                                    <label for="gambar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Gambar') }}</label>
+                                    <input type="file" name="gambar" id="gambar" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                                </div>
                                 <div>
                                     <label for="nama_produk" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Nama Produk') }}</label>
                                     <input type="text" name="nama_produk" id="nama_produk" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
@@ -168,7 +182,7 @@
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
                 <div x-show="editModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative z-10 inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                    <form x-bind:action="'/produk/' + selectedProduk?.id" method="POST">
+                    <form x-bind:action="'/produk/' + selectedProduk?.id" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -176,6 +190,10 @@
                                 {{ __('Edit Product') }}
                             </h3>
                             <div class="mt-4 space-y-4">
+                                <div>
+                                    <label for="edit_gambar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Gambar') }}</label>
+                                    <input type="file" name="gambar" id="edit_gambar" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                                </div>  
                                 <div>
                                     <label for="edit_nama_produk" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Nama Produk') }}</label>
                                     <input type="text" name="nama_produk" id="edit_nama_produk" x-model="selectedProduk?.nama_produk" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
