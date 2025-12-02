@@ -12,8 +12,6 @@ class DailySale extends Model
     protected $fillable = [
         'business_id',
         'date',
-        'total_revenue',
-        'total_profit',
         'ai_analysis',
     ];
 
@@ -29,5 +27,22 @@ class DailySale extends Model
     public function items()
     {
         return $this->hasMany(DailySaleItem::class);
+    }
+    public function getTotalRevenueAttribute()
+    {
+        return CashJournal::inflows()
+            ->whereDate('transaction_date', $this->date)
+            ->sum('amount');
+    }
+
+    public function getTotalExpenseAttribute()
+    {
+        return CashJournal::outflows()
+            ->whereDate('transaction_date', $this->date)
+            ->sum('amount');
+    }
+    public function getTotalProfitAttribute()
+    {
+        return $this->getTotalRevenueAttribute() - $this->getTotalExpenseAttribute();
     }
 }

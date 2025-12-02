@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DailyCheckinController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpenseController;
+use App\Livewire\Dashboard;
 
 Route::get('/', function () {
     return view('landing_page');
@@ -17,7 +20,6 @@ Route::get('lang/{locale}', function ($locale) {
 })->name('lang.switch');
 
 Route::middleware(['auth'])->group(function () {
-    // Rute Setup Bisnis (Harus di luar ensure.business.complete agar tidak infinite loop)
     Route::get('/setup-bisnis', [SurveyController::class, 'index'])->name('setup-bisnis');
     Route::post('/setup-bisnis', [SurveyController::class, 'store'])->name('setup-bisnis.store');
 
@@ -25,6 +27,8 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/daily-checkin/create', [DailyCheckinController::class, 'create'])->name('daily-checkin.create');
 Route::post('/daily-checkin', [DailyCheckinController::class, 'store'])->name('daily-checkin.store');
 Route::get('/daily-checkin/{id}', [DailyCheckinController::class, 'show'])->name('daily-checkin.show');
+Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
+Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
 
     Route::middleware(['ensure.business.complete'])->group(function () {
 
@@ -32,9 +36,7 @@ Route::get('/daily-checkin/{id}', [DailyCheckinController::class, 'show'])->name
             return view('amerta');
         })->name('amerta');
 
-        Route::get('/dashboard', function () {
-            return view('dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
         Route::post('/produk/suggest-price', [ProdukController::class, 'suggestPrice'])->name('produk.suggest-price');
         Route::resource('produk', ProdukController::class);
