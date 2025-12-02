@@ -160,13 +160,13 @@
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex flex-col pointer-events-auto origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] will-change-[width,height,border-radius,transform]"
             style="display: none;">
 
-<<<<<<< HEAD
-            <div @mousedown="startDrag($event)"
-                class="h-14 bg-indigo-600 flex items-center justify-between px-4 shrink-0 cursor-move select-none"
-                :class="isFullscreen ? '' : 'rounded-t-2xl'">
+            <div @mousedown="startDrag($event)" @dblclick="toggleFullscreen()"
+                class="h-14 bg-indigo-600 flex items-center justify-between px-4 shrink-0 select-none transition-all duration-300"
+                :class="isFullscreen ? 'cursor-default' : 'cursor-move rounded-t-2xl'">
 
                 <div class="flex items-center gap-3">
                     <div
+                        class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xs pointer-events-none">
                         AI
                     </div>
                     <div>
@@ -204,11 +204,7 @@
                 </div>
             </div>
 
-<<<<<<< HEAD
-            <div class="flex-1 relative overflow-hidden flex flex-col">
-=======
             <div class="flex-1 relative overflow-hidden flex flex-col bg-gray-50 dark:bg-gray-900">
->>>>>>> origin/farrel
                 @livewire('dashboard-chat')
             </div>
 
@@ -220,19 +216,6 @@
             </div>
         </div>
 
-<<<<<<< HEAD
-        <button @click="chatOpen = !chatOpen" x-show="!isFullscreen"
-            class="absolute bottom-0 right-0 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 active:scale-95 group z-50">
-            <span x-show="!chatOpen" class="text-xl font-bold">AI</span>
-            <svg x-show="chatOpen" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                style="display: none;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-
-            <span
-                class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white dark:border-gray-900"></span>
-        </button>
-=======
         <div class="absolute bottom-6 right-6 pointer-events-auto" x-show="!isFullscreen">
             <button @click="chatOpen = !chatOpen"
                 class="w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group z-50 relative">
@@ -250,7 +233,6 @@
             </button>
         </div>
 
->>>>>>> origin/farrel
     </div>
 
     <style>
