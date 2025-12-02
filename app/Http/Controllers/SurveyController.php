@@ -12,6 +12,11 @@ class SurveyController extends Controller
 {
     public function index()
     {
+        // Jika user sudah punya bisnis, redirect ke dashboard
+        if (Auth::user()->business()->exists()) {
+            return redirect()->route('dashboard');
+        }
+
         return view('setup-bisnis');
     }
 
