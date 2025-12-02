@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-@section('header', 'Katalog Produk')
+@section('header', 'Manajemen Produk')
 
 @section('content')
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8" x-data="{
+    <div class="py-8 w-full" x-data="{
         createModalOpen: {{ $errors->any() && !session('success') ? 'true' : 'false' }},
         editModalOpen: false,
         deleteModalOpen: false,
@@ -19,7 +19,7 @@
         aiReason: '',
         aiError: '',
 
-        // Fungsi Reset Form (Membersihkan Data & Preview & AI)
+        // Fungsi Reset Form
         resetForm() {
             this.selectedProduk = {
                 id: null,
@@ -33,7 +33,6 @@
             this.aiReason = '';
             this.aiError = '';
 
-            // Reset input file native
             if (document.getElementById('fileInput')) {
                 document.getElementById('fileInput').value = '';
             }
@@ -44,7 +43,6 @@
             this.aiError = '';
             this.aiReason = '';
 
-            // Validasi Input
             if (!this.selectedProduk.nama_produk || !this.selectedProduk.modal || !this.selectedProduk.jenis_produk) {
                 this.aiError = 'Mohon isi Nama Produk, Modal, dan Jenis Produk terlebih dahulu.';
                 return;
@@ -53,6 +51,7 @@
             this.suggestingPrice = true;
 
             try {
+                // Pastikan route ini ada di web.php
                 const response = await fetch('{{ route('produk.suggest-price') }}', {
                     method: 'POST',
                     headers: {
@@ -82,7 +81,7 @@
             }
         },
 
-        // Fungsi Handle File Upload (Preview Gambar)
+        // Fungsi Handle File Upload
         fileChosen(event) {
             const file = event.target.files[0];
             if (file) {
@@ -96,16 +95,12 @@
         },
 
         openEditModal(produk) {
-            // Deep copy object
             this.selectedProduk = JSON.parse(JSON.stringify(produk));
-
-            // Set Preview Gambar jika ada
             if (produk.gambar) {
                 this.imagePreview = '/storage/' + produk.gambar;
             } else {
                 this.imagePreview = null;
             }
-
             this.editModalOpen = true;
         },
 
@@ -124,12 +119,10 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <!-- Header Section -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Katalog Produk</h2>
-                    <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Kelola produk dan harga untuk laporan harian.
-                    </p>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Kelola produk dan harga untuk laporan harian.</p>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -142,7 +135,7 @@
                             </svg>
                         </div>
                         <input type="text" x-model="search" placeholder="Cari produk..."
-                            class="pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full transition-all shadow-sm">
+                            class="pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full transition-all shadow-sm text-gray-900 dark:text-gray-100">
                     </div>
 
                     <button @click="openCreateModal()"
@@ -174,7 +167,7 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
                 @forelse ($produks as $produk)
                     @php
                         $profit = $produk->harga_jual - $produk->modal;
@@ -208,7 +201,6 @@
                                 </span>
                             </div>
 
-                            <!-- Action Buttons (Hover) -->
                             <div
                                 class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
                                 <button @click='openEditModal(@json($produk))'
@@ -286,7 +278,6 @@
             </div>
         </div>
 
-        <!-- Modal Form (Create/Edit) -->
         <div x-show="createModalOpen || editModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;"
             x-cloak>
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -295,7 +286,7 @@
                     x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0"
                     class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-sm"
-                    @click="createModalOpen = false; editModalOpen = false"></div>
+                    @click="closeModals()"></div>
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
@@ -305,7 +296,7 @@
                     x-transition:leave="ease-in duration-200"
                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative z-10 inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    class="relative z-10 inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
 
                     <form :action="editModalOpen ? '/produk/' + selectedProduk?.id : '{{ route('produk.store') }}'"
                         method="POST" enctype="multipart/form-data">
@@ -316,9 +307,8 @@
                             class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white"
                                 x-text="editModalOpen ? 'Edit Produk' : 'Tambah Produk Baru'"></h3>
-                            <button type="button"
-                                @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
-                                class="text-gray-400 hover:text-gray-500 transition-colors">
+                            <button type="button" @click="closeModals()"
+                                class="text-gray-400 hover:text-gray-500 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 p-1">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M6 18L18 6M6 6l12 12" />
@@ -326,8 +316,7 @@
                             </button>
                         </div>
 
-                        <div class="px-6 py-6 space-y-5">
-                            <!-- Image Upload -->
+                        <div class="px-6 py-6 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto
                                     Produk</label>
@@ -393,7 +382,7 @@
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex justify-between items-center">
                                         Harga Jual
                                         <button type="button" @click="suggestPrice()" :disabled="suggestingPrice"
-                                            class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-md hover:bg-indigo-200 transition-colors flex items-center gap-1 disabled:opacity-50">
+                                            class="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-1 rounded-md hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors flex items-center gap-1 disabled:opacity-50">
                                             <svg x-show="!suggestingPrice" class="w-3 h-3" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -447,8 +436,7 @@
                                 class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
                                 <span x-text="editModalOpen ? 'Simpan Perubahan' : 'Simpan Produk'"></span>
                             </button>
-                            <button type="button"
-                                @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
+                            <button type="button" @click="closeModals()"
                                 class="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-5 py-2.5 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
                                 Batal
                             </button>
@@ -458,14 +446,13 @@
             </div>
         </div>
 
-        <!-- Delete Modal -->
         <div x-show="deleteModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;" x-cloak>
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                 <div x-show="deleteModalOpen" x-transition.opacity class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"
                     @click="deleteModalOpen = false"></div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
                 <div x-show="deleteModalOpen" x-transition.scale
-                    class="relative z-10 inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    class="relative z-10 inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
 
                     <div class="flex items-center gap-4">
                         <div
