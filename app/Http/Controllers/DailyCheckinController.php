@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\DailySale;
 use App\Models\DailySaleItem;
 use App\Models\Produk;
+use App\Models\CashJournal;
+use App\Models\Coa;
 use App\Services\GeminiService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DailyCheckinController extends Controller
 {
@@ -28,6 +32,34 @@ class DailyCheckinController extends Controller
             ->get()
             ->keyBy(fn($sale) => $sale->date->format('Y-m-d'));
 
+        $journals = CashJournal::whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
+            ->get();
+
+        $journalData = $journals->groupBy(function ($item) {
+            return $item->transaction_date->format('Y-m-d');
+        })->map(function ($dayEntries) {
+            $revenue = $dayEntries->where('is_inflow', true)->sum('amount');
+            $expense = $dayEntries->where('is_inflow', false)->sum('amount');
+
+            return [
+                'total_revenue' => $revenue,
+                'total_profit' => $revenue - $expense,
+            ];
+        });
+
+        $dailySales = $dailySales->map(function ($dailySale) use ($journalData) {
+            $dateStr = $dailySale->date->format('Y-m-d');
+
+            if (isset($journalData[$dateStr])) {
+                $dailySale->total_revenue = $journalData[$dateStr]['total_revenue'];
+                $dailySale->total_profit = $journalData[$dateStr]['total_profit'];
+            } else {
+                $dailySale->total_revenue = 0;
+                $dailySale->total_profit = 0;
+            }
+            return $dailySale;
+        });
+
         return view('daily-checkin.index', compact('dailySales', 'startOfMonth', 'endOfMonth'));
     }
 
@@ -35,7 +67,6 @@ class DailyCheckinController extends Controller
     {
         $date = $request->input('date', now()->format('Y-m-d'));
 
-        // Check if already exists
         $existing = DailySale::where('date', $date)->first();
         if ($existing) {
             return redirect()->route('daily-checkin.show', $existing->id);
@@ -59,73 +90,104 @@ class DailyCheckinController extends Controller
         $totalCost = 0;
         $totalProfit = 0;
 
-        $dailySale = DailySale::create([
-            'date' => $request->date,
-            'total_revenue' => 0, // Update later
-            'total_profit' => 0, // Update later
-            'ai_analysis' => 'Analyzing...',
-        ]);
+        $coaRevenue = Coa::where('name', 'Penjualan Produk')->first();
+        $coaCost = Coa::where('name', 'Beban Bahan Baku')->first();
 
-        foreach ($request->sales as $produkId => $qty) {
-            if ($qty > 0) {
-                $produk = Produk::find($produkId);
-                if ($produk) {
-                    $revenue = $produk->harga_jual * $qty;
-                    $cost = $produk->modal * $qty;
-                    $profit = $revenue - $cost;
+        if (!$coaRevenue || !$coaCost) {
+            Log::error("COA not found for sales transaction: Revenue exists=" . ($coaRevenue ? 'Yes' : 'No') . ", Cost exists=" . ($coaCost ? 'Yes' : 'No'));
+            return back()->withInput()->withErrors('Konfigurasi Akun Keuangan (COA) belum lengkap. Harap cek data seeder.');
+        }
 
-                    $totalRevenue += $revenue;
-                    $totalCost += $cost;
-                    $totalProfit += $profit;
+        DB::beginTransaction();
 
-                    DailySaleItem::create([
-                        'daily_sale_id' => $dailySale->id,
-                        'produk_id' => $produk->id,
-                        'quantity' => $qty,
-                        'price' => $produk->harga_jual,
-                        'cost' => $produk->modal,
-                    ]);
+        try {
+            $dailySale = DailySale::create([
+                'date' => $request->date,
+                'ai_analysis' => 'Analyzing...',
+            ]);
 
-                    $salesData[] = [
-                        'name' => $produk->nama_produk,
-                        'qty' => $qty,
-                        'revenue' => $revenue,
-                        'profit' => $profit,
-                    ];
+            foreach ($request->sales as $produkId => $qty) {
+                if ($qty > 0) {
+                    $produk = Produk::find($produkId);
+                    if ($produk) {
+                        $revenue = $produk->harga_jual * $qty;
+                        $cost = $produk->modal * $qty;
+                        $profit = $revenue - $cost;
+
+                        $totalRevenue += $revenue;
+                        $totalCost += $cost;
+                        $totalProfit += $profit;
+
+                        DailySaleItem::create([
+                            'daily_sale_id' => $dailySale->id,
+                            'produk_id' => $produk->id,
+                            'quantity' => $qty,
+                            'price' => $produk->harga_jual,
+                            'cost' => $produk->modal,
+                        ]);
+
+                        CashJournal::create([
+                            'transaction_date' => $request->date,
+                            'coa_id' => $coaRevenue->id,
+                            'amount' => $revenue,
+                            'is_inflow' => true,
+                            'payment_method' => 'Kas',
+                            'description' => "Penjualan {$qty} unit {$produk->nama_produk}",
+                        ]);
+
+                        CashJournal::create([
+                            'transaction_date' => $request->date,
+                            'coa_id' => $coaCost->id,
+                            'amount' => $cost,
+                            'is_inflow' => false,
+                            'payment_method' => 'Kas',
+                            'description' => "Pengeluaran modal (HPP) untuk {$qty} unit {$produk->nama_produk}",
+                        ]);
+
+                        $salesData[] = [
+                            'name' => $produk->nama_produk,
+                            'qty' => $qty,
+                            'revenue' => $revenue,
+                            'profit' => $profit,
+                        ];
+                    }
                 }
             }
+
+            $prompt = 'Analisis penjualan harian saya untuk tanggal '.Carbon::parse($request->date)->translatedFormat('l, d F Y').":\n";
+            foreach ($salesData as $data) {
+                $prompt .= "- {$data['name']}: Terjual {$data['qty']} unit. Profit: Rp ".number_format($data['profit'], 0, ',', '.')."\n";
+            }
+            $prompt .= "\nTotal Omset: Rp ".number_format($totalRevenue, 0, ',', '.');
+            $prompt .= "\nTotal Profit: Rp ".number_format($totalProfit, 0, ',', '.');
+            $prompt .= "\n\nBerikan evaluasi singkat, apakah ini untung atau rugi? Jika untung besar, beri ucapan selamat yang memotivasi. Jika rugi atau untung tipis, beri saran konkret untuk meningkatkan penjualan besok. Gunakan bahasa yang santai dan suportif.";
+
+            $business = \App\Models\Business::first();
+            if (! $business) {
+                $business = new \App\Models\Business;
+                $business->nama_bisnis = 'Bisnis Saya';
+                $business->kategori_bisnis = 'Umum';
+                $business->status_bisnis = 'Berjalan';
+                $business->target_pasar = 'Umum';
+                $business->range_omset = 'Unknown';
+                $business->jumlah_tim = 1;
+                $business->tujuan_utama = 'Profit';
+                $business->channel_penjualan = 'Offline';
+            }
+
+            $aiResponse = $this->geminiService->sendChat($prompt, $business);
+
+            $dailySale->update([
+                'ai_analysis' => $aiResponse,
+            ]);
+
+            DB::commit();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Error during DailySale store and CashJournal creation: " . $e->getMessage());
+            return back()->withInput()->withErrors('Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
         }
-
-        // Prepare prompt for Gemini
-        $prompt = 'Analisis penjualan harian saya untuk tanggal '.Carbon::parse($request->date)->translatedFormat('l, d F Y').":\n";
-        foreach ($salesData as $data) {
-            $prompt .= "- {$data['name']}: Terjual {$data['qty']} unit. Profit: Rp ".number_format($data['profit'], 0, ',', '.')."\n";
-        }
-        $prompt .= "\nTotal Omset: Rp ".number_format($totalRevenue, 0, ',', '.');
-        $prompt .= "\nTotal Profit: Rp ".number_format($totalProfit, 0, ',', '.');
-        $prompt .= "\n\nBerikan evaluasi singkat, apakah ini untung atau rugi? Jika untung besar, beri ucapan selamat yang memotivasi. Jika rugi atau untung tipis, beri saran konkret untuk meningkatkan penjualan besok. Gunakan bahasa yang santai dan suportif.";
-
-        // Get Business context
-        $business = \App\Models\Business::first();
-        if (! $business) {
-            $business = new \App\Models\Business;
-            $business->nama_bisnis = 'Bisnis Saya';
-            $business->kategori_bisnis = 'Umum';
-            $business->status_bisnis = 'Berjalan';
-            $business->target_pasar = 'Umum';
-            $business->range_omset = 'Unknown';
-            $business->jumlah_tim = 1;
-            $business->tujuan_utama = 'Profit';
-            $business->channel_penjualan = 'Offline';
-        }
-
-        $aiResponse = $this->geminiService->sendChat($prompt, $business);
-
-        $dailySale->update([
-            'total_revenue' => $totalRevenue,
-            'total_profit' => $totalProfit,
-            'ai_analysis' => $aiResponse,
-        ]);
 
         return redirect()->route('daily-checkin.show', $dailySale->id);
     }
@@ -133,6 +195,12 @@ class DailyCheckinController extends Controller
     public function show($id)
     {
         $dailySale = DailySale::with('items.produk')->findOrFail($id);
+
+        $totalRevenue = CashJournal::inflows()->whereDate('transaction_date', $dailySale->date)->sum('amount');
+        $totalExpense = CashJournal::outflows()->whereDate('transaction_date', $dailySale->date)->sum('amount');
+
+        $dailySale->total_revenue = $totalRevenue;
+        $dailySale->total_profit = $totalRevenue - $totalExpense;
 
         return view('daily-checkin.show', compact('dailySale'));
     }
