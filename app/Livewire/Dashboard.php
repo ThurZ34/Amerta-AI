@@ -69,29 +69,34 @@ class Dashboard extends Component
                 }
                 break;
 
-            case 'month': // Per Hari Bulan Ini
+            case 'month':
                 $daysInMonth = $now->daysInMonth;
                 for ($i = 1; $i <= $daysInMonth; $i++) {
                     $date = Carbon::createFromDate($now->year, $now->month, $i);
-                    if ($date->gt($now)) break;
-
                     $chartLabels[] = (string)$i;
-                    $chartData[] = CashJournal::inflows()
-                        ->whereDate('transaction_date', $date)
-                        ->sum('amount');
+
+                    if ($date->gt($now)) {
+                        $chartData[] = 0;
+                    } else {
+                        $chartData[] = CashJournal::inflows()
+                            ->whereDate('transaction_date', $date)
+                            ->sum('amount');
+                    }
                 }
                 break;
 
-            case 'year': // Per Bulan Tahun Ini
+            case 'year':
                 for ($i = 1; $i <= 12; $i++) {
                     $date = Carbon::createFromDate($now->year, $i, 1);
-                    if ($date->gt($now)) break;
-
+                    if ($date->gt($now)) {
+                        $chartData[] = 0;
+                    } else {
+                        $chartData[] = CashJournal::inflows()
+                            ->whereYear('transaction_date', $now->year)
+                            ->whereMonth('transaction_date', $i)
+                            ->sum('amount');
+                    }
                     $chartLabels[] = $date->translatedFormat('M');
-                    $chartData[] = CashJournal::inflows()
-                        ->whereYear('transaction_date', $now->year)
-                        ->whereMonth('transaction_date', $i)
-                        ->sum('amount');
                 }
                 break;
 
