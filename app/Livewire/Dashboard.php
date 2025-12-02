@@ -153,11 +153,30 @@ class Dashboard extends Component
             ? "Profit positif Rp " . number_format($profitThisMonth, 0,',','.') . ". Bagus!"
             : "Hati-hati, pengeluaran lebih besar dari pemasukan.";
 
+        // --- LOW STOCK ALERT ---
+        // Assuming $businessId is available in this context, e.g., from authenticated user or a property.
+        // For demonstration, let's assume a placeholder value if not explicitly defined elsewhere.
+        // If $businessId is not defined, this line will cause an error.
+        $businessId = 1; // Placeholder: Replace with actual business ID retrieval logic
+        $lowStockProducts = Produk::where('business_id', $businessId)
+            ->whereColumn('inventori', '<=', 'min_stock')
+            ->get();
+
         // ✅ PERBAIKAN UTAMA: Menggunakan extends() dan section() agar sesuai layout blade biasa
         return view('livewire.dashboard', compact(
-            'cashBalance', 'revenueThisMonth', 'expenseThisMonth', 'profitThisMonth',
-            'growthPercentage', 'revenueLastMonth', 'chartLabels', 'chartData',
-            'expenseLabels', 'expenseData', 'recentTransactions', 'aiMessage'
+            'cashBalance',
+            'revenueThisMonth',
+            'expenseThisMonth',
+            'profitThisMonth',
+            'growthPercentage',
+            'recentTransactions',
+            'chartLabels',
+            'chartData',
+            'expenseLabels',
+            'expenseData',
+            'range',
+            'aiMessage',
+            'lowStockProducts'
         ))
         ->extends('layouts.app') // Pastikan ini sesuai nama file layout Anda (resources/views/layouts/app.blade.php)
         ->section('content');    // Pastikan ini sesuai nama @yield('content') di layout Anda

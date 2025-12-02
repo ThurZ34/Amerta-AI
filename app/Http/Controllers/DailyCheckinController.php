@@ -126,6 +126,9 @@ class DailyCheckinController extends Controller
                             'cost' => $produk->modal,
                         ]);
 
+                        // Decrement stock
+                        $produk->decrement('inventori', $qty);
+
                         CashJournal::create([
                             'transaction_date' => $request->date,
                             'coa_id' => $coaRevenue->id,

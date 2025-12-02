@@ -8,17 +8,17 @@
         editModalOpen: false,
         deleteModalOpen: false,
         // Default Data
-        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' },
+        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, min_stock: 10, jenis_produk: '' },
         search: '',
-
+    
         // --- LOGIC IMAGE PREVIEW ---
         imagePreview: null,
-
+    
         // --- LOGIC AI SUGGESTION ---
         suggestingPrice: false,
         aiReason: '',
         aiError: '',
-
+    
         // Fungsi Reset Form
         resetForm() {
             this.selectedProduk = {
@@ -27,29 +27,30 @@
                 modal: 0,
                 harga_jual: 0,
                 inventori: 0,
+                min_stock: 10,
                 jenis_produk: ''
             };
             this.imagePreview = null;
             this.aiReason = '';
             this.aiError = '';
-
+    
             if (document.getElementById('fileInput')) {
                 document.getElementById('fileInput').value = '';
             }
         },
-
+    
         // Fungsi Tanya AI
         async suggestPrice() {
             this.aiError = '';
             this.aiReason = '';
-
+    
             if (!this.selectedProduk.nama_produk || !this.selectedProduk.modal || !this.selectedProduk.jenis_produk) {
                 this.aiError = 'Mohon isi Nama Produk, Modal, dan Jenis Produk terlebih dahulu.';
                 return;
             }
-
+    
             this.suggestingPrice = true;
-
+    
             try {
                 // Pastikan route ini ada di web.php
                 const response = await fetch('{{ route('produk.suggest-price') }}', {
@@ -64,9 +65,9 @@
                         jenis_produk: this.selectedProduk.jenis_produk
                     })
                 });
-
+    
                 const data = await response.json();
-
+    
                 if (data.price) {
                     this.selectedProduk.harga_jual = data.price;
                     this.aiReason = data.reason;
@@ -80,7 +81,7 @@
                 this.suggestingPrice = false;
             }
         },
-
+    
         // Fungsi Handle File Upload
         fileChosen(event) {
             const file = event.target.files[0];
@@ -88,12 +89,12 @@
                 this.imagePreview = URL.createObjectURL(file);
             }
         },
-
+    
         openCreateModal() {
             this.resetForm();
             this.createModalOpen = true;
         },
-
+    
         openEditModal(produk) {
             this.selectedProduk = JSON.parse(JSON.stringify(produk));
             if (produk.gambar) {
@@ -103,12 +104,12 @@
             }
             this.editModalOpen = true;
         },
-
+    
         openDeleteModal(produk) {
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
         },
-
+    
         closeModals() {
             this.createModalOpen = false;
             this.editModalOpen = false;
@@ -122,7 +123,8 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Katalog Produk</h2>
-                    <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Kelola produk dan harga untuk laporan harian.</p>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Kelola produk dan harga untuk laporan harian.
+                    </p>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -172,7 +174,7 @@
                     @php
                         $profit = $produk->harga_jual - $produk->modal;
                         $margin = $produk->harga_jual > 0 ? round(($profit / $produk->harga_jual) * 100) : 0;
-                        $stokAman = $produk->inventori > 10;
+                        $stokAman = $produk->inventori > ($produk->min_stock ?? 10);
                     @endphp
 
                     <div class="product-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden group"
@@ -255,6 +257,12 @@
                                     </p>
                                 </div>
                             </div>
+                            @if (!$stokAman)
+                                <p
+                                    class="text-xs text-red-600 dark:text-red-400 font-medium mt-2 text-center bg-red-50 dark:bg-red-900/20 py-1 rounded-md">
+                                    Stok ini akan segera habis
+                                </p>
+                            @endif
                         </div>
                     </div>
                 @empty
@@ -285,8 +293,7 @@
                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                     x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0"
-                    class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-sm"
-                    @click="closeModals()"></div>
+                    class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-sm" @click="closeModals()"></div>
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
@@ -421,12 +428,20 @@
                                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Jenis
-                                        Produk</label>
-                                    <input type="text" name="jenis_produk" x-model="selectedProduk.jenis_produk"
-                                        required placeholder="Cth: Makanan"
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Stok
+                                        Minimum (Alert)</label>
+                                    <input type="number" name="min_stock" x-model="selectedProduk.min_stock"
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow"
+                                        placeholder="Default: 10">
                                 </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Jenis
+                                    Produk</label>
+                                <input type="text" name="jenis_produk" x-model="selectedProduk.jenis_produk" required
+                                    placeholder="Cth: Makanan"
+                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                             </div>
                         </div>
 

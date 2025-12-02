@@ -13,6 +13,7 @@ class produk extends Model
         'modal',
         'harga_jual',
         'inventori',
+        'min_stock',
         'jenis_produk',
         'gambar',
     ];
