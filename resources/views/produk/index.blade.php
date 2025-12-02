@@ -9,7 +9,46 @@
         deleteModalOpen: false,
         selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' }, // Default TIDAK BOLEH NULL
         search: '',
-
+        suggestingPrice: false,
+        aiReason: '',
+        aiError: '',
+    
+        async suggestPrice() {
+            this.aiError = '';
+            if (!this.selectedProduk.nama_produk || !this.selectedProduk.modal || !this.selectedProduk.jenis_produk) {
+                this.aiError = 'Mohon isi Nama Produk, Modal, dan Jenis Produk terlebih dahulu.';
+                return;
+            }
+            this.suggestingPrice = true;
+            this.aiReason = '';
+            try {
+                const response = await fetch('{{ route('produk.suggest-price') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        nama_produk: this.selectedProduk.nama_produk,
+                        modal: this.selectedProduk.modal,
+                        jenis_produk: this.selectedProduk.jenis_produk
+                    })
+                });
+                const data = await response.json();
+                if (data.price) {
+                    this.selectedProduk.harga_jual = data.price;
+                    this.aiReason = data.reason;
+                } else {
+                    this.aiError = 'Gagal mendapatkan rekomendasi harga.';
+                }
+            } catch (error) {
+                console.error(error);
+                this.aiError = 'Terjadi kesalahan saat menghubungi AI.';
+            } finally {
+                this.suggestingPrice = false;
+            }
+        },
+    
         // Fungsi Helper untuk Reset Form
         resetForm() {
             this.selectedProduk = {
@@ -20,24 +59,26 @@
                 inventori: 0,
                 jenis_produk: ''
             };
+            this.aiReason = '';
+            this.aiError = '';
         },
-
+    
         openCreateModal() {
             this.resetForm(); // Panggil fungsi reset
             this.createModalOpen = true;
         },
-
+    
         openEditModal(produk) {
             // Copy object agar tidak reaktif langsung ke list (deep copy sederhana)
             this.selectedProduk = JSON.parse(JSON.stringify(produk));
             this.editModalOpen = true;
         },
-
+    
         openDeleteModal(produk) {
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
         },
-
+    
         closeModals() {
             this.createModalOpen = false;
             this.editModalOpen = false;
@@ -295,8 +336,27 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Harga
-                                        Jual</label>
+                                    <label
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex justify-between items-center">
+                                        Harga Jual
+                                        <button type="button" @click="suggestPrice()" :disabled="suggestingPrice"
+                                            class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-md hover:bg-indigo-200 transition-colors flex items-center gap-1 disabled:opacity-50">
+                                            <svg x-show="!suggestingPrice" class="w-3 h-3" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                            </svg>
+                                            <svg x-show="suggestingPrice" class="animate-spin w-3 h-3"
+                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10"
+                                                    stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                </path>
+                                            </svg>
+                                            <span x-text="suggestingPrice ? 'Menganalisa...' : 'Tanya AI'"></span>
+                                        </button>
+                                    </label>
                                     <div class="relative">
                                         <span
                                             class="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">Rp</span>
@@ -304,6 +364,10 @@
                                             required
                                             class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                     </div>
+                                    <p x-show="aiReason" x-text="aiReason"
+                                        class="mt-1 text-xs text-indigo-600 dark:text-indigo-400 italic"></p>
+                                    <p x-show="aiError" x-text="aiError"
+                                        class="mt-1 text-xs text-red-600 dark:text-red-400 font-medium animate-pulse"></p>
                                 </div>
                             </div>
 
@@ -330,7 +394,8 @@
                                 class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
                                 <span x-text="editModalOpen ? 'Simpan Perubahan' : 'Simpan Produk'"></span>
                             </button>
-                            <button type="button" @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
+                            <button type="button"
+                                @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
                                 class="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-5 py-2.5 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
                                 Batal
                             </button>
