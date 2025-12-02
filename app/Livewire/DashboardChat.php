@@ -4,12 +4,16 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Services\GeminiService;
+use Livewire\WithFileUploads;
 use App\Models\ChatHistory;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 
 class DashboardChat extends Component
 {
+    use WithFileUploads;
+
+    public $image;
     public $isThinking = false;
     public $limit = 4;
     public $totalChats = 0;
@@ -26,19 +30,30 @@ class DashboardChat extends Component
 
     public function sendMessage($messageText)
     {
-        if (empty(trim($messageText))) {
+        if (empty(trim($messageText)) && empty($this->image)) {
             return;
+        }
+
+        $this->validate([
+            'image' => 'nullable|image|max:4096|mimes:jpg,jpeg,png,webp',
+        ]);
+
+        $imagePath = null;
+        if ($this->image) {
+            $imagePath = $this->image->store('chat-images', 'public');
         }
 
         ChatHistory::create([
             'user_id' => Auth::id(),
             'role' => 'user',
-            'message' => $messageText
+            'message' => $messageText ?? 'Menganalisa gambar...',
+            'image_path' => $imagePath
         ]);
 
         $this->totalChats++;
-
         $this->isThinking = true;
+
+        $this->reset('image');
 
         $this->dispatch('process-ai-reply');
     }
@@ -54,9 +69,10 @@ class DashboardChat extends Component
             ->first();
 
         $userMessage = $lastUserChat ? $lastUserChat->message : '';
+        $imagePath = $lastUserChat ? $lastUserChat->image_path : null;
 
         try {
-            $aiReply = $gemini->sendChat($userMessage, $business);
+            $aiReply = $gemini->sendChat($userMessage, $business, $imagePath);
         } catch (\Exception $e) {
             $aiReply = "Maaf Bos, koneksi terputus. Coba lagi ya.";
         }
@@ -69,8 +85,11 @@ class DashboardChat extends Component
 
         $this->totalChats++;
         $this->isThinking = false;
-
         $this->dispatch('chat-updated');
+    }
+
+    public function removeImage() {
+        $this->reset('image');
     }
 
     public function render()

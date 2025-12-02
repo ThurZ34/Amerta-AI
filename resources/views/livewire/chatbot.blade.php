@@ -47,8 +47,13 @@
         @foreach ($chats as $chat)
             @if ($chat->role == 'user')
                 <div class="flex items-end gap-3 justify-end fade-in-up">
-                    <div class="bg-indigo-600 text-white p-4 rounded-2xl rounded-tr-none max-w-[85%] text-sm shadow-md">
-                        {{ $chat->message }}
+                    <div
+                        class="bg-indigo-600 text-white p-4 rounded-2xl rounded-tr-none max-w-[85%] text-sm shadow-md flex flex-col gap-2">
+                        @if ($chat->image_path)
+                            <img src="{{ asset('storage/' . $chat->image_path) }}"
+                                class="rounded-lg w-full max-w-[200px] h-auto object-cover border border-indigo-500">
+                        @endif
+                        <p>{{ $chat->message }}</p>
                     </div>
                 </div>
             @else
@@ -133,30 +138,57 @@
     <div
         class="absolute bottom-0 left-0 w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-4 transition-colors duration-300">
 
+        @if ($image)
+            <div class="max-w-4xl mx-auto mb-2 px-2 fade-in-up">
+                <div class="relative inline-block">
+                    <img src="{{ $image->temporaryUrl() }}"
+                        class="h-20 w-auto rounded-lg border border-gray-300 shadow-sm">
+                    <button wire:click="removeImage"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow-md">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        @endif
+
         <form x-data="{ userMessage: '' }"
             @submit.prevent="
-                if(userMessage.trim() !== '') {
-                    $wire.sendMessage(userMessage); // Kirim ke Livewire
-                    userMessage = ''; // Hapus teks INSTANT di browser
+                if(userMessage.trim() !== '' || $wire.image) {
+                    $wire.sendMessage(userMessage);
+                    userMessage = '';
                 }
             "
             class="relative max-w-4xl mx-auto flex items-end gap-2">
 
+            <div class="pb-3">
+                <input type="file" wire:model="image" id="file-upload" class="hidden" accept="image/*">
+                <label for="file-upload"
+                    class="cursor-pointer text-gray-400 hover:text-indigo-600 transition-colors p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                </label>
+            </div>
+
             <div class="flex-1 relative">
-                <input type="text" x-model="userMessage" placeholder="Tanya strategi, curhat masalah stok..."
+                <input type="text" x-model="userMessage" placeholder="Tanya strategi, kirim foto struk..."
                     class="w-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 pl-4 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-500 transition-colors shadow-inner"
                     autocomplete="off" @if ($isThinking) disabled @endif>
             </div>
 
             <button type="submit"
                 class="p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1"
-                :disabled="userMessage.trim() === '' || @js($isThinking)">
+                :disabled="(userMessage.trim() === '' && !$wire.image) || @js($isThinking)">
+
                 <svg wire:loading.remove wire:target="sendMessage" class="w-6 h-6 text-white" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
                 </svg>
-
                 <svg wire:loading wire:target="sendMessage" class="animate-spin w-6 h-6 text-white"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
@@ -167,6 +199,11 @@
                 </svg>
             </button>
         </form>
+
+        <div wire:loading wire:target="image"
+            class="absolute top-0 left-0 w-full h-full bg-white/80 dark:bg-gray-900/80 flex items-center justify-center z-20 backdrop-blur-sm rounded-t-xl">
+            <span class="text-indigo-600 font-medium text-sm animate-pulse">Mengupload gambar...</span>
+        </div>
     </div>
 
     <script>
