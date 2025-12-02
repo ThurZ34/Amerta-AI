@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto chat-scroll p-6 pt-24 pb-24 space-y-6" id="chat-container" x-ref="chatContainer">
+    <div class="flex-1 overflow-y-auto chat-scroll p-6 pt-24 pb-40 space-y-10" id="chat-container" x-ref="chatContainer">
 
         @if ($totalChats > $limit)
             <div x-intersect="$wire.loadMore()" class="flex justify-center py-2">
@@ -52,13 +52,63 @@
                     </div>
                 </div>
             @else
-                <div class="flex items-start gap-4 max-w-[85%] fade-in-up">
+                <div class="flex items-start gap-4 max-w-[85%] fade-in-up group">
+                    {{-- ^^^ Tambahkan class 'group' disini agar tombol copy muncul saat hover --}}
+
                     <div
                         class="w-8 h-8 rounded-full bg-indigo-600 shrink-0 flex items-center justify-center text-white text-xs font-bold shadow-md">
-                        AI</div>
-                    <div
-                        class="bg-white dark:bg-gray-800 p-5 rounded-2xl rounded-tl-none border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 shadow-sm text-sm leading-relaxed prose prose-sm prose-indigo dark:prose-invert max-w-none">
-                        <div x-data x-html="marked.parse(@js($chat->message))"></div>
+                        AI
+                    </div>
+
+                    {{-- CONTAINER UTAMA --}}
+                    {{-- Kita tambahkan x-data untuk logic copy per pesan --}}
+                    <div x-data="{
+                        copied: false,
+                        copyToClipboard() {
+                            // Menyalin teks asli (markdown source)
+                            navigator.clipboard.writeText(@js($chat->message)).then(() => {
+                                this.copied = true;
+                                // Reset status setelah 2 detik
+                                setTimeout(() => this.copied = false, 2000);
+                            });
+                        }
+                    }"
+                        class="relative bg-white dark:bg-gray-800 px-4 py-3 rounded-2xl rounded-tl-none border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 shadow-sm text-sm leading-relaxed">
+
+                        {{-- ISI CHAT (MARKDOWN) --}}
+                        <div
+                            class="prose prose-sm prose-indigo dark:prose-invert max-w-none
+                        prose-p:my-1 prose-p:first:mt-0 prose-ul:my-1 prose-li:my-0 prose-headings:mb-2 prose-headings:mt-3">
+                            <div x-data x-html="marked.parse(@js($chat->message))"></div>
+                        </div>
+
+                        {{-- TOMBOL COPY (Muncul saat Hover di Desktop, atau Selalu ada di Mobile) --}}
+                        <div
+                            class="absolute -bottom-6 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex justify-end">
+                            <button @click="copyToClipboard()"
+                                class="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-all duration-200"
+                                :class="copied ? 'text-green-600 bg-green-50 dark:bg-green-900/20' :
+                                    'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'">
+
+                                {{-- Ikon: Default (Clipboard) --}}
+                                <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                </svg>
+
+                                {{-- Ikon: Sukses (Checklist) --}}
+                                <svg x-show="copied" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" style="display: none;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+
+                                {{-- Teks Feedback --}}
+                                <span x-text="copied ? 'Disalin!' : 'Copy'" class="tracking-wide"></span>
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             @endif
@@ -101,10 +151,10 @@
             <button type="submit"
                 class="p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1"
                 :disabled="userMessage.trim() === '' || @js($isThinking)">
-                <svg wire:loading.remove wire:target="sendMessage" class="w-6 h-6 transform rotate-90" fill="none"
+                <svg wire:loading.remove wire:target="sendMessage" class="w-6 h-6 text-white" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
                 </svg>
 
                 <svg wire:loading wire:target="sendMessage" class="animate-spin w-6 h-6 text-white"

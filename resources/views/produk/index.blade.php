@@ -5,20 +5,44 @@
         createModalOpen: {{ $errors->any() && !session('success') ? 'true' : 'false' }},
         editModalOpen: false,
         deleteModalOpen: false,
-        selectedProduk: null,
+        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' }, // Default TIDAK BOLEH NULL
         search: '',
-    
+
+        // Fungsi Helper untuk Reset Form
+        resetForm() {
+            this.selectedProduk = {
+                id: null,
+                nama_produk: '',
+                modal: 0,
+                harga_jual: 0,
+                inventori: 0,
+                jenis_produk: ''
+            };
+        },
+
+        openCreateModal() {
+            this.resetForm(); // Panggil fungsi reset
+            this.createModalOpen = true;
+        },
+
         openEditModal(produk) {
-            this.selectedProduk = produk;
+            // Copy object agar tidak reaktif langsung ke list (deep copy sederhana)
+            this.selectedProduk = JSON.parse(JSON.stringify(produk));
             this.editModalOpen = true;
         },
+
         openDeleteModal(produk) {
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
         },
-        // Logika sederhana untuk filter frontend
-        filterProduk() {
-            return document.querySelectorAll('.product-card');
+
+        closeModals() {
+            this.createModalOpen = false;
+            this.editModalOpen = false;
+            this.deleteModalOpen = false;
+            // JANGAN set selectedProduk = null.
+            // Biarkan sisa data terakhir atau reset ke kosong, tapi tetap object.
+            this.resetForm();
         }
     }">
 
@@ -45,7 +69,7 @@
                             class="pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full transition-all shadow-sm">
                     </div>
 
-                    <button @click="createModalOpen = true"
+                    <button @click="openCreateModal()"
                         class="inline-flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-sm hover:shadow transition-all active:scale-95 text-sm whitespace-nowrap">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -111,7 +135,7 @@
                             <!-- Action Buttons (Hover) -->
                             <div
                                 class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
-                                <button @click="openEditModal({{ $produk }})"
+                                <button @click='openEditModal(@json($produk))'
                                     class="p-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm border border-gray-200 dark:border-gray-700 transition-colors"
                                     title="Edit">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,7 +229,7 @@
                     x-transition:leave="ease-in duration-200"
                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    class="relative z-10 inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
 
                     <form :action="editModalOpen ? '/produk/' + selectedProduk?.id : '{{ route('produk.store') }}'"
                         method="POST" enctype="multipart/form-data">
@@ -216,7 +240,8 @@
                             class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white"
                                 x-text="editModalOpen ? 'Edit Produk' : 'Tambah Produk Baru'"></h3>
-                            <button type="button" @click="createModalOpen = false; editModalOpen = false"
+                            <button type="button"
+                                @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
                                 class="text-gray-400 hover:text-gray-500 transition-colors">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -251,7 +276,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nama
                                     Produk</label>
-                                <input type="text" name="nama_produk" x-model="selectedProduk?.nama_produk" required
+                                <input type="text" name="nama_produk" x-model="selectedProduk.nama_produk" required
                                     placeholder="Contoh: Kopi Susu Aren"
                                     class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                             </div>
@@ -263,7 +288,7 @@
                                     <div class="relative">
                                         <span
                                             class="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">Rp</span>
-                                        <input type="number" name="modal" x-model="selectedProduk?.modal" required
+                                        <input type="number" name="modal" x-model="selectedProduk.modal" required
                                             class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                     </div>
                                 </div>
@@ -273,7 +298,7 @@
                                     <div class="relative">
                                         <span
                                             class="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">Rp</span>
-                                        <input type="number" name="harga_jual" x-model="selectedProduk?.harga_jual"
+                                        <input type="number" name="harga_jual" x-model="selectedProduk.harga_jual"
                                             required
                                             class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                     </div>
@@ -284,13 +309,13 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Stok
                                         Awal</label>
-                                    <input type="number" name="inventori" x-model="selectedProduk?.inventori" required
+                                    <input type="number" name="inventori" x-model="selectedProduk.inventori" required
                                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Jenis
                                         Produk</label>
-                                    <input type="text" name="jenis_produk" x-model="selectedProduk?.jenis_produk"
+                                    <input type="text" name="jenis_produk" x-model="selectedProduk.jenis_produk"
                                         required placeholder="Cth: Makanan"
                                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                 </div>
@@ -303,7 +328,7 @@
                                 class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
                                 <span x-text="editModalOpen ? 'Simpan Perubahan' : 'Simpan Produk'"></span>
                             </button>
-                            <button type="button" @click="createModalOpen = false; editModalOpen = false"
+                            <button type="button" @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
                                 class="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-5 py-2.5 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
                                 Batal
                             </button>
@@ -320,7 +345,7 @@
                     @click="deleteModalOpen = false"></div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
                 <div x-show="deleteModalOpen" x-transition.scale
-                    class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    class="relative z-10 inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
 
                     <div class="flex items-center gap-4">
                         <div

@@ -39,4 +39,8 @@ Route::get('/daily-checkin/{id}', [DailyCheckinController::class, 'show'])->name
         Route::resource('produk', ProdukController::class);
 
     });
+
+    Route::get('/profil_bisnis', [\App\Http\Controllers\ProfilController::class, 'bussiness_index'])->name('profil_bisnis');
+    Route::put('/profil_bisnis', [\App\Http\Controllers\ProfilController::class, 'update'])->name('profil_bisnis.update');
+    Route::post('/categories', [\App\Http\Controllers\ProfilController::class, 'storeCategory'])->name('categories.store');
 });
