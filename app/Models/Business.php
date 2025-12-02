@@ -11,7 +11,7 @@ class Business extends Model
         'user_id',
         'nama_bisnis',
         'status_bisnis',
-        'kategori_bisnis',
+        'category_id',
         'masalah_utama',
         'channel_penjualan',
         'range_omset',
@@ -25,5 +25,10 @@ class Business extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

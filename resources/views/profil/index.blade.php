@@ -6,7 +6,7 @@
         categorySearch: '',
         showCategoryDropdown: false,
         categories: {{ json_encode($categories->pluck('name')->toArray()) }},
-        selectedCategory: '{{ old('kategori', $business->kategori ?? '') }}',
+        selectedCategory: '{{ old('kategori', $business->category->name ?? '') }}',
         
         get filteredCategories() {
             if (!this.categorySearch) return this.categories;
@@ -106,7 +106,7 @@
                                     <template x-if="!isEditing">
                                         <div>
                                             <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $business->nama_bisnis ?? 'Nama Bisnis Belum Diisi' }}</h3>
-                                            <p class="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{{ $business->kategori ?? 'Kategori belum diisi' }}</p>
+                                            <p class="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{{ $business->category->name ?? 'Kategori belum diisi' }}</p>
                                         </div>
                                     </template>
                                     <template x-if="isEditing">
@@ -204,7 +204,7 @@
                                     </label>
                                     <template x-if="!isEditing">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $business->kategori ?? '-' }}
+                                            {{ $business->category->name ?? '-' }}
                                         </p>
                                     </template>
                                     <template x-if="isEditing">

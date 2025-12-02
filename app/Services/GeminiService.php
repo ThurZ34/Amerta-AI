@@ -13,6 +13,9 @@ class GeminiService
         $apiKey = env('GEMINI_API_KEY');
         $model = "gemini-2.5-flash"; // Pastikan model ini aktif
 
+        // Get category name safely
+        $categoryName = $business->category ? $business->category->name : 'Tidak ada';
+
         // --- CONTEXT INJECTION (RAHASIA AI PINTAR) ---
         // Kita rangkum data database jadi kalimat instruksi
         $systemInstruction = "
@@ -20,7 +23,7 @@ class GeminiService
 
             PROFIL BISNIS PENGGUNA:
             - Nama Bisnis: {$business->nama_bisnis}
-            - Kategori: {$business->kategori_bisnis}
+            - Kategori: {$categoryName}
             - Status: {$business->status_bisnis}
             - Target Pasar: {$business->target_pasar}
             - Omset: {$business->range_omset}
