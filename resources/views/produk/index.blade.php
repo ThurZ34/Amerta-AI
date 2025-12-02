@@ -7,10 +7,10 @@
         createModalOpen: {{ $errors->any() && !session('success') ? 'true' : 'false' }},
         editModalOpen: false,
         deleteModalOpen: false,
-        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' }, // Default TIDAK BOLEH NULL
+        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' },
         search: '',
+        imagePreview: null, // <--- TAMBAHAN 1: Variable Preview
 
-        // Fungsi Helper untuk Reset Form
         resetForm() {
             this.selectedProduk = {
                 id: null,
@@ -20,16 +20,28 @@
                 inventori: 0,
                 jenis_produk: ''
             };
+            this.imagePreview = null; // <--- TAMBAHAN 2: Reset Preview
+            // Reset input file value secara manual agar event change bisa trigger lagi
+            if (document.getElementById('fileInput')) {
+                document.getElementById('fileInput').value = '';
+            }
         },
 
         openCreateModal() {
-            this.resetForm(); // Panggil fungsi reset
+            this.resetForm();
             this.createModalOpen = true;
         },
 
         openEditModal(produk) {
-            // Copy object agar tidak reaktif langsung ke list (deep copy sederhana)
             this.selectedProduk = JSON.parse(JSON.stringify(produk));
+
+            // <--- TAMBAHAN 3: Set Preview jika produk punya gambar
+            if (produk.gambar) {
+                this.imagePreview = '/storage/' + produk.gambar;
+            } else {
+                this.imagePreview = null;
+            }
+
             this.editModalOpen = true;
         },
 
@@ -42,9 +54,15 @@
             this.createModalOpen = false;
             this.editModalOpen = false;
             this.deleteModalOpen = false;
-            // JANGAN set selectedProduk = null.
-            // Biarkan sisa data terakhir atau reset ke kosong, tapi tetap object.
             this.resetForm();
+        },
+
+        // <--- TAMBAHAN 4: Fungsi Handler File Upload
+        fileChosen(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.imagePreview = URL.createObjectURL(file);
+            }
         }
     }">
 
@@ -259,18 +277,39 @@
                                     Produk</label>
                                 <div class="flex items-center justify-center w-full">
                                     <label
-                                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        class="relative flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all overflow-hidden group">
+
+                                        <div x-show="!imagePreview"
+                                            class="flex flex-col items-center justify-center pt-5 pb-6">
                                             <svg class="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                                 </path>
                                             </svg>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">Klik untuk upload gambar
-                                            </p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Klik untuk
+                                                upload gambar</p>
+                                            <p class="text-xs text-gray-400 mt-1">PNG, JPG up to 2MB</p>
                                         </div>
-                                        <input type="file" name="gambar" class="hidden" accept="image/*">
+
+                                        <div x-show="imagePreview" class="absolute inset-0 w-full h-full"
+                                            style="display: none;">
+                                            <img :src="imagePreview" class="w-full h-full object-cover">
+
+                                            <div
+                                                class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                <svg class="w-8 h-8 text-white mb-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
+                                                    </path>
+                                                </svg>
+                                                <span class="text-white text-sm font-medium">Ganti Gambar</span>
+                                            </div>
+                                        </div>
+
+                                        <input type="file" id="fileInput" name="gambar" class="hidden"
+                                            accept="image/*" @change="fileChosen">
                                     </label>
                                 </div>
                             </div>
@@ -330,7 +369,8 @@
                                 class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
                                 <span x-text="editModalOpen ? 'Simpan Perubahan' : 'Simpan Produk'"></span>
                             </button>
-                            <button type="button" @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
+                            <button type="button"
+                                @click="createModalOpen = false; editModalOpen = false; selectedProduk = null"
                                 class="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-5 py-2.5 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
                                 Batal
                             </button>
