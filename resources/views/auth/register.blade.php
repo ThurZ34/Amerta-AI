@@ -13,10 +13,10 @@
 <body class="bg-white">
 
     <div class="flex min-h-screen">
-        
+
         <div class="w-full md:w-1/2 flex items-center justify-center p-8 bg-white text-gray-800">
             <div class="w-full max-w-md space-y-6">
-                
+
                 <div class="text-left">
                     <h1 class="text-3xl font-bold mb-2">Buat Akun Baru</h1>
                     <p class="text-gray-500">Mulai perjalanan anda bersama kami.</p>
@@ -35,17 +35,17 @@
 
                 <form method="POST" action="{{ route('register') }}" class="space-y-4">
                     @csrf
-                    
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                        <input type="text" name="name" required
+                        <input autocomplete="off" type="text" name="name" required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
                             placeholder="Masukkan Nama Anda">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" name="email" required
+                        <input autocomplete="off" type="email" name="email" required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
                             placeholder="Masukkan Email Anda">
                         @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -66,21 +66,21 @@
                             placeholder="Ketik ulang password">
                     </div>
 
-                    <button type="submit" 
+                    <button type="submit"
                         class="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-800 transition duration-300">
                         Daftar
                     </button>
                 </form>
 
                 <div class="text-center text-sm text-gray-600">
-                    Sudah punya akun? 
+                    Sudah punya akun?
                     <a href="{{ route('login') }}" class="font-semibold text-black hover:underline">Masuk disini</a>
                 </div>
 
             </div>
         </div>
 
-        <div class="hidden md:block w-1/2 bg-cover bg-center" 
+        <div class="hidden md:block w-1/2 bg-cover bg-center"
              style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
         </div>
 
