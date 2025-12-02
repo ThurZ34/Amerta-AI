@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('daily_sales', function (Blueprint $table) {
             $table->id();
-            $table->date('date')->unique(); // One record per day
-            $table->decimal('total_revenue', 15, 2);
-            $table->decimal('total_profit', 15, 2);
+            $table->date('date')->unique();
             $table->text('ai_analysis')->nullable();
             $table->timestamps();
         });
