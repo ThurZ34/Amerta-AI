@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('header', 'Keuangan Bisnis')
+@section('header', 'Dashboard')
 
 @section('content')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

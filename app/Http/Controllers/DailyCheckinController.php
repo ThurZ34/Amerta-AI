@@ -26,7 +26,7 @@ class DailyCheckinController extends Controller
 
         $dailySales = DailySale::whereBetween('date', [$startOfMonth, $endOfMonth])
             ->get()
-            ->keyBy('date');
+            ->keyBy(fn($sale) => $sale->date->format('Y-m-d'));
 
         return view('daily-checkin.index', compact('dailySales', 'startOfMonth', 'endOfMonth'));
     }
