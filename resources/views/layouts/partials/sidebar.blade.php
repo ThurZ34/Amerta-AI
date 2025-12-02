@@ -51,7 +51,7 @@
     <div class="p-4 border-t border-gray-200 dark:border-gray-800">
         <div class="flex items-center gap-3">
             <div
-                class="w-10 h-10 rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                class="w-10 h-10 rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 flex items-center justify-center dark:text-white font-bold text-sm">
                 {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
             </div>
             <div class="overflow-hidden">
