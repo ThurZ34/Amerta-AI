@@ -12,15 +12,16 @@
             <div
                 class="bg-linear-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg relative overflow-hidden group cursor-pointer transition-transform active:scale-[0.99] border border-transparent dark:border-indigo-500/30">
                 <div class="relative z-10 flex items-start gap-4">
-                    <div class="p-3 bg-white/20 rounded-lg backdrop-blur-sm animate-pulse">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="p-3 bg-gray-100 dark:bg-white/10 rounded-lg backdrop-blur-sm animate-pulse">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                     </div>
                     <div>
-                        <h3 class="font-bold text-lg">Analisa Keuangan Hari Ini</h3>
-                        <p class="text-indigo-100 mt-1 text-sm leading-relaxed max-w-2xl">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg">Analisa Keuangan Hari Ini</h3>
+                        <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm leading-relaxed max-w-2xl">
                             "Bos, performa minggu ini bagus! Omzet naik 15% dibanding minggu lalu. Tapi hati-hati,
                             pengeluaran bahan baku agak bengkak di hari Selasa. Saldo kas saat ini aman untuk operasional 14
                             hari ke depan."
