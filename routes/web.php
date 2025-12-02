@@ -36,6 +36,7 @@ Route::get('/daily-checkin/{id}', [DailyCheckinController::class, 'show'])->name
             return view('dashboard');
         })->name('dashboard');
 
+        Route::post('/produk/suggest-price', [ProdukController::class, 'suggestPrice'])->name('produk.suggest-price');
         Route::resource('produk', ProdukController::class);
 
     });
