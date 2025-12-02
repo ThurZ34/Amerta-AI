@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -23,11 +24,13 @@ class BusinessSetupTest extends TestCase
     public function test_user_with_business_can_access_dashboard()
     {
         $user = User::factory()->create();
+        $category = Category::create(['name' => 'Tech']);
+        
         Business::create([
             'user_id' => $user->id,
             'nama_bisnis' => 'Test Business',
             'status_bisnis' => 'Baru Mulai',
-            'kategori_bisnis' => 'Tech',
+            'category_id' => $category->id,
             'channel_penjualan' => 'Online',
             'range_omset' => '< 10 Juta',
             'target_pasar' => 'B2B',
@@ -59,11 +62,20 @@ class BusinessSetupTest extends TestCase
 
         $response->assertRedirect(route('dashboard'));
 
+        // Check that category was created
+        $this->assertDatabaseHas('categories', [
+            'name' => 'Teknologi',
+        ]);
+
+        // Get the created category
+        $category = Category::where('name', 'Teknologi')->first();
+
+        // Check that business was created with correct category_id
         $this->assertDatabaseHas('businesses', [
             'user_id' => $user->id,
             'nama_bisnis' => 'My Business',
             'status_bisnis' => 'Baru Mulai',
-            'kategori_bisnis' => 'Teknologi',
+            'category_id' => $category->id,
         ]);
     }
 }

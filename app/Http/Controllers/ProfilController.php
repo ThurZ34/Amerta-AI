@@ -11,7 +11,7 @@ class ProfilController extends Controller
 {
     public function bussiness_index()
     {
-        $business = Business::where('user_id', auth()->user()->id)->first();
+        $business = Business::with('category')->where('user_id', auth()->user()->id)->first();
         $categories = Category::orderBy('name')->get();
         return view('profil.index', compact('business', 'categories'));
     }
@@ -36,7 +36,18 @@ class ProfilController extends Controller
             $business->user_id = auth()->user()->id;
         }
 
-        $business->update($request->all());
+        // Handle category - find or create
+        if ($request->filled('kategori')) {
+            $category = Category::firstOrCreate(
+                ['name' => $request->kategori],
+                ['created_at' => now(), 'updated_at' => now()]
+            );
+            $business->category_id = $category->id;
+        }
+
+        // Update other fields
+        $business->fill($request->except(['kategori']));
+        $business->save();
 
         return redirect()->route('profil_bisnis')->with('success', 'Profil bisnis berhasil diperbarui.');
     }
