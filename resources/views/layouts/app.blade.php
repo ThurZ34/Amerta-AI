@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50" x-data="{
-    // Ambil state dari DOM/Class yang sudah di-set di skrip HEAD
-    darkMode: document.documentElement.classList.contains('dark'),
+    darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
     toggleTheme() {
         this.darkMode = !this.darkMode;
         localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
-        document.documentElement.classList.toggle('dark', this.darkMode);
+        if (this.darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
     }
-}">
+}"
+    x-init="$watch('darkMode', val => val ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark'));
+    if (darkMode) document.documentElement.classList.add('dark');" :class="{ 'dark': darkMode }">
 
 <head>
     <meta charset="utf-8">
@@ -16,25 +21,7 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <script>
-        function initializeTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            let themeToApply = (savedTheme === 'dark' || (!savedTheme && prefersDark)) ? 'dark' : 'light';
-
-            if (themeToApply === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-            if (!savedTheme) {
-                localStorage.setItem('theme', themeToApply);
-            }
-        }
-        initializeTheme();
-    </script>
-
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">

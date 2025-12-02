@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\DailyCheckinController;
+use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SurveyController;
 
 Route::get('/', function () {
@@ -19,6 +21,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/setup-bisnis', [SurveyController::class, 'index'])->name('setup-bisnis');
     Route::post('/setup-bisnis', [SurveyController::class, 'store'])->name('setup-bisnis.store');
 
+    Route::get('/daily-checkin', [DailyCheckinController::class, 'index'])->name('daily-checkin.index');
+Route::get('/daily-checkin/create', [DailyCheckinController::class, 'create'])->name('daily-checkin.create');
+Route::post('/daily-checkin', [DailyCheckinController::class, 'store'])->name('daily-checkin.store');
+Route::get('/daily-checkin/{id}', [DailyCheckinController::class, 'show'])->name('daily-checkin.show');
+
     Route::middleware(['ensure.business.complete'])->group(function () {
 
         Route::get('/amerta', function () {
@@ -29,7 +36,7 @@ Route::middleware(['auth'])->group(function () {
             return view('dashboard');
         })->name('dashboard');
 
-        Route::resource('produk', \App\Http\Controllers\ProdukController::class);
+        Route::resource('produk', ProdukController::class);
 
     });
 
