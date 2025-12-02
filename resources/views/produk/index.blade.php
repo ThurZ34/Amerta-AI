@@ -7,20 +7,51 @@
         createModalOpen: {{ $errors->any() && !session('success') ? 'true' : 'false' }},
         editModalOpen: false,
         deleteModalOpen: false,
-        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' }, // Default TIDAK BOLEH NULL
+        // Default Data
+        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' },
         search: '',
+
+        // --- LOGIC IMAGE PREVIEW ---
+        imagePreview: null,
+
+        // --- LOGIC AI SUGGESTION ---
         suggestingPrice: false,
         aiReason: '',
         aiError: '',
-    
+
+        // Fungsi Reset Form (Membersihkan Data & Preview & AI)
+        resetForm() {
+            this.selectedProduk = {
+                id: null,
+                nama_produk: '',
+                modal: 0,
+                harga_jual: 0,
+                inventori: 0,
+                jenis_produk: ''
+            };
+            this.imagePreview = null;
+            this.aiReason = '';
+            this.aiError = '';
+
+            // Reset input file native
+            if (document.getElementById('fileInput')) {
+                document.getElementById('fileInput').value = '';
+            }
+        },
+
+        // Fungsi Tanya AI
         async suggestPrice() {
             this.aiError = '';
+            this.aiReason = '';
+
+            // Validasi Input
             if (!this.selectedProduk.nama_produk || !this.selectedProduk.modal || !this.selectedProduk.jenis_produk) {
                 this.aiError = 'Mohon isi Nama Produk, Modal, dan Jenis Produk terlebih dahulu.';
                 return;
             }
+
             this.suggestingPrice = true;
-            this.aiReason = '';
+
             try {
                 const response = await fetch('{{ route('produk.suggest-price') }}', {
                     method: 'POST',
@@ -34,7 +65,9 @@
                         jenis_produk: this.selectedProduk.jenis_produk
                     })
                 });
+
                 const data = await response.json();
+
                 if (data.price) {
                     this.selectedProduk.harga_jual = data.price;
                     this.aiReason = data.reason;
@@ -48,43 +81,43 @@
                 this.suggestingPrice = false;
             }
         },
-    
-        // Fungsi Helper untuk Reset Form
-        resetForm() {
-            this.selectedProduk = {
-                id: null,
-                nama_produk: '',
-                modal: 0,
-                harga_jual: 0,
-                inventori: 0,
-                jenis_produk: ''
-            };
-            this.aiReason = '';
-            this.aiError = '';
+
+        // Fungsi Handle File Upload (Preview Gambar)
+        fileChosen(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.imagePreview = URL.createObjectURL(file);
+            }
         },
-    
+
         openCreateModal() {
-            this.resetForm(); // Panggil fungsi reset
+            this.resetForm();
             this.createModalOpen = true;
         },
-    
+
         openEditModal(produk) {
-            // Copy object agar tidak reaktif langsung ke list (deep copy sederhana)
+            // Deep copy object
             this.selectedProduk = JSON.parse(JSON.stringify(produk));
+
+            // Set Preview Gambar jika ada
+            if (produk.gambar) {
+                this.imagePreview = '/storage/' + produk.gambar;
+            } else {
+                this.imagePreview = null;
+            }
+
             this.editModalOpen = true;
         },
-    
+
         openDeleteModal(produk) {
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
         },
-    
+
         closeModals() {
             this.createModalOpen = false;
             this.editModalOpen = false;
             this.deleteModalOpen = false;
-            // JANGAN set selectedProduk = null.
-            // Biarkan sisa data terakhir atau reset ke kosong, tapi tetap object.
             this.resetForm();
         }
     }">
@@ -300,18 +333,38 @@
                                     Produk</label>
                                 <div class="flex items-center justify-center w-full">
                                     <label
-                                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        class="relative flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all overflow-hidden group">
+
+                                        <div x-show="!imagePreview"
+                                            class="flex flex-col items-center justify-center pt-5 pb-6">
                                             <svg class="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                                 </path>
                                             </svg>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">Klik untuk upload gambar
-                                            </p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Klik untuk
+                                                upload gambar</p>
+                                            <p class="text-xs text-gray-400 mt-1">PNG, JPG up to 2MB</p>
                                         </div>
-                                        <input type="file" name="gambar" class="hidden" accept="image/*">
+
+                                        <div x-show="imagePreview" class="absolute inset-0 w-full h-full"
+                                            style="display: none;">
+                                            <img :src="imagePreview" class="w-full h-full object-cover">
+                                            <div
+                                                class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                <svg class="w-8 h-8 text-white mb-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
+                                                    </path>
+                                                </svg>
+                                                <span class="text-white text-sm font-medium">Ganti Gambar</span>
+                                            </div>
+                                        </div>
+
+                                        <input type="file" id="fileInput" name="gambar" class="hidden"
+                                            accept="image/*" @change="fileChosen">
                                     </label>
                                 </div>
                             </div>
