@@ -7,12 +7,12 @@
         createModalOpen: {{ $errors->any() && !session('success') ? 'true' : 'false' }},
         editModalOpen: false,
         deleteModalOpen: false,
-        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' }, // Default TIDAK BOLEH NULL
+        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, jenis_produk: '' },
         search: '',
         suggestingPrice: false,
         aiReason: '',
         aiError: '',
-    
+
         async suggestPrice() {
             this.aiError = '';
             if (!this.selectedProduk.nama_produk || !this.selectedProduk.modal || !this.selectedProduk.jenis_produk) {
@@ -48,8 +48,7 @@
                 this.suggestingPrice = false;
             }
         },
-    
-        // Fungsi Helper untuk Reset Form
+
         resetForm() {
             this.selectedProduk = {
                 id: null,
@@ -62,29 +61,26 @@
             this.aiReason = '';
             this.aiError = '';
         },
-    
+
         openCreateModal() {
-            this.resetForm(); // Panggil fungsi reset
+            this.resetForm();
             this.createModalOpen = true;
         },
-    
+
         openEditModal(produk) {
-            // Copy object agar tidak reaktif langsung ke list (deep copy sederhana)
             this.selectedProduk = JSON.parse(JSON.stringify(produk));
             this.editModalOpen = true;
         },
-    
+
         openDeleteModal(produk) {
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
         },
-    
+
         closeModals() {
             this.createModalOpen = false;
             this.editModalOpen = false;
             this.deleteModalOpen = false;
-            // JANGAN set selectedProduk = null.
-            // Biarkan sisa data terakhir atau reset ke kosong, tapi tetap object.
             this.resetForm();
         }
     }">
