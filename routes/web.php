@@ -36,6 +36,11 @@ Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.st
             return view('amerta');
         })->name('amerta');
 
+        Route::get('/main_menu', function () {
+            return view('main_menu');
+        })->name('main_menu');
+        
+
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
         Route::post('/produk/suggest-price', [ProdukController::class, 'suggestPrice'])->name('produk.suggest-price');

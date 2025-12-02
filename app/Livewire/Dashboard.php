@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\CashJournal;
+use App\Models\Produk;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -174,7 +175,6 @@ class Dashboard extends Component
             'chartData',
             'expenseLabels',
             'expenseData',
-            'range',
             'aiMessage',
             'lowStockProducts'
         ))
