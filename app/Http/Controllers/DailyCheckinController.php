@@ -24,7 +24,9 @@ class DailyCheckinController extends Controller
         $startOfMonth = Carbon::parse($date)->startOfMonth();
         $endOfMonth = Carbon::parse($date)->endOfMonth();
 
-        $dailySales = DailySale::whereBetween('date', [$startOfMonth, $endOfMonth])
+        $businessId = auth()->user()->business?->id;
+        $dailySales = DailySale::where('business_id', $businessId)
+            ->whereBetween('date', [$startOfMonth, $endOfMonth])
             ->get()
             ->keyBy(fn($sale) => $sale->date->format('Y-m-d'));
 
@@ -36,12 +38,15 @@ class DailyCheckinController extends Controller
         $date = $request->input('date', now()->format('Y-m-d'));
 
         // Check if already exists
-        $existing = DailySale::where('date', $date)->first();
+        $businessId = auth()->user()->business?->id;
+        $existing = DailySale::where('business_id', $businessId)
+            ->where('date', $date)
+            ->first();
         if ($existing) {
             return redirect()->route('daily-checkin.show', $existing->id);
         }
 
-        $produks = Produk::all();
+        $produks = Produk::where('business_id', $businessId)->get();
 
         return view('daily-checkin.create', compact('produks', 'date'));
     }
@@ -49,7 +54,13 @@ class DailyCheckinController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'date' => 'required|date|unique:daily_sales,date',
+            'date' => [
+                'required',
+                'date',
+                \Illuminate\Validation\Rule::unique('daily_sales')->where(function ($query) {
+                    return $query->where('business_id', auth()->user()->business?->id);
+                }),
+            ],
             'sales' => 'required|array',
             'sales.*' => 'required|integer|min:0',
         ]);
@@ -59,7 +70,9 @@ class DailyCheckinController extends Controller
         $totalCost = 0;
         $totalProfit = 0;
 
+        $businessId = auth()->user()->business?->id;
         $dailySale = DailySale::create([
+            'business_id' => $businessId,
             'date' => $request->date,
             'total_revenue' => 0, // Update later
             'total_profit' => 0, // Update later
@@ -68,7 +81,7 @@ class DailyCheckinController extends Controller
 
         foreach ($request->sales as $produkId => $qty) {
             if ($qty > 0) {
-                $produk = Produk::find($produkId);
+                $produk = Produk::where('business_id', $businessId)->find($produkId);
                 if ($produk) {
                     $revenue = $produk->harga_jual * $qty;
                     $cost = $produk->modal * $qty;
@@ -106,7 +119,7 @@ class DailyCheckinController extends Controller
         $prompt .= "\n\nBerikan evaluasi singkat, apakah ini untung atau rugi? Jika untung besar, beri ucapan selamat yang memotivasi. Jika rugi atau untung tipis, beri saran konkret untuk meningkatkan penjualan besok. Gunakan bahasa yang santai dan suportif.";
 
         // Get Business context
-        $business = \App\Models\Business::first();
+        $business = auth()->user()->business;
         if (! $business) {
             $business = new \App\Models\Business;
             $business->nama_bisnis = 'Bisnis Saya';
@@ -132,7 +145,9 @@ class DailyCheckinController extends Controller
 
     public function show($id)
     {
-        $dailySale = DailySale::with('items.produk')->findOrFail($id);
+        $dailySale = DailySale::where('business_id', auth()->user()->business?->id)
+            ->with('items.produk')
+            ->findOrFail($id);
 
         return view('daily-checkin.show', compact('dailySale'));
     }

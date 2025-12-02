@@ -10,6 +10,7 @@ class DailySale extends Model
     use HasFactory;
 
     protected $fillable = [
+        'business_id',
         'date',
         'total_revenue',
         'total_profit',
@@ -19,6 +20,11 @@ class DailySale extends Model
     protected $casts = [
         'date' => 'date',
     ];
+
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
+    }
 
     public function items()
     {
