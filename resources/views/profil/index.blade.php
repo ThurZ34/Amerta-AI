@@ -202,12 +202,12 @@
                                 <template x-if="!isEditing">
                                     <p
                                         class="text-gray-900 dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg min-h-[80px]">
-                                        {{ $business->tujuan_utama ?? '-' }}
+                                        {{ $business?->tujuan_utama ?? '-' }}
                                     </p>
                                 </template>
                                 <template x-if="isEditing">
                                     <textarea name="tujuan_utama" rows="3" placeholder="Apa tujuan utama bisnis Anda?"
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">{{ old('tujuan_utama', $business->tujuan_utama ?? '') }}</textarea>
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">{{ old('tujuan_utama', $business?->tujuan_utama ?? '') }}</textarea>
                                 </template>
                             </div>
 
@@ -226,12 +226,12 @@
                                 <template x-if="!isEditing">
                                     <p
                                         class="text-gray-900 dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg min-h-[80px]">
-                                        {{ $business->alamat ?? '-' }}
+                                        {{ $business?->alamat ?? '-' }}
                                     </p>
                                 </template>
                                 <template x-if="isEditing">
                                     <textarea name="alamat" rows="3" placeholder="Alamat lengkap bisnis Anda"
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">{{ old('alamat', $business->alamat ?? '') }}</textarea>
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">{{ old('alamat', $business?->alamat ?? '') }}</textarea>
                                 </template>
                             </div>
                         </div>
@@ -428,6 +428,32 @@
                     </div>
                 </div>
             </form>
+        </div>
+
+        <div x-show="showImageModal"
+            style="display: none;"
+            class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-sm p-4"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            @click.self="showImageModal = false"
+            @keydown.escape.window="showImageModal = false">
+
+            <div class="relative max-w-4xl w-full max-h-screen flex flex-col items-center">
+                <button @click="showImageModal = false"
+                    class="absolute -top-12 right-0 text-white hover:text-gray-300 focus:outline-none p-2">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                <img :src="modalImageUrl"
+                    class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                    alt="Full size business image">
+            </div>
         </div>
     </div>
 @endsection
