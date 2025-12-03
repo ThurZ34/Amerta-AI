@@ -3,8 +3,8 @@
 use App\Http\Controllers\DailyCheckinController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProdukController;
-use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\RiwayatController;
+use App\Http\Controllers\SurveyController;
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
 

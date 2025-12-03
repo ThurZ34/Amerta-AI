@@ -9,5 +9,10 @@ class ChatHistory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'role', 'message', 'image_path'];
+    protected $fillable = ['user_id', 'conversation_id', 'role', 'message', 'image_path'];
+
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
+    }
 }

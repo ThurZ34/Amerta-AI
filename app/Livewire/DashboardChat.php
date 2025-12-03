@@ -8,6 +8,8 @@ use Livewire\WithFileUploads;
 use App\Models\ChatHistory;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
+use App\Models\Conversation;
+use Illuminate\Support\Str;
 
 class DashboardChat extends Component
 {
@@ -19,13 +21,42 @@ class DashboardChat extends Component
     public $totalChats = 0;
     public $mode = 'full'; // 'full' or 'quick'
     public $ephemeralChats = []; // For quick mode
+    public $conversationId = null;
+    public $conversations = [];
 
     public function mount($mode = 'full')
     {
         $this->mode = $mode;
         if ($this->mode === 'full') {
-            $this->totalChats = ChatHistory::where('user_id', Auth::id())->count();
+            $this->loadConversations();
+            // Start new chat by default when entering page
+            $this->conversationId = null;
+            $this->totalChats = 0;
         }
+    }
+
+    public function loadConversations()
+    {
+        $this->conversations = Conversation::where('user_id', Auth::id())
+            ->latest()
+            ->get();
+    }
+
+    public function loadConversation($id)
+    {
+        $conversation = Conversation::where('user_id', Auth::id())->find($id);
+        if ($conversation) {
+            $this->conversationId = $conversation->id;
+            $this->totalChats = $conversation->chats()->count();
+            $this->limit = max(4, $this->totalChats); // Load all or at least 4
+        }
+    }
+
+    public function newChat()
+    {
+        $this->conversationId = null;
+        $this->totalChats = 0;
+        $this->reset('image');
     }
 
     public function loadMore()
@@ -49,8 +80,20 @@ class DashboardChat extends Component
         }
 
         if ($this->mode === 'full') {
+            
+            if (!$this->conversationId) {
+                $title = Str::limit($messageText ?? 'Image Analysis', 30);
+                $conversation = Conversation::create([
+                    'user_id' => Auth::id(),
+                    'title' => $title
+                ]);
+                $this->conversationId = $conversation->id;
+                $this->loadConversations(); // Refresh list
+            }
+
             ChatHistory::create([
                 'user_id' => Auth::id(),
+                'conversation_id' => $this->conversationId,
                 'role' => 'user',
                 'message' => $messageText ?? 'Menganalisa gambar...',
                 'image_path' => $imagePath
@@ -82,6 +125,7 @@ class DashboardChat extends Component
 
         if ($this->mode === 'full') {
             $lastUserChat = ChatHistory::where('user_id', Auth::id())
+                ->where('conversation_id', $this->conversationId)
                 ->where('role', 'user')
                 ->latest()
                 ->first();
@@ -105,6 +149,7 @@ class DashboardChat extends Component
         if ($this->mode === 'full') {
             ChatHistory::create([
                 'user_id' => Auth::id(),
+                'conversation_id' => $this->conversationId,
                 'role' => 'ai',
                 'message' => $aiReply
             ]);
@@ -129,13 +174,19 @@ class DashboardChat extends Component
     public function render()
     {
         if ($this->mode === 'full') {
-            $chats = ChatHistory::where('user_id', Auth::id())
-                ->latest()
-                ->take($this->limit)
-                ->get()
-                ->sortBy('id');
+            if ($this->conversationId) {
+                $chats = ChatHistory::where('conversation_id', $this->conversationId)
+                    ->latest()
+                    ->take($this->limit)
+                    ->get()
+                    ->sortBy('id');
+            } else {
+                $chats = collect([]);
+            }
         } else {
-            $chats = collect($this->ephemeralChats);
+            $chats = collect($this->ephemeralChats)->map(function ($chat) {
+                return (object) $chat;
+            });
         }
 
         return view('livewire.chatbot', [
