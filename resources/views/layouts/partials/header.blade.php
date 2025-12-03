@@ -38,6 +38,7 @@
         <div class="relative ml-3" x-data="{ open: false }" @click.away="open = false">
             <button @click="open = !open" type="button"
                 class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group">
+
                 <div class="relative">
                     <div
                         class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-sm uppercase">
@@ -46,19 +47,24 @@
                     <span
                         class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></span>
                 </div>
+
                 <div class="flex-1 min-w-0 hidden sm:block">
                     <p
-                        class="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        class="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors uppercase">
                         {{ Auth::user()->name ?? 'Guest' }}
                     </p>
                 </div>
-                <svg class="w-4 h-4 text-gray-400 dark:text-gray-600 transition-transform duration-200"
-                    :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                <svg class="w-4 h-4 text-gray-400 dark:text-gray-600 transform transition-transform duration-200"
+                    :class="{ 'rotate-180': open }"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
+
             </button>
 
-            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+            <div x-show="open"
+                x-transition:enter="transition ease-out duration-100"
                 x-transition:enter-start="transform opacity-0 scale-95"
                 x-transition:enter-end="transform opacity-100 scale-100"
                 x-transition:leave="transition ease-in duration-75"
