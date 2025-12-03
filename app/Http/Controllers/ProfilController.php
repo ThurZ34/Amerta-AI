@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Business;
 use App\Models\User;
 use App\Models\Category;
+use Illuminate\Support\Facades\Storage;
 
 class ProfilController extends Controller
 {
@@ -45,8 +46,23 @@ class ProfilController extends Controller
             $business->category_id = $category->id;
         }
 
+        // Handle image upload
+        if ($request->hasFile('gambar')) {
+            $request->validate([
+                'gambar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+
+            // Delete old image if exists
+            if ($business->gambar && Storage::disk('public')->exists($business->gambar)) {
+                Storage::disk('public')->delete($business->gambar);
+            }
+
+            $path = $request->file('gambar')->store('business_images', 'public');
+            $business->gambar = $path;
+        }
+
         // Update other fields
-        $business->fill($request->except(['kategori']));
+        $business->fill($request->except(['kategori', 'gambar']));
         $business->save();
 
         return redirect()->route('profil_bisnis')->with('success', 'Profil bisnis berhasil diperbarui.');
