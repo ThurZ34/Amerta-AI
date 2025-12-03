@@ -92,6 +92,7 @@ class DailyCheckinController extends Controller
 
         try {
             $dailySale = DailySale::create([
+                'business_id' => auth()->user()->business->id,
                 'date' => $request->date,
                 'ai_analysis' => 'Analyzing...',
             ]);
@@ -181,7 +182,9 @@ class DailyCheckinController extends Controller
 
     public function show($id)
     {
-        $dailySale = DailySale::with('items.produk')->findOrFail($id);
+        $dailySale = DailySale::where('business_id', auth()->user()->business->id)
+            ->with('items.produk')
+            ->findOrFail($id);
 
         $totalRevenue = CashJournal::where('business_id', auth()->user()->business->id)->inflows()->whereDate('transaction_date', $dailySale->date)->sum('amount');
         $totalExpense = CashJournal::where('business_id', auth()->user()->business->id)->outflows()->whereDate('transaction_date', $dailySale->date)->sum('amount');
