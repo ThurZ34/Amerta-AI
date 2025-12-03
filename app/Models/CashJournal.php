@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class CashJournal extends Model
 {
@@ -26,6 +28,19 @@ class CashJournal extends Model
         'is_inflow' => 'boolean',
         'amount' => 'decimal:2',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope('business', function (Builder $builder) {
+            if (Auth::check()) {
+                $businessId = Auth::user()->business_id;
+
+                if ($businessId) {
+                    $builder->where('business_id', $businessId);
+                }
+            }
+        });
+    }
 
     public function coa()
     {

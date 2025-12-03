@@ -48,16 +48,21 @@ class SurveyController extends Controller
         );
 
         // Simpan ke Database via Relasi User
-        Auth::user()->business()->create([
+        $business = Business::create([
+            'user_id' => Auth::id(), // <--- INI PALING PENTING (Memasukkan ID user login)
+            'category_id' => $category->id,
             'nama_bisnis' => $validated['nama_bisnis'],
             'status_bisnis' => $validated['status_bisnis'],
-            'category_id' => $category->id,
             'channel_penjualan' => $validated['channel_penjualan'],
             'target_pasar' => $validated['target_pasar'],
             'range_omset' => $validated['range_omset'],
             'jumlah_tim' => $validated['jumlah_tim'],
             'tujuan_utama' => $validated['tujuan_utama'],
         ]);
+
+        $user = Auth::user();
+        $user->business_id = $business->id;
+        $user->save();
 
         return redirect()->route('dashboard');
     }
