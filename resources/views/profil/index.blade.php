@@ -6,7 +6,9 @@
         categorySearch: '',
         showCategoryDropdown: false,
         categories: {{ json_encode($categories->pluck('name')->toArray()) }},
-        selectedCategory: '{{ old('kategori', $business->category->name ?? '') }}',
+        selectedCategory: '{{ old('kategori', $business?->category?->name ?? '') }}',
+        showImageModal: false,
+        modalImageUrl: '',
     
         get filteredCategories() {
             if (!this.categorySearch) return this.categories;
@@ -97,7 +99,7 @@
                         <!-- Business Name Header -->
                         <div class="px-6 py-6 border-b border-gray-200 dark:border-gray-700">
                             <div class="flex items-center gap-4" x-data="{
-                                imagePreview: '{{ $business->gambar ? Storage::url($business->gambar) : '' }}',
+                                imagePreview: '{{ $business?->gambar ? Storage::url($business->gambar) : '' }}',
                                 updatePreview(event) {
                                     const file = event.target.files[0];
                                     if (file) {
@@ -107,16 +109,22 @@
                                         };
                                         reader.readAsDataURL(file);
                                     }
+                                },
+                                openModal() {
+                                    if (!this.isEditing && this.imagePreview) {
+                                        this.modalImageUrl = this.imagePreview;
+                                        this.showImageModal = true;
+                                    }
                                 }
                             }">
                                 <!-- Hidden file input -->
                                 <input type="file" id="gambar-input" name="gambar" accept="image/*" class="hidden"
                                     @change="updatePreview($event)">
 
-                                <!-- Image container - clickable in edit mode -->
+                                <!-- Image container - clickable in edit mode or view mode -->
                                 <div class="relative w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden group"
-                                    :class="{ 'cursor-pointer': isEditing }"
-                                    @click="isEditing && document.getElementById('gambar-input').click()">
+                                    :class="{ 'cursor-pointer': isEditing || imagePreview }"
+                                    @click="isEditing ? document.getElementById('gambar-input').click() : openModal()">
 
                                     <template x-if="imagePreview">
                                         <img :src="imagePreview" alt="Business Logo" class="w-full h-full object-cover">
@@ -140,21 +148,26 @@
                                                 d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                     </div>
+                                    
+                                    <!-- View overlay - only visible in view mode when image exists -->
+                                    <div x-show="!isEditing && imagePreview"
+                                        class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
+                                    </div>
                                 </div>
 
                                 <div class="flex-1">
                                     <template x-if="!isEditing">
                                         <div>
                                             <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                                                {{ $business->nama_bisnis ?? 'Nama Bisnis Belum Diisi' }}</h3>
+                                                {{ $business?->nama_bisnis ?? 'Nama Bisnis Belum Diisi' }}</h3>
                                             <p class="text-gray-500 dark:text-gray-400 text-sm mt-0.5">
-                                                {{ $business->category->name ?? 'Kategori belum diisi' }}</p>
+                                                {{ $business?->category?->name ?? 'Kategori belum diisi' }}</p>
                                         </div>
                                     </template>
                                     <template x-if="isEditing">
                                         <div class="space-y-2">
                                             <input type="text" name="nama_bisnis"
-                                                value="{{ old('nama_bisnis', $business->nama_bisnis ?? '') }}"
+                                                value="{{ old('nama_bisnis', $business?->nama_bisnis ?? '') }}"
                                                 placeholder="Nama Bisnis"
                                                 class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-lg font-semibold">
                                             @error('nama_bisnis')
@@ -184,12 +197,12 @@
                                 <template x-if="!isEditing">
                                     <p
                                         class="text-gray-900 dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg min-h-[80px]">
-                                        {{ $business->tujuan_utama ?? '-' }}
+                                        {{ $business?->tujuan_utama ?? '-' }}
                                     </p>
                                 </template>
                                 <template x-if="isEditing">
                                     <textarea name="tujuan_utama" rows="3" placeholder="Apa tujuan utama bisnis Anda?"
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">{{ old('tujuan_utama', $business->tujuan_utama ?? '') }}</textarea>
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">{{ old('tujuan_utama', $business?->tujuan_utama ?? '') }}</textarea>
                                 </template>
                             </div>
 
@@ -209,12 +222,12 @@
                                 <template x-if="!isEditing">
                                     <p
                                         class="text-gray-900 dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg min-h-[80px]">
-                                        {{ $business->alamat ?? '-' }}
+                                        {{ $business?->alamat ?? '-' }}
                                     </p>
                                 </template>
                                 <template x-if="isEditing">
                                     <textarea name="alamat" rows="3" placeholder="Alamat lengkap bisnis Anda"
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">{{ old('alamat', $business->alamat ?? '') }}</textarea>
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">{{ old('alamat', $business?->alamat ?? '') }}</textarea>
                                 </template>
                             </div>
                         </div>
@@ -258,10 +271,10 @@
                                     <div class="flex items-center gap-2" x-data="{ copied: false }">
                                         <code
                                             class="flex-1 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg text-sm font-mono font-bold text-gray-900 dark:text-white tracking-wider text-center border border-gray-200 dark:border-gray-600">
-                                            {{ $business->invite_code ?? 'BELUM ADA' }}
+                                            {{ $business?->invite_code ?? 'BELUM ADA' }}
                                         </code>
                                         <button
-                                            @click="navigator.clipboard.writeText('{{ $business->invite_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
+                                            @click="navigator.clipboard.writeText('{{ $business?->invite_code ?? '' }}'); copied = true; setTimeout(() => copied = false, 2000)"
                                             class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors relative group">
                                             <svg x-show="!copied" class="w-5 h-5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -300,7 +313,7 @@
                                     </label>
                                     <template x-if="!isEditing">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $business->category->name ?? '-' }}
+                                            {{ $business?->category?->name ?? '-' }}
                                         </p>
                                     </template>
                                     <template x-if="isEditing">
@@ -357,12 +370,12 @@
                                     </label>
                                     <template x-if="!isEditing">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $business->target_pasar ?? '-' }}
+                                            {{ $business?->target_pasar ?? '-' }}
                                         </p>
                                     </template>
                                     <template x-if="isEditing">
                                         <input type="text" name="target_pasar"
-                                            value="{{ old('target_pasar', $business->target_pasar ?? '') }}"
+                                            value="{{ old('target_pasar', $business?->target_pasar ?? '') }}"
                                             placeholder="Contoh: Mahasiswa"
                                             class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
                                     </template>
@@ -383,12 +396,12 @@
                                     </label>
                                     <template x-if="!isEditing">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $business->jumlah_tim ?? '0' }} Orang
+                                            {{ $business?->jumlah_tim ?? '0' }} Orang
                                         </p>
                                     </template>
                                     <template x-if="isEditing">
                                         <input type="number" name="jumlah_tim"
-                                            value="{{ old('jumlah_tim', $business->jumlah_tim ?? '') }}" placeholder="0"
+                                            value="{{ old('jumlah_tim', $business?->jumlah_tim ?? '') }}" placeholder="0"
                                             class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
                                     </template>
                                 </div>
@@ -408,12 +421,12 @@
                                     </label>
                                     <template x-if="!isEditing">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $business->telepon ?? '-' }}
+                                            {{ $business?->telepon ?? '-' }}
                                         </p>
                                     </template>
                                     <template x-if="isEditing">
                                         <input type="text" name="telepon"
-                                            value="{{ old('telepon', $business->telepon ?? '') }}"
+                                            value="{{ old('telepon', $business?->telepon ?? '') }}"
                                             placeholder="08123456789"
                                             class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
                                     </template>
@@ -423,6 +436,35 @@
                     </div>
                 </div>
             </form>
+        </div>
+
+        <!-- Image Modal -->
+        <div x-show="showImageModal" 
+            style="display: none;"
+            class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-sm p-4"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            @click.self="showImageModal = false"
+            @keydown.escape.window="showImageModal = false">
+            
+            <div class="relative max-w-4xl w-full max-h-screen flex flex-col items-center">
+                <!-- Close button -->
+                <button @click="showImageModal = false" 
+                    class="absolute -top-12 right-0 text-white hover:text-gray-300 focus:outline-none p-2">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                <!-- Image -->
+                <img :src="modalImageUrl" 
+                    class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" 
+                    alt="Full size business image">
+            </div>
         </div>
     </div>
 @endsection
