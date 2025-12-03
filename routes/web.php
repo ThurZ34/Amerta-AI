@@ -1,14 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\DailyCheckinController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SurveyController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\RiwayatController;
 use App\Livewire\Dashboard;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('landing_page');
@@ -17,25 +14,29 @@ Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'id'])) {
         session(['locale' => $locale]);
     }
+
     return redirect()->back();
 })->name('lang.switch');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/setup-bisnis', [SurveyController::class, 'index'])->name('setup-bisnis');
-    Route::post('/setup-bisnis', [SurveyController::class, 'store'])->name('setup-bisnis.store');
-
-    Route::get('/daily-checkin', [DailyCheckinController::class, 'index'])->name('daily-checkin.index');
-Route::get('/daily-checkin/create', [DailyCheckinController::class, 'create'])->name('daily-checkin.create');
-Route::post('/daily-checkin', [DailyCheckinController::class, 'store'])->name('daily-checkin.store');
-Route::get('/daily-checkin/{id}', [DailyCheckinController::class, 'show'])->name('daily-checkin.show');
-Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
-Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
-
     Route::middleware(['ensure.business.complete'])->group(function () {
+
+        Route::post('/setup-bisnis', [SurveyController::class, 'store'])->name('setup-bisnis.store');
+
+        Route::get('/daily-checkin', [DailyCheckinController::class, 'index'])->name('daily-checkin.index');
+        Route::get('/daily-checkin/create', [DailyCheckinController::class, 'create'])->name('daily-checkin.create');
+        Route::post('/daily-checkin', [DailyCheckinController::class, 'store'])->name('daily-checkin.store');
+        Route::get('/daily-checkin/{id}', [DailyCheckinController::class, 'show'])->name('daily-checkin.show');
+        Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
+        Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
 
         Route::get('/amerta', function () {
             return view('amerta');
         })->name('amerta');
+
+        Route::get('/main_menu', [\App\Http\Controllers\MainMenuController::class, 'index'])->name('main_menu');
+        Route::post('/main_menu/update-target', [\App\Http\Controllers\MainMenuController::class, 'updateTarget'])->name('main_menu.update-target');
 
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
@@ -47,8 +48,4 @@ Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.st
     Route::get('/profil_bisnis', [\App\Http\Controllers\ProfilController::class, 'bussiness_index'])->name('profil_bisnis');
     Route::put('/profil_bisnis', [\App\Http\Controllers\ProfilController::class, 'update'])->name('profil_bisnis.update');
     Route::post('/categories', [\App\Http\Controllers\ProfilController::class, 'storeCategory'])->name('categories.store');
-    Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
-    Route::post('/riwayat', [RiwayatController::class, 'store'])->name('riwayat.store');
-    Route::put('/riwayat/{id}', [RiwayatController::class, 'update'])->name('riwayat.update');
-    Route::delete('/riwayat/{id}', [RiwayatController::class, 'destroy'])->name('riwayat.destroy');
 });

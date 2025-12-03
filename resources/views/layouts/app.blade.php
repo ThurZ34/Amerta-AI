@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50"
-    x-data="{
-        darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
-        toggleTheme() {
-            this.darkMode = !this.darkMode;
-            localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
-            if (this.darkMode) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50" x-data="{
+    darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+    toggleTheme() {
+        this.darkMode = !this.darkMode;
+        localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+        if (this.darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
-    }"
+    }
+}"
     :class="{ 'dark': darkMode }">
 
 <head>
@@ -22,7 +21,8 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
+                '(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
@@ -46,14 +46,22 @@
                 }
             }
         }
-        marked.use({ breaks: true, gfm: true });
+        marked.use({
+            breaks: true,
+            gfm: true
+        });
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        [x-cloak] { display: none !important; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 
@@ -68,7 +76,9 @@
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
             class="fixed inset-0 bg-gray-900/80 z-40 md:hidden" style="display: none;"></div>
 
-        @include('layouts.partials.sidebar')
+        @unless (request()->routeIs('main_menu'))
+            @include('layouts.partials.sidebar')
+        @endunless
 
         <div class="flex-1 flex flex-col min-w-0 h-full">
             @include('layouts.partials.header')
@@ -87,21 +97,21 @@
         pos: { x: 0, y: 0 },
         start: { x: 0, y: 0 },
         limits: { minX: 0, maxX: 0, minY: 0, maxY: 0 },
-
+    
         startDrag(e) {
             if (this.isFullscreen) return;
             this.isDragging = true;
             this.start.x = e.clientX - this.pos.x;
             this.start.y = e.clientY - this.pos.y;
-
+    
             const winW = window.innerWidth;
             const winH = window.innerHeight;
             const rect = this.$refs.chatModal.getBoundingClientRect();
-
+    
             // Margin aman
             const baseRight = 24;
             const baseBottom = 96;
-
+    
             this.limits = {
                 maxX: baseRight,
                 minX: -(winW - rect.width - baseRight),
@@ -109,7 +119,7 @@
                 minY: -(winH - rect.height - baseBottom)
             };
         },
-
+    
         doDrag(e) {
             if (this.isDragging) {
                 let rawX = e.clientX - this.start.x;
@@ -118,11 +128,11 @@
                 this.pos.y = Math.max(this.limits.minY, Math.min(rawY, this.limits.maxY));
             }
         },
-
+    
         stopDrag() {
             this.isDragging = false;
         },
-
+    
         toggleFullscreen() {
             this.isFullscreen = !this.isFullscreen;
             this.pos = { x: 0, y: 0 };
@@ -201,22 +211,24 @@
             </div>
         </div>
 
-        <div class="absolute bottom-6 right-6 pointer-events-auto" x-show="!isFullscreen">
-            <button @click="chatOpen = !chatOpen"
-                class="w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group z-50 relative">
+        @unless (request()->routeIs('main_menu'))
+            <div class="absolute bottom-6 right-6 pointer-events-auto" x-show="!isFullscreen">
+                <button @click="chatOpen = !chatOpen"
+                    class="w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group z-50 relative">
 
-                <span x-show="!chatOpen"
-                    class="text-xl font-bold transition-transform duration-300 group-hover:rotate-12">AI</span>
+                    <span x-show="!chatOpen"
+                        class="text-xl font-bold transition-transform duration-300 group-hover:rotate-12">AI</span>
 
-                <svg x-show="chatOpen" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    style="display: none;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
+                    <svg x-show="chatOpen" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        style="display: none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
 
-                <span
-                    class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white dark:border-gray-900 animate-pulse"></span>
-            </button>
-        </div>
+                    <span
+                        class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white dark:border-gray-900 animate-pulse"></span>
+                </button>
+            </div>
+        @endunless
 
     </div>
 

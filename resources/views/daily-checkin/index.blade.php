@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('header', 'Laporan Penjualan Harian')
+
 @section('content')
     @php
         $monthlyRevenue = collect($dailySales)->sum('total_revenue');
