@@ -98,4 +98,63 @@ class GeminiService
 
         return $data['candidates'][0]['content']['parts'][0]['text'] ?? "Maaf, saya tidak bisa membaca respon AI.";
     }
+    public function analyzeReceipt(string $imagePath)
+    {
+        $apiKey = config('services.gemini.key');
+        $model = config('services.gemini.model');
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+
+        if (!Storage::disk('public')->exists($imagePath)) {
+            return null;
+        }
+
+        $mimeType = Storage::disk('public')->mimeType($imagePath);
+        $imageData = base64_encode(Storage::disk('public')->get($imagePath));
+
+        $prompt = "
+            Analyze this receipt image and extract the following information in JSON format:
+            - merchant_name (string)
+            - transaction_date (YYYY-MM-DD)
+            - total_amount (number, just the value)
+            - items (array of strings, just item names)
+            - category_suggestion (string, e.g., 'Bahan Baku', 'Operasional', 'Lainnya')
+
+            Return ONLY the JSON. No markdown formatting, no code blocks.
+        ";
+
+        $response = Http::withHeaders(['Content-Type' => 'application/json'])
+            ->post($url, [
+                'contents' => [[
+                    'parts' => [
+                        ['text' => $prompt],
+                        [
+                            'inlineData' => [
+                                'mimeType' => $mimeType,
+                                'data' => $imageData
+                            ]
+                        ]
+                    ]
+                ]]
+            ]);
+
+        if ($response->failed()) {
+            Log::error('Gemini Receipt Analysis Error', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+            return null;
+        }
+
+        $data = $response->json();
+        $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+
+        if ($text) {
+            // Clean up potential markdown code blocks
+            $text = str_replace('```json', '', $text);
+            $text = str_replace('```', '', $text);
+            return json_decode(trim($text), true);
+        }
+
+        return null;
+    }
 }

@@ -53,6 +53,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profil_bisnis', [\App\Http\Controllers\ProfilController::class, 'update'])->name('profil_bisnis.update');
     Route::post('/categories', [\App\Http\Controllers\ProfilController::class, 'storeCategory'])->name('categories.store');
     Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
+    Route::post('/riwayat/scan', [RiwayatController::class, 'scan'])->name('riwayat.scan');
     Route::post('/riwayat', [RiwayatController::class, 'store'])->name('riwayat.store');
     Route::put('/riwayat/{id}', [RiwayatController::class, 'update'])->name('riwayat.update');
     Route::delete('/riwayat/{id}', [RiwayatController::class, 'destroy'])->name('riwayat.destroy');
