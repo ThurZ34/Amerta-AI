@@ -1,26 +1,25 @@
-@extends('layouts.app')
 
 @section('header', 'Pilih Jalur Anda')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center relative overflow-hidden px-4 sm:px-6 lg:px-8">
-    
+
     {{-- 1. BACKGROUND DECORATION (Mengisi kekosongan) --}}
     <div class="absolute inset-0 w-full h-full">
         {{-- Grid Pattern --}}
         <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
         <div class="absolute inset-0" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 32px 32px; opacity: 0.05;"></div>
-        
+
         {{-- Blurs --}}
         <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-screen animate-blob"></div>
         <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-screen animate-blob animation-delay-2000"></div>
     </div>
 
     <div class="w-full max-w-5xl relative z-10">
-        
+
         {{-- 2. HEADER SECTION --}}
         <div class="text-center mb-12">
-            
+
             <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
                 Selamat Datang, {{ explode(' ', Auth::user()->name)[0] }}!
             </h1>
@@ -36,7 +35,7 @@
             <div class="group relative bg-white dark:bg-gray-800 rounded-[2rem] border border-gray-200 dark:border-gray-700 p-8 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
                 {{-- Decor --}}
                 <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-900/20 rounded-bl-[4rem] transition-colors group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40"></div>
-                
+
                 <div class="relative z-10 flex flex-col h-full">
                     <div class="flex justify-between items-start mb-6">
                         <div class="w-14 h-14 rounded-2xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300">
@@ -92,7 +91,7 @@
                                 <input type="text" name="invite_code" required
                                     class="block w-full pl-11 pr-24 py-4 rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-slate-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all font-mono tracking-wider uppercase"
                                     placeholder="KODE-123">
-                                
+
                                 <button type="submit" class="absolute right-2 top-2 bottom-2 bg-white dark:bg-gray-800 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-gray-700 px-4 rounded-lg text-sm font-bold shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
                                     Gabung
                                 </button>
