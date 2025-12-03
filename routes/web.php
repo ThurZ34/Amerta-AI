@@ -4,6 +4,7 @@ use App\Http\Controllers\DailyCheckinController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\RiwayatController;
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
 
@@ -48,4 +49,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profil_bisnis', [\App\Http\Controllers\ProfilController::class, 'bussiness_index'])->name('profil_bisnis');
     Route::put('/profil_bisnis', [\App\Http\Controllers\ProfilController::class, 'update'])->name('profil_bisnis.update');
     Route::post('/categories', [\App\Http\Controllers\ProfilController::class, 'storeCategory'])->name('categories.store');
+    Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
+    Route::post('/riwayat', [RiwayatController::class, 'store'])->name('riwayat.store');
+    Route::put('/riwayat/{id}', [RiwayatController::class, 'update'])->name('riwayat.update');
+    Route::delete('/riwayat/{id}', [RiwayatController::class, 'destroy'])->name('riwayat.destroy');
 });
