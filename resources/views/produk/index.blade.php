@@ -82,6 +82,44 @@
             }
         },
     
+        // Format currency for display (adds Rp. and thousand separators)
+        formatCurrency(value) {
+            if (!value) return '';
+            const number = parseFloat(value);
+            if (isNaN(number)) return '';
+            return 'Rp. ' + new Intl.NumberFormat('id-ID').format(number);
+        },
+    
+        // Parse currency input (removes Rp. and dots)
+        parseCurrency(value) {
+            if (!value) return '';
+            return value.toString().replace(/[^0-9]/g, '');
+        },
+    
+        // Handle modal input
+        updateModal(event) {
+            const rawValue = this.parseCurrency(event.target.value);
+            this.selectedProduk.modal = rawValue;
+            event.target.value = this.formatCurrency(rawValue);
+        },
+    
+        // Handle harga jual input
+        updateHargaJual(event) {
+            const rawValue = this.parseCurrency(event.target.value);
+            this.selectedProduk.harga_jual = rawValue;
+            event.target.value = this.formatCurrency(rawValue);
+        },
+    
+        // Get formatted display value for modal
+        get displayModal() {
+            return this.formatCurrency(this.selectedProduk.modal);
+        },
+    
+        // Get formatted display value for harga jual
+        get displayHargaJual() {
+            return this.formatCurrency(this.selectedProduk.harga_jual);
+        },
+    
         // Fungsi Handle File Upload
         fileChosen(event) {
             const file = event.target.files[0];
@@ -377,12 +415,13 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Modal
                                         (HPP)</label>
-                                    <div class="relative">
-                                        <span
-                                            class="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">Rp</span>
-                                        <input type="number" name="modal" x-model="selectedProduk.modal" required
-                                            class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
-                                    </div>
+                                    <input type="hidden" name="modal" x-model="selectedProduk.modal">
+                                    <input type="text" 
+                                        @input="updateModal($event)"
+                                        :value="displayModal"
+                                        required
+                                        placeholder="Rp. 0"
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                 </div>
                                 <div>
                                     <label
@@ -406,13 +445,13 @@
                                             <span x-text="suggestingPrice ? 'Menganalisa...' : 'Tanya AI'"></span>
                                         </button>
                                     </label>
-                                    <div class="relative">
-                                        <span
-                                            class="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400 text-sm">Rp</span>
-                                        <input type="number" name="harga_jual" x-model="selectedProduk.harga_jual"
-                                            required
-                                            class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
-                                    </div>
+                                    <input type="hidden" name="harga_jual" x-model="selectedProduk.harga_jual">
+                                    <input type="text" 
+                                        @input="updateHargaJual($event)"
+                                        :value="displayHargaJual"
+                                        required
+                                        placeholder="Rp. 0"
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                     <p x-show="aiReason" x-text="aiReason"
                                         class="mt-1 text-xs text-indigo-600 dark:text-indigo-400 italic"></p>
                                     <p x-show="aiError" x-text="aiError"

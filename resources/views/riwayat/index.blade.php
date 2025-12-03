@@ -81,6 +81,38 @@
             return new Intl.NumberFormat('id-ID').format(angka);
         },
     
+        // Format currency for display (adds Rp. and thousand separators)
+        formatCurrency(value) {
+            if (!value) return '';
+            const number = parseFloat(value);
+            if (isNaN(number)) return '';
+            return 'Rp. ' + new Intl.NumberFormat('id-ID').format(number);
+        },
+    
+        // Parse currency input (removes Rp. and dots)
+        parseCurrency(value) {
+            if (!value) return '';
+            return value.toString().replace(/[^0-9]/g, '');
+        },
+    
+        // Handle harga satuan input
+        updateHargaSatuan(event) {
+            const rawValue = this.parseCurrency(event.target.value);
+            this.formData.harga_satuan = rawValue;
+            event.target.value = this.formatCurrency(rawValue);
+            this.calculateTotal();
+        },
+    
+        // Get formatted display value for harga satuan
+        get displayHargaSatuan() {
+            return this.formatCurrency(this.formData.harga_satuan);
+        },
+    
+        // Get formatted display value for total harga
+        get displayTotalHarga() {
+            return this.formatCurrency(this.formData.total_harga);
+        },
+    
         triggerScan() {
             document.getElementById('scanInput').click();
         },
@@ -105,7 +137,7 @@
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
                 <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-black/10 rounded-full blur-3xl"></div>
 
-                <div class="relative z-10 text-white text-center">
+                <div class="relative z-10 text-gray-900 dark:text-white text-center">
                     <p class="text-sm font-medium opacity-90 uppercase tracking-wider"
                         x-text="activeTab === 'pengeluaran' ? 'Total Pengeluaran' : 'Total Pendapatan'"></p>
                     <h2 class="text-4xl font-black mt-2 tracking-tight">
@@ -201,14 +233,18 @@
                             <div
                                 class="flex items-center justify-end gap-3 mt-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button @click="openEditModal(riwayat)"
-                                    class="text-xs font-medium text-indigo-600 hover:underline">Edit</button>
+                                    class="text-xs font-medium hover:text-indigo-600 hover:underline"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                    </svg></button>
                                 <form :action="`{{ route('riwayat.index') }}/${riwayat.id}`" method="POST"
                                     class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"
-                                        class="text-xs font-medium text-gray-400 hover:text-red-500 transition-colors"
-                                        onclick="return confirm('Hapus data ini?')">Hapus</button>
+                                        class="text-xs font-medium hover:text-red-500 transition-colors"
+                                        onclick="return confirm('Hapus data ini?')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                    </svg></button>
                                 </form>
                             </div>
                         </div>
@@ -227,7 +263,6 @@
                     <p class="text-gray-500 font-medium">Belum ada transaksi.</p>
                 </div>
             </div>
-
         </div>
 
         <div x-show="showModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;" x-cloak>
@@ -268,9 +303,9 @@
                             <div class="text-center">
                                 <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total
                                     Harga</label>
-                                <input type="number" name="total_harga" x-model="formData.total_harga" readonly
-                                    class="w-full text-center text-3xl font-black bg-transparent border-none focus:ring-0 p-0 text-gray-900 dark:text-white"
-                                    placeholder="0">
+                                <input type="hidden" name="total_harga" x-model="formData.total_harga">
+                                <div class="w-full text-center text-3xl font-black bg-transparent p-0 text-gray-900 dark:text-white"
+                                    x-text="displayTotalHarga || 'Rp. 0'"></div>
                                 <p class="text-xs text-gray-400 italic mt-1">*Otomatis dihitung</p>
                             </div>
 
@@ -283,8 +318,12 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Harga Satuan</label>
-                                    <input type="number" name="harga_satuan" x-model="formData.harga_satuan"
-                                        @input="calculateTotal()" required
+                                    <input type="hidden" name="harga_satuan" x-model="formData.harga_satuan">
+                                    <input type="text" 
+                                        @input="updateHargaSatuan($event)"
+                                        :value="displayHargaSatuan"
+                                        required
+                                        placeholder="Rp. 0"
                                         class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow">
                                 </div>
                             </div>

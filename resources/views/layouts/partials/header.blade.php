@@ -41,7 +41,7 @@
 
                 <div class="relative">
                     <div
-                        class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-sm uppercase">
+                        class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-gray-900 dark:text-white font-bold text-xs shadow-sm uppercase">
                         {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
                     </div>
                     <span
