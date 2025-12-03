@@ -64,6 +64,14 @@
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Riwayat Transaksi</h2>
                     <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Kelola riwayat pengeluaran dan pendapatan bisnis Anda.</p>
                 </div>
+                <!-- Add Button -->
+                <button @click="openAddModal(activeTab)"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm transition-all active:scale-95">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span x-text="'Tambah ' + (activeTab === 'pengeluaran' ? 'Pengeluaran' : 'Pendapatan')"></span>
+                </button>
             </div>
 
             @if (session('success'))
@@ -84,7 +92,7 @@
                     <span class="font-medium text-sm">{{ session('success') }}</span>
                 </div>
             @endif
-
+            
             <!-- Tabs Navigation -->
             <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                 <div class="border-b border-gray-200 dark:border-gray-700">
@@ -110,17 +118,6 @@
                             </div>
                         </button>
                     </nav>
-                </div>
-
-                <!-- Add Button -->
-                <div class="p-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
-                    <button @click="openAddModal(activeTab)"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm transition-all active:scale-95">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span x-text="'Tambah ' + (activeTab === 'pengeluaran' ? 'Pengeluaran' : 'Pendapatan')"></span>
-                    </button>
                 </div>
 
                 <!-- Table -->
