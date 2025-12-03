@@ -412,14 +412,8 @@
                             </div>
                             <div>
                                 <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Amerta AI Assistant</h4>
-                                <p class="text-sm text-gray-500 dark:text-indigo-200 mb-3">Konsultasi cerdas untuk strategi
+                                <p class="text-sm text-gray-500 dark:text-indigo-200 ">Konsultasi cerdas untuk strategi
                                     bisnis Anda.</p>
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200 border border-indigo-100 dark:border-indigo-500/20">
-                                    <span
-                                        class="w-1.5 h-1.5 bg-green-500 dark:bg-green-400 rounded-full mr-1.5 animate-pulse"></span>
-                                    AI Online
-                                </span>
                             </div>
                         </div>
                     </a>

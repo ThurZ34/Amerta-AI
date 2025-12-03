@@ -17,10 +17,15 @@ class DashboardChat extends Component
     public $isThinking = false;
     public $limit = 4;
     public $totalChats = 0;
+    public $mode = 'full'; // 'full' or 'quick'
+    public $ephemeralChats = []; // For quick mode
 
-    public function mount()
+    public function mount($mode = 'full')
     {
-        $this->totalChats = ChatHistory::where('user_id', Auth::id())->count();
+        $this->mode = $mode;
+        if ($this->mode === 'full') {
+            $this->totalChats = ChatHistory::where('user_id', Auth::id())->count();
+        }
     }
 
     public function loadMore()
@@ -43,14 +48,24 @@ class DashboardChat extends Component
             $imagePath = $this->image->store('chat-images', 'public');
         }
 
-        ChatHistory::create([
-            'user_id' => Auth::id(),
-            'role' => 'user',
-            'message' => $messageText ?? 'Menganalisa gambar...',
-            'image_path' => $imagePath
-        ]);
+        if ($this->mode === 'full') {
+            ChatHistory::create([
+                'user_id' => Auth::id(),
+                'role' => 'user',
+                'message' => $messageText ?? 'Menganalisa gambar...',
+                'image_path' => $imagePath
+            ]);
+            $this->totalChats++;
+        } else {
+            $this->ephemeralChats[] = [
+                'id' => uniqid(),
+                'role' => 'user',
+                'message' => $messageText,
+                'image_path' => null, // Quick mode doesn't support image upload
+                'created_at' => now(),
+            ];
+        }
 
-        $this->totalChats++;
         $this->isThinking = true;
 
         $this->reset('image');
@@ -62,14 +77,24 @@ class DashboardChat extends Component
     public function generateAiReply(GeminiService $gemini)
     {
         $business = Auth::user()->business;
+        $userMessage = '';
+        $imagePath = null;
 
-        $lastUserChat = ChatHistory::where('user_id', Auth::id())
-            ->where('role', 'user')
-            ->latest()
-            ->first();
+        if ($this->mode === 'full') {
+            $lastUserChat = ChatHistory::where('user_id', Auth::id())
+                ->where('role', 'user')
+                ->latest()
+                ->first();
 
-        $userMessage = $lastUserChat ? $lastUserChat->message : '';
-        $imagePath = $lastUserChat ? $lastUserChat->image_path : null;
+            $userMessage = $lastUserChat ? $lastUserChat->message : '';
+            $imagePath = $lastUserChat ? $lastUserChat->image_path : null;
+        } else {
+            // Get last user message from ephemeral chats
+            $lastChat = end($this->ephemeralChats);
+            if ($lastChat && $lastChat['role'] === 'user') {
+                $userMessage = $lastChat['message'];
+            }
+        }
 
         try {
             $aiReply = $gemini->sendChat($userMessage, $business, $imagePath);
@@ -77,13 +102,22 @@ class DashboardChat extends Component
             $aiReply = "Maaf Bos, koneksi terputus. Coba lagi ya.";
         }
 
-        ChatHistory::create([
-            'user_id' => Auth::id(),
-            'role' => 'ai',
-            'message' => $aiReply
-        ]);
+        if ($this->mode === 'full') {
+            ChatHistory::create([
+                'user_id' => Auth::id(),
+                'role' => 'ai',
+                'message' => $aiReply
+            ]);
+            $this->totalChats++;
+        } else {
+            $this->ephemeralChats[] = [
+                'id' => uniqid(),
+                'role' => 'ai',
+                'message' => $aiReply,
+                'created_at' => now(),
+            ];
+        }
 
-        $this->totalChats++;
         $this->isThinking = false;
         $this->dispatch('chat-updated');
     }
@@ -94,11 +128,15 @@ class DashboardChat extends Component
 
     public function render()
     {
-        $chats = ChatHistory::where('user_id', Auth::id())
-            ->latest()
-            ->take($this->limit)
-            ->get()
-            ->sortBy('id');
+        if ($this->mode === 'full') {
+            $chats = ChatHistory::where('user_id', Auth::id())
+                ->latest()
+                ->take($this->limit)
+                ->get()
+                ->sortBy('id');
+        } else {
+            $chats = collect($this->ephemeralChats);
+        }
 
         return view('livewire.chatbot', [
             'chats' => $chats

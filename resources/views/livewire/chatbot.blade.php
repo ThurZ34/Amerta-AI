@@ -2,14 +2,18 @@
     <div
         class="h-16 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 bg-white/90 dark:bg-gray-900/90 backdrop-blur z-10 absolute top-0 w-full transition-colors duration-300">
         <div>
-            <h2 class="text-lg font-bold text-gray-800 dark:text-white">Amerta Assistant</h2>
+            <h2 class="text-lg font-bold text-gray-800 dark:text-white">
+                {{ $mode === 'full' ? 'Amerta Studio' : 'Amerta Quick Assist' }}
+            </h2>
             <div class="flex items-center gap-2">
                 <span class="relative flex h-2 w-2">
                     <span
                         class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
-                <span class="text-xs text-gray-500 dark:text-gray-400">Online & Siap Membantu</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ $mode === 'full' ? 'Mode Konsultasi Penuh' : 'Mode Cepat (Chat tidak disimpan)' }}
+                </span>
             </div>
         </div>
     </div>
@@ -42,6 +46,49 @@
                         sudah siap. Ada yang bisa saya bantu?</p>
                 </div>
             </div>
+
+            @if ($mode === 'full')
+                {{-- Prompt Starters --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 fade-in-up px-2">
+                    <button wire:click="sendMessage('Buatkan strategi pemasaran digital untuk bulan ini')"
+                        class="text-left p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500 hover:shadow-md transition-all group">
+                        <span class="text-lg mb-2 block">🚀</span>
+                        <h3
+                            class="font-semibold text-gray-800 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                            Strategi Pemasaran</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Buatkan rencana konten & iklan bulan
+                            ini.</p>
+                    </button>
+
+                    <button wire:click="sendMessage('Analisis tren penjualan saya dan berikan saran')"
+                        class="text-left p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500 hover:shadow-md transition-all group">
+                        <span class="text-lg mb-2 block">📊</span>
+                        <h3
+                            class="font-semibold text-gray-800 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                            Analisis Tren</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Cek performa bisnis & peluang cuan.</p>
+                    </button>
+
+                    <button wire:click="sendMessage('Buatkan caption Instagram yang menarik untuk produk unggulan')"
+                        class="text-left p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500 hover:shadow-md transition-all group">
+                        <span class="text-lg mb-2 block">✍️</span>
+                        <h3
+                            class="font-semibold text-gray-800 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                            Ide Konten Sosmed</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Bikin caption IG/TikTok yang viral.</p>
+                    </button>
+
+                    <button
+                        wire:click="sendMessage('Bagaimana cara menghemat biaya operasional tanpa mengurangi kualitas?')"
+                        class="text-left p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500 hover:shadow-md transition-all group">
+                        <span class="text-lg mb-2 block">💰</span>
+                        <h3
+                            class="font-semibold text-gray-800 dark:text-white text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                            Efisiensi Biaya</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Tips hemat budget operasional.</p>
+                    </button>
+                </div>
+            @endif
         @endif
 
         @foreach ($chats as $chat)
@@ -163,7 +210,7 @@
             "
             class="relative max-w-4xl mx-auto flex items-end gap-2">
 
-            <div class="pb-3">
+            <div class="pb-3" @if ($mode === 'quick') style="display: none;" @endif>
                 <input type="file" wire:model="image" id="file-upload" class="hidden" accept="image/*">
                 <label for="file-upload"
                     class="cursor-pointer text-gray-400 hover:text-indigo-600 transition-colors p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center">
@@ -175,7 +222,7 @@
             </div>
 
             <div class="flex-1 relative">
-                <input type="text" x-model="userMessage" placeholder="Tanya strategi, kirim foto struk..."
+                <input type="text" x-model="userMessage" placeholder="Kirim pesan"
                     class="w-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl py-3 pl-4 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-500 transition-colors shadow-inner"
                     autocomplete="off" @if ($isThinking) disabled @endif>
             </div>

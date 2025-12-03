@@ -144,9 +144,9 @@
                                 class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none"
                                 role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1"
                                 style="display: none;">
-                                <a href="{{ url('/dashboard') }}"
+                                <a href="{{ url('/main_menu') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                    role="menuitem" tabindex="-1" id="user-menu-item-0">{{ __('Dashboard') }}</a>
+                                    role="menuitem" tabindex="-1" id="user-menu-item-0">{{ __('Main Menu') }}</a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"

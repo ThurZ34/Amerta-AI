@@ -2,7 +2,7 @@
     class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 transition-colors duration-300">
     <!-- Left: Mobile Toggle & Title -->
     <div class="flex items-center gap-4">
-        @unless (request()->routeIs('main_menu'))
+        @unless (request()->routeIs('main_menu') || request()->routeIs('amerta'))
             <button @click="sidebarOpen = !sidebarOpen"
                 class="md:hidden text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

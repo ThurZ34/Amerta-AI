@@ -76,7 +76,7 @@
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
             class="fixed inset-0 bg-gray-900/80 z-40 md:hidden" style="display: none;"></div>
 
-        @unless (request()->routeIs('main_menu'))
+        @unless (request()->routeIs('main_menu') || request()->routeIs('amerta'))
             @include('layouts.partials.sidebar')
         @endunless
 
@@ -200,7 +200,7 @@
             </div>
 
             <div class="flex-1 relative overflow-hidden flex flex-col bg-gray-50 dark:bg-gray-900">
-                @livewire('dashboard-chat')
+                @livewire('dashboard-chat', ['mode' => 'quick'])
             </div>
 
             <div x-show="!isFullscreen"
@@ -211,7 +211,7 @@
             </div>
         </div>
 
-        @unless (request()->routeIs('main_menu'))
+        @unless (request()->routeIs('main_menu') || request()->routeIs('amerta'))
             <div class="absolute bottom-6 right-6 pointer-events-auto" x-show="!isFullscreen">
                 <button @click="chatOpen = !chatOpen"
                     class="w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group z-50 relative">
