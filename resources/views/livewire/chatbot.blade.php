@@ -191,7 +191,8 @@
                                 class="relative bg-white dark:bg-gray-800 px-5 py-4 rounded-2xl rounded-tl-none border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 shadow-sm text-sm leading-relaxed w-full">
                                 <div
                                     class="prose prose-sm prose-indigo dark:prose-invert max-w-none prose-p:my-2 prose-headings:mb-2 prose-headings:mt-4">
-                                    <div x-data x-html="marked.parse(@js($chat->message))"></div>
+                                    <div x-data
+                                        x-html="DOMPurify.sanitize(marked.parse(@js($chat->message)))"></div>
                                 </div>
                                 <div
                                     class="absolute -bottom-6 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex justify-end">

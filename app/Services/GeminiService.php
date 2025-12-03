@@ -11,8 +11,8 @@ class GeminiService
 {
     public function sendChat(string $message, Business $business, ?string $imagePath = null)
     {
-        $apiKey = env('GEMINI_API_KEY');
-        $model = "gemini-2.5-flash"; // Pastikan model ini aktif
+        $apiKey = config('services.gemini.key');
+        $model = config('services.gemini.model');
 
         // Get category name safely
         $categoryName = $business->category ? $business->category->name : 'Tidak ada';

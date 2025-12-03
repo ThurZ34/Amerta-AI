@@ -21,10 +21,10 @@ class RiwayatController extends Controller
     {
         $request->validate([
             'nama_barang' => 'required|string|max:255',
-            'jumlah' => 'required|string',
-            'harga_satuan' => 'required|string',
-            'total_harga' => 'required|string',
-            'inventori' => 'required|string',
+            'jumlah' => 'required|numeric|min:0',
+            'harga_satuan' => 'required|numeric|min:0',
+            'total_harga' => 'required|numeric|min:0',
+            'inventori' => 'required|numeric|min:0',
             'jenis' => 'required|in:pengeluaran,pendapatan',
             'metode_pembayaran' => 'required|string',
             'keterangan' => 'nullable|string',
@@ -51,16 +51,16 @@ class RiwayatController extends Controller
     {
         $request->validate([
             'nama_barang' => 'required|string|max:255',
-            'jumlah' => 'required|string',
-            'harga_satuan' => 'required|string',
-            'total_harga' => 'required|string',
-            'inventori' => 'required|string',
+            'jumlah' => 'required|numeric|min:0',
+            'harga_satuan' => 'required|numeric|min:0',
+            'total_harga' => 'required|numeric|min:0',
+            'inventori' => 'required|numeric|min:0',
             'jenis' => 'required|in:pengeluaran,pendapatan',
             'metode_pembayaran' => 'required|string',
             'keterangan' => 'nullable|string',
         ]);
 
-        $riwayat = Riwayat::findOrFail($id);
+        $riwayat = Riwayat::where('business_id', auth()->user()->business->id)->findOrFail($id);
         $riwayat->update($request->all());
 
         return redirect()->route('riwayat.index')->with('success', 'Data berhasil diperbarui.');
@@ -68,7 +68,7 @@ class RiwayatController extends Controller
 
     public function destroy($id)
     {
-        $riwayat = Riwayat::findOrFail($id);
+        $riwayat = Riwayat::where('business_id', auth()->user()->business->id)->findOrFail($id);
         $riwayat->delete();
 
         return redirect()->route('riwayat.index')->with('success', 'Data berhasil dihapus.');

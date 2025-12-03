@@ -35,6 +35,7 @@ class ExpenseController extends Controller
         DB::beginTransaction();
         try {
             CashJournal::create([
+                'business_id' => auth()->user()->business->id,
                 'transaction_date' => $request->transaction_date,
                 'coa_id' => $request->coa_id,
                 'amount' => $request->amount,

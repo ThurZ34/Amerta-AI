@@ -13,6 +13,7 @@ class CashJournal extends Model
 
     protected $fillable = [
         'transaction_date',
+        'business_id',
         'coa_id',
         'amount',
         'is_inflow',
@@ -29,6 +30,11 @@ class CashJournal extends Model
     public function coa()
     {
         return $this->belongsTo(Coa::class, 'coa_id');
+    }
+
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
     }
 
     public function scopeInflows($query)

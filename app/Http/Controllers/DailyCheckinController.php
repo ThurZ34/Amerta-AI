@@ -29,36 +29,18 @@ class DailyCheckinController extends Controller
         $endOfMonth = Carbon::parse($date)->endOfMonth();
 
         $dailySales = DailySale::whereBetween('date', [$startOfMonth, $endOfMonth])
+            ->leftJoin('cash_journals', function ($join) {
+                $join->on('daily_sales.date', '=', 'cash_journals.transaction_date')
+                     ->where('cash_journals.business_id', auth()->user()->business->id);
+            })
+            ->select(
+                'daily_sales.*',
+                DB::raw('COALESCE(SUM(CASE WHEN cash_journals.is_inflow = 1 THEN cash_journals.amount ELSE 0 END), 0) as total_revenue'),
+                DB::raw('COALESCE(SUM(CASE WHEN cash_journals.is_inflow = 1 THEN cash_journals.amount ELSE -cash_journals.amount END), 0) as total_profit')
+            )
+            ->groupBy('daily_sales.id')
             ->get()
             ->keyBy(fn($sale) => $sale->date->format('Y-m-d'));
-
-        $journals = CashJournal::whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
-            ->get();
-
-        $journalData = $journals->groupBy(function ($item) {
-            return $item->transaction_date->format('Y-m-d');
-        })->map(function ($dayEntries) {
-            $revenue = $dayEntries->where('is_inflow', true)->sum('amount');
-            $expense = $dayEntries->where('is_inflow', false)->sum('amount');
-
-            return [
-                'total_revenue' => $revenue,
-                'total_profit' => $revenue - $expense,
-            ];
-        });
-
-        $dailySales = $dailySales->map(function ($dailySale) use ($journalData) {
-            $dateStr = $dailySale->date->format('Y-m-d');
-
-            if (isset($journalData[$dateStr])) {
-                $dailySale->total_revenue = $journalData[$dateStr]['total_revenue'];
-                $dailySale->total_profit = $journalData[$dateStr]['total_profit'];
-            } else {
-                $dailySale->total_revenue = 0;
-                $dailySale->total_profit = 0;
-            }
-            return $dailySale;
-        });
 
         return view('daily-checkin.index', compact('dailySales', 'startOfMonth', 'endOfMonth'));
     }
@@ -130,6 +112,7 @@ class DailyCheckinController extends Controller
                         $produk->decrement('inventori', $qty);
 
                         CashJournal::create([
+                            'business_id' => auth()->user()->business->id,
                             'transaction_date' => $request->date,
                             'coa_id' => $coaRevenue->id,
                             'amount' => $revenue,
@@ -139,6 +122,7 @@ class DailyCheckinController extends Controller
                         ]);
 
                         CashJournal::create([
+                            'business_id' => auth()->user()->business->id,
                             'transaction_date' => $request->date,
                             'coa_id' => $coaCost->id,
                             'amount' => $cost,
@@ -199,8 +183,8 @@ class DailyCheckinController extends Controller
     {
         $dailySale = DailySale::with('items.produk')->findOrFail($id);
 
-        $totalRevenue = CashJournal::inflows()->whereDate('transaction_date', $dailySale->date)->sum('amount');
-        $totalExpense = CashJournal::outflows()->whereDate('transaction_date', $dailySale->date)->sum('amount');
+        $totalRevenue = CashJournal::where('business_id', auth()->user()->business->id)->inflows()->whereDate('transaction_date', $dailySale->date)->sum('amount');
+        $totalExpense = CashJournal::where('business_id', auth()->user()->business->id)->outflows()->whereDate('transaction_date', $dailySale->date)->sum('amount');
 
         $dailySale->total_revenue = $totalRevenue;
         $dailySale->total_profit = $totalRevenue - $totalExpense;
