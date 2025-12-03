@@ -24,7 +24,7 @@ class ProfilController extends Controller
             'deskripsi' => 'nullable|string',
             'kategori' => 'nullable|string',
             'target_pasar' => 'nullable|string',
-            'jumlah_tim' => 'nullable|integer',
+            'jumlah_tim' => 'nullable|string',
             'tujuan_utama' => 'nullable|string',
             'alamat' => 'nullable|string',
             'telepon' => 'nullable|string',
