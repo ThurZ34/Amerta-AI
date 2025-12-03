@@ -7,25 +7,25 @@
         showCategoryDropdown: false,
         categories: {{ json_encode($categories->pluck('name')->toArray()) }},
         selectedCategory: '{{ old('kategori', $business->category->name ?? '') }}',
-    
+
         get filteredCategories() {
             if (!this.categorySearch) return this.categories;
             return this.categories.filter(cat =>
                 cat.toLowerCase().includes(this.categorySearch.toLowerCase())
             );
         },
-    
+
         get showAddButton() {
             return this.categorySearch &&
                 !this.categories.some(cat => cat.toLowerCase() === this.categorySearch.toLowerCase());
         },
-    
+
         selectCategory(category) {
             this.selectedCategory = category;
             this.categorySearch = '';
             this.showCategoryDropdown = false;
         },
-    
+
         async addNewCategory() {
             try {
                 const response = await fetch('{{ route('categories.store') }}', {
@@ -36,7 +36,7 @@
                     },
                     body: JSON.stringify({ name: this.categorySearch })
                 });
-    
+
                 const data = await response.json();
                 if (data.success) {
                     this.categories.push(data.category.name);
