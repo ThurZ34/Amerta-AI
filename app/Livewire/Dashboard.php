@@ -2,12 +2,15 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\CashJournal;
 use App\Models\Produk;
+use App\Services\GeminiService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class Dashboard extends Component
 {
@@ -20,6 +23,11 @@ class Dashboard extends Component
     public function updatedRange()
     {
         $this->resetPage();
+    }
+
+    public function dismissInsight()
+    {
+        Session::put('amerta_insight_dismissed', true);
     }
 
     public function render()
@@ -61,11 +69,11 @@ class Dashboard extends Component
         switch ($this->range) {
             case 'day': // Per Jam Hari Ini
                 for ($i = 0; $i <= 23; $i++) {
-                    $chartLabels[] = sprintf("%02d:00", $i);
+                    $chartLabels[] = sprintf('%02d:00', $i);
                     $chartData[] = CashJournal::inflows()
                         ->whereDate('transaction_date', Carbon::today())
-                        ->whereTime('created_at', '>=', sprintf("%02d:00:00", $i))
-                        ->whereTime('created_at', '<=', sprintf("%02d:59:59", $i))
+                        ->whereTime('created_at', '>=', sprintf('%02d:00:00', $i))
+                        ->whereTime('created_at', '<=', sprintf('%02d:59:59', $i))
                         ->sum('amount');
                 }
                 break;
@@ -74,7 +82,7 @@ class Dashboard extends Component
                 $daysInMonth = $now->daysInMonth;
                 for ($i = 1; $i <= $daysInMonth; $i++) {
                     $date = Carbon::createFromDate($now->year, $now->month, $i);
-                    $chartLabels[] = (string)$i;
+                    $chartLabels[] = (string) $i;
 
                     if ($date->gt($now)) {
                         $chartData[] = 0;
@@ -105,7 +113,7 @@ class Dashboard extends Component
                 $currentYear = $now->year;
                 for ($i = 9; $i >= 0; $i--) {
                     $year = $currentYear - $i;
-                    $chartLabels[] = (string)$year;
+                    $chartLabels[] = (string) $year;
                     $chartData[] = CashJournal::inflows()
                         ->whereYear('transaction_date', $year)
                         ->sum('amount');
@@ -135,11 +143,11 @@ class Dashboard extends Component
             ->get();
 
         if ($expenseAllocationQuery->isEmpty()) {
-             $expenseLabels = ['Belum Ada Pengeluaran'];
-             $expenseData = [1];
+            $expenseLabels = ['Belum Ada Pengeluaran'];
+            $expenseData = [1];
         } else {
-             $expenseLabels = $expenseAllocationQuery->pluck('name');
-             $expenseData = $expenseAllocationQuery->pluck('total');
+            $expenseLabels = $expenseAllocationQuery->pluck('name');
+            $expenseData = $expenseAllocationQuery->pluck('total');
         }
 
         // --- 4. TRANSAKSI (PAGINATION) ---
@@ -148,17 +156,38 @@ class Dashboard extends Component
             ->orderBy('created_at', 'desc')
             ->paginate(4);
 
-        // Pesan AI Sederhana
-        $aiMessage = "Halo! Omset bulan ini Rp " . number_format($revenueThisMonth, 0,',','.') . ". ";
-        $aiMessage .= ($profitThisMonth > 0)
-            ? "Profit positif Rp " . number_format($profitThisMonth, 0,',','.') . ". Bagus!"
-            : "Hati-hati, pengeluaran lebih besar dari pemasukan.";
+        // Pesan Semangat Amerta (Quotes) - AI Generated & Session Based
+        $aiMessage = null;
+        if (! Session::has('amerta_insight_dismissed')) {
+            if (Session::has('amerta_insight_quote')) {
+                $aiMessage = Session::get('amerta_insight_quote');
+            } else {
+                // Generate new quote via Gemini
+                try {
+                    $business = Auth::user()->business;
+                    if ($business) {
+                        $gemini = app(GeminiService::class);
+                        $prompt = 'Berikan satu kalimat motivasi singkat, unik, dan semangat untuk pemilik bisnis ini. Jangan terlalu panjang, maksimal 15-20 kata. Gaya bahasa santai tapi profesional. jangan memakai emoji ataupun simbol';
+                        $aiMessage = $gemini->sendChat($prompt, $business);
+
+                        // Clean up quotes if AI adds them
+                        $aiMessage = trim($aiMessage, '"\'');
+
+                        Session::put('amerta_insight_quote', $aiMessage);
+                    } else {
+                        $aiMessage = 'Semangat terus membangun bisnismu!';
+                    }
+                } catch (\Exception $e) {
+                    $aiMessage = 'Sukses adalah perjalanan, nikmati prosesnya.';
+                }
+            }
+        }
 
         // --- LOW STOCK ALERT ---
         // Assuming $businessId is available in this context, e.g., from authenticated user or a property.
         // For demonstration, let's assume a placeholder value if not explicitly defined elsewhere.
         // If $businessId is not defined, this line will cause an error.
-        $businessId = 1; // Placeholder: Replace with actual business ID retrieval logic
+        $businessId = Auth::user()->business_id;
         $lowStockProducts = Produk::where('business_id', $businessId)
             ->whereColumn('inventori', '<=', 'min_stock')
             ->get();
@@ -178,7 +207,7 @@ class Dashboard extends Component
             'aiMessage',
             'lowStockProducts'
         ))
-        ->extends('layouts.app') // Pastikan ini sesuai nama file layout Anda (resources/views/layouts/app.blade.php)
-        ->section('content');    // Pastikan ini sesuai nama @yield('content') di layout Anda
+            ->extends('layouts.app') // Pastikan ini sesuai nama file layout Anda (resources/views/layouts/app.blade.php)
+            ->section('content');    // Pastikan ini sesuai nama @yield('content') di layout Anda
     }
 }

@@ -99,7 +99,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                <div
+                <div x-data="{ showModal: false }"
                     class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
                     <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <svg class="w-16 h-16 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor"
@@ -108,16 +108,87 @@
                                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                         </svg>
                     </div>
-                    <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Target
-                        Bulan Ini</h3>
+                    <div class="relative z-10">
+                        <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                            Target
+                            Bulan Ini</h3>
+                    </div>
+
                     <div class="flex items-end gap-2 mb-3">
-                        <span class="text-2xl font-bold text-gray-900 dark:text-white">65%</span>
+                        <span
+                            class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($targetPercentage, 0) }}%</span>
                         <span class="text-sm text-gray-500 dark:text-gray-400 mb-1">tercapai</span>
                     </div>
                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-1">
-                        <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 65%"></div>
+                        <div class="bg-indigo-600 h-2.5 rounded-full" style="width: {{ $targetPercentage }}%"></div>
                     </div>
-                    <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-2 font-medium">Semangat! Sedikit lagi.</p>
+                    <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-2 font-medium">
+                        {{ $targetPercentage >= 100 ? 'Luar biasa! Target tercapai.' : 'Semangat! Sedikit lagi.' }}
+                    </p>
+                    <div class="flex items-center justify-between mt-1 relative z-10">
+                        <p class="text-xs text-gray-400">Target: Rp {{ number_format($targetRevenue, 0, ',', '.') }}</p>
+                        <button @click="showModal = true"
+                            class="text-indigo-600 hover:text-indigo-800 text-xs font-bold">Ubah</button>
+                    </div>
+
+                    {{-- Modal Update Target --}}
+                    <div x-show="showModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+                        <div
+                            class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                            <div x-show="showModal" @click="showModal = false" x-transition:enter="ease-out duration-300"
+                                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0" class="fixed inset-0 transition-opacity"
+                                aria-hidden="true">
+                                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                            </div>
+
+                            <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+                                aria-hidden="true">&#8203;</span>
+
+                            <div x-show="showModal" x-transition:enter="ease-out duration-300"
+                                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                x-transition:leave="ease-in duration-200"
+                                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                <form action="{{ route('main_menu.update-target') }}" method="POST">
+                                    @csrf
+                                    <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                        <div class="sm:flex sm:items-start">
+                                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white"
+                                                    id="modal-title">
+                                                    Ubah Target Bulanan
+                                                </h3>
+                                                <div class="mt-2">
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                                        Tentukan target omset yang ingin Anda capai bulan ini.
+                                                    </p>
+                                                    <input type="number" name="target_revenue"
+                                                        value="{{ $targetRevenue }}"
+                                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                                                        placeholder="Masukkan nominal target (Rp)">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                        <button type="submit"
+                                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                            Simpan
+                                        </button>
+                                        <button type="button" @click="showModal = false"
+                                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                            Batal
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div
@@ -132,21 +203,23 @@
                     <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Produk
                         Jagoan</h3>
 
-                    @if (isset($topProduct))
-                        <h4 class="text-xl font-bold text-gray-900 dark:text-white truncate"
-                            title="{{ $topProduct->nama_produk }}">
-                            {{ $topProduct->nama_produk }}
-                        </h4>
-                        <div class="flex items-center gap-2 mt-2">
-                            <span
-                                class="px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold">
-                                Terjual {{ $topProduct->total_sold ?? 0 }}
-                            </span>
-                            <span class="text-xs text-gray-500">Minggu ini</span>
+                    @forelse ($topProducts as $product)
+                        <div class="mb-3 last:mb-0">
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate"
+                                title="{{ $product->nama_produk }}">
+                                {{ $product->nama_produk }}
+                            </h4>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span
+                                    class="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-bold">
+                                    Stok: {{ $product->inventori }}
+                                </span>
+                                <span class="text-[10px] text-gray-500">Favorit Pelanggan</span>
+                            </div>
                         </div>
-                    @else
-                        <p class="text-sm text-gray-400 italic mt-2">Belum ada data penjualan cukup.</p>
-                    @endif
+                    @empty
+                        <p class="text-sm text-gray-400 italic mt-2">Belum ada data produk.</p>
+                    @endforelse
                 </div>
 
                 <div
@@ -162,7 +235,7 @@
                         Disiplin Laporan 🔥</h3>
                     <div class="flex items-baseline gap-2">
                         <span class="text-3xl font-black text-rose-600 dark:text-rose-400">
-                            {{ $streakDays ?? 0 }}
+                            {{ $streakDays }}
                         </span>
                         <span class="text-gray-600 dark:text-gray-300 font-medium">Hari Beruntun</span>
                     </div>

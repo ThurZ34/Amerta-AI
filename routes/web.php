@@ -36,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
         })->name('amerta');
 
         Route::get('/main_menu', [\App\Http\Controllers\MainMenuController::class, 'index'])->name('main_menu');
+        Route::post('/main_menu/update-target', [\App\Http\Controllers\MainMenuController::class, 'updateTarget'])->name('main_menu.update-target');
 
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
 

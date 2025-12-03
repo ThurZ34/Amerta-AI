@@ -15,6 +15,7 @@ class Business extends Model
         'masalah_utama',
         'channel_penjualan',
         'range_omset',
+        'target_revenue',
         'target_pasar',
         'jumlah_tim',
         'tujuan_utama',
