@@ -20,7 +20,8 @@ class Business extends Model
         'jumlah_tim',
         'tujuan_utama',
         'alamat',
-        'telepon'
+        'telepon',
+        'gambar'
     ];
 
     public function user()
