@@ -30,19 +30,34 @@ class DailySale extends Model
     }
     public function getTotalRevenueAttribute()
     {
-        return CashJournal::inflows()
+        if (array_key_exists('total_revenue', $this->attributes)) {
+            return $this->attributes['total_revenue'];
+        }
+
+        return CashJournal::where('business_id', $this->business_id)
+            ->inflows()
             ->whereDate('transaction_date', $this->date)
             ->sum('amount');
     }
 
     public function getTotalExpenseAttribute()
     {
-        return CashJournal::outflows()
+        if (array_key_exists('total_expense', $this->attributes)) {
+            return $this->attributes['total_expense'];
+        }
+
+        return CashJournal::where('business_id', $this->business_id)
+            ->outflows()
             ->whereDate('transaction_date', $this->date)
             ->sum('amount');
     }
+
     public function getTotalProfitAttribute()
     {
-        return $this->getTotalRevenueAttribute() - $this->getTotalExpenseAttribute();
+        if (array_key_exists('total_profit', $this->attributes)) {
+            return $this->attributes['total_profit'];
+        }
+
+        return $this->total_revenue - $this->total_expense;
     }
 }

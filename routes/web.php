@@ -21,6 +21,9 @@ Route::get('lang/{locale}', function ($locale) {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/setup-bisnis', [SurveyController::class, 'index'])->name('setup-bisnis');
+    
+    Route::get('/dashboard-selection', [App\Http\Controllers\DashboardSelectionController::class, 'index'])->name('dashboard-selection');
+    Route::post('/dashboard-selection/join', [App\Http\Controllers\DashboardSelectionController::class, 'join'])->name('dashboard-selection.join');
     Route::middleware(['ensure.business.complete'])->group(function () {
 
         Route::post('/setup-bisnis', [SurveyController::class, 'store'])->name('setup-bisnis.store');

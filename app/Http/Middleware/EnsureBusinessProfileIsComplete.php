@@ -18,8 +18,11 @@ class EnsureBusinessProfileIsComplete
         $user = $request->user();
 
         if ($user && ! $user->business) {
-            if (! $request->routeIs('setup-bisnis') && ! $request->routeIs('setup-bisnis.store')) {
-                return redirect()->route('setup-bisnis');
+            if (! $request->routeIs('setup-bisnis') && 
+                ! $request->routeIs('setup-bisnis.store') &&
+                ! $request->routeIs('dashboard-selection') &&
+                ! $request->routeIs('dashboard-selection.join')) {
+                return redirect()->route('dashboard-selection');
             }
         }
 

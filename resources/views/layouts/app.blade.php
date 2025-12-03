@@ -76,12 +76,17 @@
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
             class="fixed inset-0 bg-gray-900/80 z-40 md:hidden" style="display: none;"></div>
 
-        @unless (request()->routeIs('main_menu') || request()->routeIs('amerta'))
+        @unless (request()->routeIs('main_menu') ||
+                request()->routeIs('amerta') ||
+                request()->routeIs('dashboard-selection') ||
+                request()->routeIs('dashboard-selection.join'))
             @include('layouts.partials.sidebar')
         @endunless
 
         <div class="flex-1 flex flex-col min-w-0 h-full">
-            @include('layouts.partials.header')
+            @unless (request()->routeIs('dashboard-selection') || request()->routeIs('dashboard-selection.join'))
+                @include('layouts.partials.header')
+            @endunless
 
             <main
                 class="flex-1 h-full overflow-y-auto bg-gray-50 dark:bg-gray-950 relative flex flex-col transition-colors duration-300">
@@ -164,12 +169,6 @@
                         class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xs pointer-events-none">
                         AI
                     </div>
-                    <div>
-                        <h3 class="text-white font-bold text-sm pointer-events-none">Amerta Assistant</h3>
-                        <p class="text-indigo-200 text-[10px] pointer-events-none flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> Online
-                        </p>
-                    </div>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -211,7 +210,10 @@
             </div>
         </div>
 
-        @unless (request()->routeIs('main_menu') || request()->routeIs('amerta'))
+        @unless (request()->routeIs('main_menu') ||
+                request()->routeIs('amerta') ||
+                request()->routeIs('dashboard-selection') ||
+                request()->routeIs('dashboard-selection.join'))
             <div class="absolute bottom-6 right-6 pointer-events-auto" x-show="!isFullscreen">
                 <button @click="chatOpen = !chatOpen"
                     class="w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group z-50 relative">
