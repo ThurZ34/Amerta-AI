@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8" x-data="{
+    <div class="min-h-screen bg-gray-50/50 dark:bg-gray-950 py-8 transition-colors duration-300" 
+    x-data="{
         isEditing: false,
         categorySearch: '',
         showCategoryDropdown: false,
@@ -11,6 +12,15 @@
         imagePreview: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
         originalImage: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
         deleteImage: false,
+        
+        // Modal Preview Image
+        showImageModal: false,
+        modalImageUrl: '',
+
+        openImageModal(url) {
+            this.modalImageUrl = url;
+            this.showImageModal = true;
+        },
 
         updatePreview(event) {
             const file = event.target.files[0];
@@ -32,12 +42,14 @@
 
         toggleEdit() {
             if (this.isEditing) {
+                // Cancel Edit
                 this.isEditing = false;
                 this.imagePreview = this.originalImage;
                 this.deleteImage = false;
-                document.getElementById('gambar-input').value = '';
+                this.selectedCategory = '{{ optional(optional($business)->category)->name ?? '' }}';
+                if(document.getElementById('gambar-input')) document.getElementById('gambar-input').value = '';
             } else {
-                // Masuk mode edit
+                // Start Edit
                 this.isEditing = true;
             }
         },
@@ -81,39 +93,38 @@
             }
         }
     }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            {{-- 1. HEADER SECTION & ACTIONS --}}
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Profil Bisnis</h2>
-                    <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Kelola informasi dan detail bisnis Anda.</p>
+                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Profil Bisnis</h1>
+                    <p class="text-gray-500 dark:text-gray-400 mt-1">Identitas dan informasi publik bisnis Anda di Amerta.</p>
                 </div>
 
-                <button @click="toggleEdit()" type="button"
-                    class="inline-flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-sm hover:shadow transition-all active:scale-95 text-sm whitespace-nowrap">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                    <span x-text="isEditing ? 'Batal Edit' : 'Edit Profil'"></span>
-                </button>
+                <div class="flex items-center gap-3">
+                    <button @click="toggleEdit()" type="button"
+                        class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm border"
+                        :class="isEditing 
+                            ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' 
+                            : 'bg-indigo-600 text-white border-transparent hover:bg-indigo-700 hover:shadow-indigo-500/30'">
+                        <svg x-show="!isEditing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                        <svg x-show="isEditing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        <span x-text="isEditing ? 'Batal Edit' : 'Edit Profil'"></span>
+                    </button>
+                </div>
             </div>
 
             @if (session('success'))
-               <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
+               <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)"
                     x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 transform -translate-y-2"
-                    x-transition:enter-end="opacity-100 transform translate-y-0"
+                    x-transition:enter-start="opacity-0 -translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
                     x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="opacity-100 transform translate-y-0"
-                    x-transition:leave-end="opacity-0 transform -translate-y-2"
-                    class="mb-8 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 rounded-lg flex items-center gap-3 shadow-sm"
-                    role="alert">
-                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clip-rule="evenodd" />
-                    </svg>
+                    x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 -translate-y-2"
+                    class="mb-6 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm" role="alert">
+                    <div class="p-1 bg-emerald-100 dark:bg-emerald-800 rounded-full"><svg class="w-4 h-4 text-emerald-600 dark:text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div>
                     <span class="font-medium text-sm">{{ session('success') }}</span>
                 </div>
             @endif
@@ -121,339 +132,247 @@
             <form action="{{ route('profil_bisnis.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-
                 <input type="hidden" name="hapus_gambar" :value="deleteImage ? '1' : '0'">
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                {{-- 2. MAIN IDENTITY CARD --}}
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 p-6 mb-6 relative overflow-hidden">
+                    {{-- Decorative Background --}}
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50 dark:bg-indigo-900/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
-                        <div class="px-6 py-6 border-b border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center gap-4">
-                                <input type="file" id="gambar-input" name="gambar" accept="image/*" class="hidden"
-                                    @change="updatePreview($event)">
-
-                                <div class="relative w-14 h-14 flex-shrink-0">
-                                    <div class="w-full h-full bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden group border border-gray-200 dark:border-gray-600"
-                                        :class="{ 'cursor-pointer': isEditing }"
-                                        @click="isEditing && document.getElementById('gambar-input').click()">
-
-                                        <template x-if="imagePreview">
-                                            <img :src="imagePreview" alt="Business Logo" class="w-full h-full object-cover">
-                                        </template>
-                                        <template x-if="!imagePreview">
-                                            <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                        </template>
-
-                                        <div x-show="isEditing" x-cloak
-                                            class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                            </svg>
-                                        </div>
+                    <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6">
+                        {{-- Image Upload Section --}}
+                        <div class="group relative shrink-0">
+                            <input type="file" id="gambar-input" name="gambar" accept="image/*" class="hidden" @change="updatePreview($event)">
+                            
+                            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-4 border-white dark:border-gray-700 shadow-md bg-gray-100 dark:bg-gray-800 relative"
+                                 :class="{ 'cursor-pointer ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800': isEditing }">
+                                
+                                {{-- Image Logic --}}
+                                <template x-if="imagePreview">
+                                    <img :src="imagePreview" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                         @click="!isEditing && openImageModal(imagePreview)" :class="{'cursor-zoom-in': !isEditing}">
+                                </template>
+                                <template x-if="!imagePreview">
+                                    <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500" @click="isEditing && document.getElementById('gambar-input').click()">
+                                        <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                        <span class="text-[10px] font-medium">Logo</span>
                                     </div>
+                                </template>
 
-                                    <button type="button"
-                                        x-show="isEditing && imagePreview" x-cloak
-                                        @click="removeImage()"
-                                        class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md transition-colors z-10"
-                                        title="Hapus Gambar">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                <div class="flex-1">
-                                    <template x-if="!isEditing">
-                                        <div>
-                                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                                                {{ optional($business)->nama_bisnis ?? 'Nama Bisnis Belum Diisi' }}</h3>
-                                            <p class="text-gray-500 dark:text-gray-400 text-sm mt-0.5">
-                                                {{ optional(optional($business)->category)->name ?? 'Kategori belum diisi' }}</p>
-                                        </div>
-                                    </template>
-                                    <template x-if="isEditing">
-                                        <div class="space-y-2">
-                                            <input type="text" name="nama_bisnis"
-                                                value="{{ old('nama_bisnis', optional($business)->nama_bisnis ?? '') }}"
-                                                placeholder="Nama Bisnis"
-                                                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-lg font-semibold">
-                                            @error('nama_bisnis')
-                                                <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-                                            @enderror
-                                        </div>
-                                    </template>
+                                {{-- Edit Overlay --}}
+                                <div x-show="isEditing" 
+                                     @click="document.getElementById('gambar-input').click()"
+                                     class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-[1px]">
+                                    <svg class="w-6 h-6 text-white mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /></svg>
+                                    <span class="text-xs text-white font-medium">Ubah Foto</span>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="p-6 space-y-6">
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z" />
-                                    </svg>
-                                    Tujuan Utama
-                                </label>
-                                <template x-if="!isEditing">
-                                    <p
-                                        class="text-gray-900 dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg min-h-[80px]">
-                                        {{ $business?->tujuan_utama ?? '-' }}
-                                    </p>
-                                </template>
-                                <template x-if="isEditing">
-                                    <textarea name="tujuan_utama" rows="3" placeholder="Apa tujuan utama bisnis Anda?"
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">{{ old('tujuan_utama', $business?->tujuan_utama ?? '') }}</textarea>
-                                </template>
-                            </div>
-
-                            <div class="space-y-2">
-                                <label
-                                    class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    Alamat
-                                </label>
-                                <template x-if="!isEditing">
-                                    <p
-                                        class="text-gray-900 dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg min-h-[80px]">
-                                        {{ $business?->alamat ?? '-' }}
-                                    </p>
-                                </template>
-                                <template x-if="isEditing">
-                                    <textarea name="alamat" rows="3" placeholder="Alamat lengkap bisnis Anda"
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">{{ old('alamat', $business?->alamat ?? '') }}</textarea>
-                                </template>
-                            </div>
-                        </div>
-
-                        <div x-show="isEditing" x-transition x-cloak
-                            class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 flex flex-row-reverse gap-3 border-t border-gray-100 dark:border-gray-700">
-                            <button type="submit"
-                                class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Simpan Perubahan
-                            </button>
-                            <button type="button" @click="toggleEdit()"
-                                class="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-5 py-2.5 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
-                                Batal
+                            {{-- Remove Button --}}
+                            <button type="button" x-show="isEditing && imagePreview" @click="removeImage()"
+                                class="absolute -top-2 -right-2 bg-white dark:bg-gray-700 text-red-500 rounded-full p-1.5 shadow-md border border-gray-100 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-gray-600 transition-colors z-20">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
-                    </div>
 
-                    <div class="space-y-6">
-                        <div
-                            class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
-                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">Informasi Cepat</h4>
-                            <div class="space-y-4">
-                                <div class="space-y-2">
-                                    <label
-                                        class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                                        </svg>
-                                        Kode Invite Tim
-                                    </label>
-                                    <div class="flex items-center gap-2" x-data="{ copied: false }">
-                                        <code
-                                            class="flex-1 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg text-sm font-mono font-bold text-gray-900 dark:text-white tracking-wider text-center border border-gray-200 dark:border-gray-600">
-                                            {{ optional($business)->invite_code ?? 'BELUM ADA' }}
-                                        </code>
-                                        <button
-                                            @click="navigator.clipboard.writeText('{{ optional($business)->invite_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
-                                            class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors relative group">
-                                            <svg x-show="!copied" class="w-5 h-5" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                            </svg>
-                                            <svg x-show="copied" class="w-5 h-5 text-green-500" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M5 13l4 4L19 7" />
-                                            </svg>
+                        {{-- Name & Category Inputs --}}
+                        <div class="flex-1 w-full space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nama Bisnis</label>
+                                <template x-if="!isEditing">
+                                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+                                        {{ optional($business)->nama_bisnis ?? 'Belum ada nama' }}
+                                    </h2>
+                                </template>
+                                <template x-if="isEditing">
+                                    <input type="text" name="nama_bisnis"
+                                        value="{{ old('nama_bisnis', optional($business)->nama_bisnis ?? '') }}"
+                                        placeholder="Contoh: Kopi Kenangan"
+                                        class="w-full text-xl font-bold text-gray-900 dark:text-white bg-white dark:bg-gray-900 border-b-2 border-gray-200 dark:border-gray-700 focus:border-indigo-500 focus:ring-0 px-0 py-2 placeholder-gray-300 transition-colors">
+                                </template>
+                                @error('nama_bisnis') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
 
-                                            <span x-show="copied" x-transition x-cloak
-                                                class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
-                                                Disalin!
-                                            </span>
-                                        </button>
-                                    </div>
-                                    <p class="text-[10px] text-gray-400 leading-tight">
-                                        Bagikan kode ini ke karyawan Anda untuk bergabung ke tim.
-                                    </p>
-                                </div>
-
-                                <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                                <div class="space-y-2" x-data="{ open: false }">
-                                    <label
-                                        class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                        </svg>
-                                        Kategori
-                                    </label>
-                                    <template x-if="!isEditing">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ optional(optional($business)->category)->name ?? '-' }}
-                                        </p>
-                                    </template>
-                                    <template x-if="isEditing">
+                            <div class="relative max-w-sm" x-data="{ open: false }">
+                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Kategori</label>
+                                <template x-if="!isEditing">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium border border-indigo-100 dark:border-indigo-800">
+                                        {{ optional(optional($business)->category)->name ?? 'Belum ada kategori' }}
+                                    </span>
+                                </template>
+                                <template x-if="isEditing">
+                                    <div class="relative">
+                                        <input type="hidden" name="kategori" :value="selectedCategory">
                                         <div class="relative">
-                                            <input type="hidden" name="kategori" :value="selectedCategory">
                                             <input type="text" x-model="categorySearch"
                                                 @focus="showCategoryDropdown = true"
                                                 @click.away="showCategoryDropdown = false"
-                                                :placeholder="selectedCategory || 'Cari atau tambah kategori...'"
-                                                class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
-
-                                            <div x-show="showCategoryDropdown && (filteredCategories.length > 0 || showAddButton)"
-                                                x-transition x-cloak
-                                                class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-
-                                                <template x-for="category in filteredCategories" :key="category">
-                                                    <button type="button" @click="selectCategory(category)"
-                                                        class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm text-gray-900 dark:text-white"
-                                                        x-text="category">
-                                                    </button>
-                                                </template>
-
-                                                <template x-if="showAddButton">
-                                                    <button type="button" @click="addNewCategory()"
-                                                        class="w-full text-left px-3 py-2 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-sm text-indigo-600 dark:text-indigo-400 border-t border-gray-200 dark:border-gray-600 flex items-center gap-2">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M12 4v16m8-8H4" />
-                                                        </svg>
-                                                        <span>Tambah "<span x-text="categorySearch"></span>"</span>
-                                                    </button>
-                                                </template>
+                                                :placeholder="selectedCategory || 'Cari Kategori...'"
+                                                class="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
                                             </div>
                                         </div>
-                                    </template>
-                                </div>
 
-                                <div class="border-t border-gray-200 dark:border-gray-700"></div>
-
-                                <div class="space-y-2">
-                                    <label
-                                        class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                        Target Pasar
-                                    </label>
-                                    <template x-if="!isEditing">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ optional($business)->target_pasar ?? '-' }}
-                                        </p>
-                                    </template>
-                                    <template x-if="isEditing">
-                                        <input type="text" name="target_pasar"
-                                            value="{{ old('target_pasar', optional($business)->target_pasar ?? '') }}"
-                                            placeholder="Contoh: Mahasiswa"
-                                            class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
-                                    </template>
-                                </div>
-
-                                <div class="border-t border-gray-200 dark:border-gray-700"></div>
-
-                                <div class="space-y-2">
-                                    <label
-                                        class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                        </svg>
-                                        Jumlah Tim
-                                    </label>
-                                    <template x-if="!isEditing">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ optional($business)->jumlah_tim ?? '0' }} Orang
-                                        </p>
-                                    </template>
-                                    <template x-if="isEditing">
-                                        <input type="number" name="jumlah_tim"
-                                            value="{{ old('jumlah_tim', optional($business)->jumlah_tim ?? '') }}" placeholder="0"
-                                            class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
-                                    </template>
-                                </div>
-
-                                <div class="border-t border-gray-200 dark:border-gray-700"></div>
-
-                                <div class="space-y-2">
-                                    <label
-                                        class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                        </svg>
-                                        Telepon
-                                    </label>
-                                    <template x-if="!isEditing">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ optional($business)->telepon ?? '-' }}
-                                        </p>
-                                    </template>
-                                    <template x-if="isEditing">
-                                        <input type="text" name="telepon"
-                                            value="{{ old('telepon', optional($business)->telepon ?? '') }}"
-                                            placeholder="08123456789"
-                                            class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
-                                    </template>
-                                </div>
+                                        {{-- Dropdown --}}
+                                        <div x-show="showCategoryDropdown && (filteredCategories.length > 0 || showAddButton)"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="opacity-0 scale-95"
+                                            x-transition:enter-end="opacity-100 scale-100"
+                                            class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl max-h-56 overflow-y-auto custom-scrollbar">
+                                            <template x-for="category in filteredCategories" :key="category">
+                                                <button type="button" @click="selectCategory(category)"
+                                                    class="w-full text-left px-4 py-2.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-sm text-gray-700 dark:text-gray-200 transition-colors"
+                                                    x-text="category">
+                                                </button>
+                                            </template>
+                                            <template x-if="showAddButton">
+                                                <button type="button" @click="addNewCategory()"
+                                                    class="w-full text-left px-4 py-2.5 bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-sm text-indigo-600 dark:text-indigo-400 font-medium border-t border-gray-100 dark:border-gray-700 flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                                    <span>Tambah "<span x-text="categorySearch"></span>"</span>
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                {{-- 3. GRID DETAILS --}}
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    {{-- LEFT COL: General Info --}}
+                    <div class="lg:col-span-2 space-y-6">
+                        {{-- Card: Tentang Bisnis --}}
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-full">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Tentang Bisnis
+                            </h3>
+                            
+                            <div class="space-y-6">
+                                {{-- Tujuan --}}
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Tujuan Utama</label>
+                                    <template x-if="!isEditing">
+                                        <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                            {{ $business?->tujuan_utama ?: 'Belum diisi' }}
+                                        </p>
+                                    </template>
+                                    <template x-if="isEditing">
+                                        <textarea name="tujuan_utama" rows="3" class="w-full rounded-xl border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white text-sm" placeholder="Contoh: Menjadi kedai kopi nomor 1 di Jakarta Selatan">{{ old('tujuan_utama', $business?->tujuan_utama) }}</textarea>
+                                    </template>
+                                </div>
+
+                                {{-- Alamat --}}
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Alamat Lengkap</label>
+                                    <template x-if="!isEditing">
+                                        <div class="flex items-start gap-3 bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                            <svg class="w-5 h-5 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                            <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{{ $business?->alamat ?: 'Belum diisi' }}</p>
+                                        </div>
+                                    </template>
+                                    <template x-if="isEditing">
+                                        <textarea name="alamat" rows="3" class="w-full rounded-xl border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white text-sm" placeholder="Jalan Sudirman No. 1...">{{ old('alamat', $business?->alamat) }}</textarea>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- RIGHT COL: Stats & Meta --}}
+                    <div class="lg:col-span-1 space-y-6">
+                        
+                        {{-- Invite Code Card --}}
+                        <div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                            
+                            <h4 class="text-sm font-semibold text-indigo-100 uppercase tracking-wide mb-4">Kode Tim</h4>
+                            <div class="flex items-center gap-2" x-data="{ copied: false }">
+                                <code class="flex-1 bg-white/20 backdrop-blur-sm border border-white/20 px-4 py-3 rounded-xl text-lg font-mono font-bold tracking-widest text-center shadow-inner">
+                                    {{ optional($business)->invite_code ?? '---' }}
+                                </code>
+                                <button type="button" @click="navigator.clipboard.writeText('{{ optional($business)->invite_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
+                                    class="p-3 bg-white text-indigo-600 rounded-xl hover:bg-indigo-50 transition-colors shadow-lg active:scale-95">
+                                    <svg x-show="!copied" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                    <svg x-show="copied" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                </button>
+                            </div>
+                            <p class="text-xs text-indigo-200 mt-3 leading-relaxed">Bagikan kode ini kepada staff Anda untuk bergabung ke dalam workspace ini.</p>
+                        </div>
+
+                        {{-- Details Card --}}
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4">Detail Lainnya</h4>
+                            <div class="space-y-4">
+                                {{-- Target Pasar --}}
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">Target Pasar</label>
+                                    <template x-if="!isEditing">
+                                        <p class="font-medium text-gray-800 dark:text-gray-200">{{ optional($business)->target_pasar ?? '-' }}</p>
+                                    </template>
+                                    <template x-if="isEditing">
+                                        <input type="text" name="target_pasar" value="{{ old('target_pasar', $business?->target_pasar) }}" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-600 text-sm bg-gray-50 dark:bg-gray-900 dark:text-white" placeholder="Cth: Remaja">
+                                    </template>
+                                </div>
+                                <div class="border-t border-gray-100 dark:border-gray-700"></div>
+                                {{-- Jumlah Tim --}}
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">Jumlah Tim</label>
+                                    <template x-if="!isEditing">
+                                        <p class="font-medium text-gray-800 dark:text-gray-200">{{ optional($business)->jumlah_tim ?? '0' }} Orang</p>
+                                    </template>
+                                    <template x-if="isEditing">
+                                        <input type="number" name="jumlah_tim" value="{{ old('jumlah_tim', $business?->jumlah_tim) }}" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-600 text-sm bg-gray-50 dark:bg-gray-900 dark:text-white" placeholder="0">
+                                    </template>
+                                </div>
+                                <div class="border-t border-gray-100 dark:border-gray-700"></div>
+                                {{-- Telepon --}}
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">Telepon / WA</label>
+                                    <template x-if="!isEditing">
+                                        <p class="font-medium text-gray-800 dark:text-gray-200 font-mono">{{ optional($business)->telepon ?? '-' }}</p>
+                                    </template>
+                                    <template x-if="isEditing">
+                                        <input type="text" name="telepon" value="{{ old('telepon', $business?->telepon) }}" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-600 text-sm bg-gray-50 dark:bg-gray-900 dark:text-white" placeholder="0812...">
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                {{-- SAVE BAR (Floating) --}}
+                <div x-show="isEditing" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-10" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-10" x-cloak
+                    class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-2xl px-6 py-4 flex items-center gap-4 w-[90%] max-w-2xl">
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Perubahan belum disimpan</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Pastikan data sudah benar sebelum menyimpan.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" @click="toggleEdit()" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Batal</button>
+                        <button type="submit" class="px-6 py-2 rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all active:scale-95">Simpan</button>
+                    </div>
+                </div>
+
             </form>
         </div>
 
-        <div x-show="showImageModal"
-            style="display: none;"
-            class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-sm p-4"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            @click.self="showImageModal = false"
-            @keydown.escape.window="showImageModal = false">
-
-            <div class="relative max-w-4xl w-full max-h-screen flex flex-col items-center">
-                <button @click="showImageModal = false"
-                    class="absolute -top-12 right-0 text-white hover:text-gray-300 focus:outline-none p-2">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+        {{-- IMAGE MODAL --}}
+        <div x-show="showImageModal" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+            x-transition.opacity @click.self="showImageModal = false" @keydown.escape.window="showImageModal = false">
+            <div class="relative max-w-5xl w-full flex flex-col items-center">
+                <button @click="showImageModal = false" class="absolute -top-12 right-0 text-white/70 hover:text-white p-2">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
-
-                <img :src="modalImageUrl"
-                    class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
-                    alt="Full size business image">
+                <img :src="modalImageUrl" class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl ring-1 ring-white/10">
             </div>
         </div>
+
     </div>
 @endsection
