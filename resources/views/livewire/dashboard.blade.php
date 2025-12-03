@@ -66,7 +66,17 @@
 
         {{-- LOW STOCK ALERT --}}
         @if ($lowStockProducts->count() > 0)
-            <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm mb-6">
+            <div x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="opacity-100 transform translate-x-0"
+                x-transition:leave-end="opacity-0 transform translate-x-full"
+                class="relative bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm mb-6">
+                <button @click="show = false"
+                    class="absolute top-2 right-2 text-red-400 hover:text-red-600 dark:hover:text-red-300 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
                 <div class="flex items-start">
                     <div class="flex-shrink-0">
                         <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
@@ -75,7 +85,7 @@
                                 clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <div class="ml-3 w-full">
+                    <div class="ml-3 w-full pr-6">
                         <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Perhatian: Stok Menipis</h3>
                         <div class="mt-2 text-sm text-red-700 dark:text-red-300">
                             <ul class="list-disc pl-5 space-y-1">
