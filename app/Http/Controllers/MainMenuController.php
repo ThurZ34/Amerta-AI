@@ -14,20 +14,26 @@ class MainMenuController extends Controller
 {
     public function index()
     {
-        // 1. Profit Yesterday
+        $user = Auth::user();
+
+        $businessId = $user->business_id;
+
         $yesterday = Carbon::yesterday();
-        $revenueYesterday = CashJournal::inflows()
+        $revenueYesterday = CashJournal::where('business_id', $businessId)
+            ->inflows()
             ->whereDate('transaction_date', $yesterday)
             ->sum('amount');
-        
-        $expenseYesterday = CashJournal::outflows()
+
+        $expenseYesterday = CashJournal::where('business_id', $businessId)
+            ->outflows()
             ->whereDate('transaction_date', $yesterday)
             ->sum('amount');
-            
+
         $profitYesterday = $revenueYesterday - $expenseYesterday;
 
         // 2. Stock Warnings
-        $lowStockProducts = Produk::whereColumn('inventori', '<=', 'min_stock')
+        $lowStockProducts = Produk::where('business_id', $businessId)
+            ->whereColumn('inventori', '<=', 'min_stock')
             ->limit(5)
             ->get();
 
@@ -35,34 +41,30 @@ class MainMenuController extends Controller
         $insight = $this->generateInsight($profitYesterday, $lowStockProducts);
 
         // 4. Monthly Target
-        $business = Auth::user()->business;
+        $business = $user->business;
         $targetRevenue = $business->target_revenue ?? 0;
-        $revenueThisMonth = CashJournal::inflows()
+        $revenueThisMonth = CashJournal::where('business_id', $businessId)
+            ->inflows()
             ->whereBetween('transaction_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
             ->sum('amount');
-        
+
         $targetPercentage = $targetRevenue > 0 ? ($revenueThisMonth / $targetRevenue) * 100 : 0;
         $targetPercentage = min($targetPercentage, 100); // Cap at 100% for bar width
 
-        // 5. Top Products (Produk Jagoan)
-        // Since we don't have a direct sales table linked to products yet, we'll simulate this 
-        // or use a placeholder if no sales data. 
-        // Ideally, we would query a TransactionDetail model.
-        // For now, let's assume we can get it from Produk model if it has a 'sold' count or similar.
-        // If not, we'll just take random products for demo or based on 'inventori' changes if tracked.
-        // Let's use a placeholder logic: Get 3 random products for now as "Top Selling" simulation 
-        // until we have real sales data linked.
-        $topProducts = Produk::inRandomOrder()->limit(3)->get(); 
+        $topProducts = Produk::where('business_id', $businessId)
+        ->inRandomOrder()
+        ->limit(3)
+        ->get();
 
         // 6. Streak (Daily Check-in)
         $streakDays = $this->calculateStreak();
 
         return view('main_menu', compact(
-            'profitYesterday', 
-            'lowStockProducts', 
-            'insight', 
-            'targetRevenue', 
-            'revenueThisMonth', 
+            'profitYesterday',
+            'lowStockProducts',
+            'insight',
+            'targetRevenue',
+            'revenueThisMonth',
             'targetPercentage',
             'topProducts',
             'streakDays'
@@ -84,7 +86,7 @@ class MainMenuController extends Controller
     private function calculateStreak()
     {
         $businessId = Auth::user()->business_id;
-        
+
         // We need to count consecutive days backwards from today/yesterday.
         // Using DailySale as the check-in record
         $checkins = DailySale::where('business_id', $businessId)
