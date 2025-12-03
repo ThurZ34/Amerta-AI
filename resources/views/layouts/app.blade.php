@@ -28,6 +28,9 @@
             document.documentElement.classList.remove('dark');
         }
     </script>
+    <style>
+    [x-cloak] { display: none !important; }
+</style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -102,21 +105,21 @@
         pos: { x: 0, y: 0 },
         start: { x: 0, y: 0 },
         limits: { minX: 0, maxX: 0, minY: 0, maxY: 0 },
-    
+
         startDrag(e) {
             if (this.isFullscreen) return;
             this.isDragging = true;
             this.start.x = e.clientX - this.pos.x;
             this.start.y = e.clientY - this.pos.y;
-    
+
             const winW = window.innerWidth;
             const winH = window.innerHeight;
             const rect = this.$refs.chatModal.getBoundingClientRect();
-    
+
             // Margin aman
             const baseRight = 24;
             const baseBottom = 96;
-    
+
             this.limits = {
                 maxX: baseRight,
                 minX: -(winW - rect.width - baseRight),
@@ -124,7 +127,7 @@
                 minY: -(winH - rect.height - baseBottom)
             };
         },
-    
+
         doDrag(e) {
             if (this.isDragging) {
                 let rawX = e.clientX - this.start.x;
@@ -133,11 +136,11 @@
                 this.pos.y = Math.max(this.limits.minY, Math.min(rawY, this.limits.maxY));
             }
         },
-    
+
         stopDrag() {
             this.isDragging = false;
         },
-    
+
         toggleFullscreen() {
             this.isFullscreen = !this.isFullscreen;
             this.pos = { x: 0, y: 0 };

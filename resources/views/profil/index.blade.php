@@ -6,7 +6,41 @@
         categorySearch: '',
         showCategoryDropdown: false,
         categories: {{ json_encode($categories->pluck('name')->toArray()) }},
-        selectedCategory: '{{ old('kategori', $business->category->name ?? '') }}',
+        selectedCategory: '{{ old('kategori', optional(optional($business)->category)->name ?? '') }}',
+
+        imagePreview: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
+        originalImage: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
+        deleteImage: false,
+
+        updatePreview(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.deleteImage = false;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.imagePreview = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        },
+
+        removeImage() {
+            this.imagePreview = '';
+            this.deleteImage = true;
+            document.getElementById('gambar-input').value = '';
+        },
+
+        toggleEdit() {
+            if (this.isEditing) {
+                this.isEditing = false;
+                this.imagePreview = this.originalImage;
+                this.deleteImage = false;
+                document.getElementById('gambar-input').value = '';
+            } else {
+                // Masuk mode edit
+                this.isEditing = true;
+            }
+        },
 
         get filteredCategories() {
             if (!this.categorySearch) return this.categories;
@@ -27,7 +61,7 @@
         },
 
         async addNewCategory() {
-            try {
+             try {
                 const response = await fetch('{{ route('categories.store') }}', {
                     method: 'POST',
                     headers: {
@@ -49,14 +83,13 @@
     }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <!-- Header Section -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Profil Bisnis</h2>
                     <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Kelola informasi dan detail bisnis Anda.</p>
                 </div>
 
-                <button @click="isEditing = !isEditing" type="button"
+                <button @click="toggleEdit()" type="button"
                     class="inline-flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-sm hover:shadow transition-all active:scale-95 text-sm whitespace-nowrap">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -67,7 +100,7 @@
             </div>
 
             @if (session('success'))
-                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
+               <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 transform -translate-y-2"
                     x-transition:enter-end="opacity-100 transform translate-y-0"
@@ -85,82 +118,69 @@
                 </div>
             @endif
 
-            <!-- Profile Grid -->
             <form action="{{ route('profil_bisnis.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
+                <input type="hidden" name="hapus_gambar" :value="deleteImage ? '1' : '0'">
+
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Left Column - Main Business Info -->
-                    <div
-                        class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                        <!-- Business Name Header -->
+                    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+
                         <div class="px-6 py-6 border-b border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center gap-4" x-data="{
-                                imagePreview: '{{ $business->gambar ? Storage::url($business->gambar) : '' }}',
-                                updatePreview(event) {
-                                    const file = event.target.files[0];
-                                    if (file) {
-                                        const reader = new FileReader();
-                                        reader.onload = (e) => {
-                                            this.imagePreview = e.target.result;
-                                        };
-                                        reader.readAsDataURL(file);
-                                    }
-                                }
-                            }">
-                                <!-- Hidden file input -->
+                            <div class="flex items-center gap-4">
                                 <input type="file" id="gambar-input" name="gambar" accept="image/*" class="hidden"
                                     @change="updatePreview($event)">
 
-                                <!-- Image container - clickable in edit mode -->
-                                <div class="relative w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden group"
-                                    :class="{ 'cursor-pointer': isEditing }"
-                                    @click="isEditing && document.getElementById('gambar-input').click()">
+                                <div class="relative w-14 h-14 flex-shrink-0">
+                                    <div class="w-full h-full bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden group border border-gray-200 dark:border-gray-600"
+                                        :class="{ 'cursor-pointer': isEditing }"
+                                        @click="isEditing && document.getElementById('gambar-input').click()">
 
-                                    <template x-if="imagePreview">
-                                        <img :src="imagePreview" alt="Business Logo" class="w-full h-full object-cover">
-                                    </template>
-                                    <template x-if="!imagePreview">
-                                        <svg class="w-7 h-7 text-gray-600 dark:text-gray-400" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                        </svg>
-                                    </template>
+                                        <template x-if="imagePreview">
+                                            <img :src="imagePreview" alt="Business Logo" class="w-full h-full object-cover">
+                                        </template>
+                                        <template x-if="!imagePreview">
+                                            <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </template>
 
-                                    <!-- Edit overlay - only visible in edit mode -->
-                                    <div x-show="isEditing"
-                                        class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
+                                        <div x-show="isEditing" x-cloak
+                                            class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                            </svg>
+                                        </div>
                                     </div>
+
+                                    <button type="button"
+                                        x-show="isEditing && imagePreview" x-cloak
+                                        @click="removeImage()"
+                                        class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md transition-colors z-10"
+                                        title="Hapus Gambar">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                                 </div>
 
                                 <div class="flex-1">
                                     <template x-if="!isEditing">
                                         <div>
                                             <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                                                {{ $business->nama_bisnis ?? 'Nama Bisnis Belum Diisi' }}</h3>
+                                                {{ optional($business)->nama_bisnis ?? 'Nama Bisnis Belum Diisi' }}</h3>
                                             <p class="text-gray-500 dark:text-gray-400 text-sm mt-0.5">
-                                                {{ $business->category->name ?? 'Kategori belum diisi' }}</p>
+                                                {{ optional(optional($business)->category)->name ?? 'Kategori belum diisi' }}</p>
                                         </div>
                                     </template>
                                     <template x-if="isEditing">
                                         <div class="space-y-2">
                                             <input type="text" name="nama_bisnis"
-                                                value="{{ old('nama_bisnis', $business->nama_bisnis ?? '') }}"
+                                                value="{{ old('nama_bisnis', optional($business)->nama_bisnis ?? '') }}"
                                                 placeholder="Nama Bisnis"
                                                 class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-lg font-semibold">
                                             @error('nama_bisnis')
-                                                <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-                                            @enderror
-                                            @error('gambar')
                                                 <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                                             @enderror
                                         </div>
@@ -169,15 +189,13 @@
                             </div>
                         </div>
 
-                        <!-- Business Details -->
                         <div class="p-6 space-y-6">
-                            <!-- Tujuan Utama -->
                             <div class="space-y-2">
                                 <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z" />
                                     </svg>
                                     Tujuan Utama
                                 </label>
@@ -193,7 +211,6 @@
                                 </template>
                             </div>
 
-                            <!-- Alamat -->
                             <div class="space-y-2">
                                 <label
                                     class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -219,8 +236,7 @@
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
-                        <div x-show="isEditing" x-transition
+                        <div x-show="isEditing" x-transition x-cloak
                             class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 flex flex-row-reverse gap-3 border-t border-gray-100 dark:border-gray-700">
                             <button type="submit"
                                 class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
@@ -230,21 +246,18 @@
                                 </svg>
                                 Simpan Perubahan
                             </button>
-                            <button type="button" @click="isEditing = false"
+                            <button type="button" @click="toggleEdit()"
                                 class="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-5 py-2.5 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
                                 Batal
                             </button>
                         </div>
                     </div>
 
-                    <!-- Right Column - Quick Info -->
                     <div class="space-y-6">
-                        <!-- Quick Stats Card -->
                         <div
                             class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
                             <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">Informasi Cepat</h4>
                             <div class="space-y-4">
-                                <!-- Invite Code -->
                                 <div class="space-y-2">
                                     <label
                                         class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -258,10 +271,10 @@
                                     <div class="flex items-center gap-2" x-data="{ copied: false }">
                                         <code
                                             class="flex-1 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg text-sm font-mono font-bold text-gray-900 dark:text-white tracking-wider text-center border border-gray-200 dark:border-gray-600">
-                                            {{ $business->invite_code ?? 'BELUM ADA' }}
+                                            {{ optional($business)->invite_code ?? 'BELUM ADA' }}
                                         </code>
                                         <button
-                                            @click="navigator.clipboard.writeText('{{ $business->invite_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
+                                            @click="navigator.clipboard.writeText('{{ optional($business)->invite_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
                                             class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors relative group">
                                             <svg x-show="!copied" class="w-5 h-5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -274,8 +287,7 @@
                                                     d="M5 13l4 4L19 7" />
                                             </svg>
 
-                                            <!-- Tooltip -->
-                                            <span x-show="copied" x-transition
+                                            <span x-show="copied" x-transition x-cloak
                                                 class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
                                                 Disalin!
                                             </span>
@@ -287,7 +299,6 @@
                                 </div>
 
                                 <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                                <!-- Kategori -->
                                 <div class="space-y-2" x-data="{ open: false }">
                                     <label
                                         class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -300,7 +311,7 @@
                                     </label>
                                     <template x-if="!isEditing">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $business->category->name ?? '-' }}
+                                            {{ optional(optional($business)->category)->name ?? '-' }}
                                         </p>
                                     </template>
                                     <template x-if="isEditing">
@@ -312,12 +323,10 @@
                                                 :placeholder="selectedCategory || 'Cari atau tambah kategori...'"
                                                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
 
-                                            <!-- Dropdown -->
                                             <div x-show="showCategoryDropdown && (filteredCategories.length > 0 || showAddButton)"
-                                                x-transition
+                                                x-transition x-cloak
                                                 class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto">
 
-                                                <!-- Existing categories -->
                                                 <template x-for="category in filteredCategories" :key="category">
                                                     <button type="button" @click="selectCategory(category)"
                                                         class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm text-gray-900 dark:text-white"
@@ -325,7 +334,6 @@
                                                     </button>
                                                 </template>
 
-                                                <!-- Add new category button -->
                                                 <template x-if="showAddButton">
                                                     <button type="button" @click="addNewCategory()"
                                                         class="w-full text-left px-3 py-2 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-sm text-indigo-600 dark:text-indigo-400 border-t border-gray-200 dark:border-gray-600 flex items-center gap-2">
@@ -344,7 +352,6 @@
 
                                 <div class="border-t border-gray-200 dark:border-gray-700"></div>
 
-                                <!-- Target Pasar -->
                                 <div class="space-y-2">
                                     <label
                                         class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -357,12 +364,12 @@
                                     </label>
                                     <template x-if="!isEditing">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $business->target_pasar ?? '-' }}
+                                            {{ optional($business)->target_pasar ?? '-' }}
                                         </p>
                                     </template>
                                     <template x-if="isEditing">
                                         <input type="text" name="target_pasar"
-                                            value="{{ old('target_pasar', $business->target_pasar ?? '') }}"
+                                            value="{{ old('target_pasar', optional($business)->target_pasar ?? '') }}"
                                             placeholder="Contoh: Mahasiswa"
                                             class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
                                     </template>
@@ -370,7 +377,6 @@
 
                                 <div class="border-t border-gray-200 dark:border-gray-700"></div>
 
-                                <!-- Jumlah Tim -->
                                 <div class="space-y-2">
                                     <label
                                         class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -383,19 +389,18 @@
                                     </label>
                                     <template x-if="!isEditing">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $business->jumlah_tim ?? '0' }} Orang
+                                            {{ optional($business)->jumlah_tim ?? '0' }} Orang
                                         </p>
                                     </template>
                                     <template x-if="isEditing">
                                         <input type="number" name="jumlah_tim"
-                                            value="{{ old('jumlah_tim', $business->jumlah_tim ?? '') }}" placeholder="0"
+                                            value="{{ old('jumlah_tim', optional($business)->jumlah_tim ?? '') }}" placeholder="0"
                                             class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
                                     </template>
                                 </div>
 
                                 <div class="border-t border-gray-200 dark:border-gray-700"></div>
 
-                                <!-- Telepon -->
                                 <div class="space-y-2">
                                     <label
                                         class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -408,12 +413,12 @@
                                     </label>
                                     <template x-if="!isEditing">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $business->telepon ?? '-' }}
+                                            {{ optional($business)->telepon ?? '-' }}
                                         </p>
                                     </template>
                                     <template x-if="isEditing">
                                         <input type="text" name="telepon"
-                                            value="{{ old('telepon', $business->telepon ?? '') }}"
+                                            value="{{ old('telepon', optional($business)->telepon ?? '') }}"
                                             placeholder="08123456789"
                                             class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm">
                                     </template>
