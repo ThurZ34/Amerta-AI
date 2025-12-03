@@ -9,6 +9,7 @@ class Business extends Model
 {
     protected $fillable = [
         'user_id',
+        'invite_code',
         'nama_bisnis',
         'status_bisnis',
         'category_id',
@@ -24,9 +25,23 @@ class Business extends Model
         'gambar'
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($business) {
+            $business->invite_code = strtoupper(\Illuminate\Support\Str::random(6));
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
     }
 
     public function category()

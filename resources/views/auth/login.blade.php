@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Aplikasi Saya</title>
+    <title>Login - Amerta AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Font Google (Opsional: Inter) */
