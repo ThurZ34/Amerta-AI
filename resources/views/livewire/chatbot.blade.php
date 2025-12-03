@@ -263,7 +263,7 @@
                     @endif
 
                     <input type="text" x-model="userMessage" placeholder="Kirim pesan ke Amerta..."
-                        class="flex-1 bg-transparent border-none text-gray-900 dark:text-white placeholder-gray-500 focus:ring-0 py-3 px-2 max-h-32 overflow-y-auto"
+                        class="flex-1 bg-transparent border-none outline-none shadow-none ring-0 focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 py-3 px-2 max-h-32 overflow-y-auto"
                         autocomplete="off" @if ($isThinking) disabled @endif>
 
                     <button type="submit"
@@ -289,80 +289,78 @@
                 </p>
             </div>
         </div>
-    </div>
-
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            const chatContainer = document.getElementById('chat-container');
-            const scrollBottom = () => {
-                if (chatContainer) {
-                    chatContainer.scrollTo({
-                        top: chatContainer.scrollHeight,
-                        behavior: 'smooth'
-                    });
-                }
-            };
-            scrollBottom();
-            Livewire.on('chat-updated', () => setTimeout(scrollBottom, 100));
-            Livewire.hook('commit', ({
-                component,
-                commit,
-                succeed
-            }) => {
-                succeed(() => {
-                    if (commit.calls.some(call => call.method === 'sendMessage')) {
-                        setTimeout(scrollBottom, 50);
+        <script>
+            document.addEventListener('livewire:initialized', () => {
+                const chatContainer = document.getElementById('chat-container');
+                const scrollBottom = () => {
+                    if (chatContainer) {
+                        chatContainer.scrollTo({
+                            top: chatContainer.scrollHeight,
+                            behavior: 'smooth'
+                        });
                     }
-                })
+                };
+                scrollBottom();
+                Livewire.on('chat-updated', () => setTimeout(scrollBottom, 100));
+                Livewire.hook('commit', ({
+                    component,
+                    commit,
+                    succeed
+                }) => {
+                    succeed(() => {
+                        if (commit.calls.some(call => call.method === 'sendMessage')) {
+                            setTimeout(scrollBottom, 50);
+                        }
+                    })
+                });
             });
-        });
-    </script>
+        </script>
 
-    <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #374151;
-            border-radius: 20px;
-        }
-
-        .chat-scroll::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .chat-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .chat-scroll::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 20px;
-        }
-
-        .dark .chat-scroll::-webkit-scrollbar-thumb {
-            background-color: #4b5563;
-        }
-
-        .fade-in-up {
-            animation: fadeInUp 0.3s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+        <style>
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 4px;
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: transparent;
             }
-        }
-    </style>
-</div>
+
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #374151;
+                border-radius: 20px;
+            }
+
+            .chat-scroll::-webkit-scrollbar {
+                width: 5px;
+            }
+
+            .chat-scroll::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .chat-scroll::-webkit-scrollbar-thumb {
+                background-color: #cbd5e1;
+                border-radius: 20px;
+            }
+
+            .dark .chat-scroll::-webkit-scrollbar-thumb {
+                background-color: #4b5563;
+            }
+
+            .fade-in-up {
+                animation: fadeInUp 0.3s ease-out;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+    </div>
