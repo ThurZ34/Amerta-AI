@@ -149,17 +149,9 @@ class DailyCheckinController extends Controller
             $prompt .= "\nTotal Profit: Rp ".number_format($totalProfit, 0, ',', '.');
             $prompt .= "\n\nBerikan evaluasi singkat, apakah ini untung atau rugi? Jika untung besar, beri ucapan selamat yang memotivasi. Jika rugi atau untung tipis, beri saran konkret untuk meningkatkan penjualan besok. Gunakan bahasa yang santai dan suportif.";
 
-            $business = \App\Models\Business::first();
+            $business = auth()->user()->business;
             if (! $business) {
-                $business = new \App\Models\Business;
-                $business->nama_bisnis = 'Bisnis Saya';
-                $business->kategori_bisnis = 'Umum';
-                $business->status_bisnis = 'Berjalan';
-                $business->target_pasar = 'Umum';
-                $business->range_omset = 'Unknown';
-                $business->jumlah_tim = 1;
-                $business->tujuan_utama = 'Profit';
-                $business->channel_penjualan = 'Offline';
+                throw new \Exception('Bisnis tidak ditemukan. Silakan setup bisnis terlebih dahulu.');
             }
 
             $aiResponse = $this->geminiService->sendChat($prompt, $business);

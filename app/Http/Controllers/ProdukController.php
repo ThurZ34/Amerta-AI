@@ -34,9 +34,7 @@ class ProdukController extends Controller
         // Get Business context
         $business = auth()->user()->business;
         if (! $business) {
-            $business = new \App\Models\Business;
-            $business->nama_bisnis = 'Bisnis Saya';
-            // Defaults...
+            return response()->json(['error' => 'Bisnis tidak ditemukan. Silakan setup bisnis terlebih dahulu.'], 400);
         }
 
         try {
@@ -52,7 +50,8 @@ class ProdukController extends Controller
                 // Fallback if JSON parsing fails
                 return response()->json([
                     'price' => $request->modal * 1.3, // Default 30% margin
-                    'reason' => $response,
+                    'reason' => "AI sedang sibuk. Ini adalah estimasi margin standar 30%. (" . Str::limit($response, 50) . ")",
+                    'is_fallback' => true
                 ]);
             }
         } catch (\Exception $e) {
