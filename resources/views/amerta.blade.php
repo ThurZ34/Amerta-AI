@@ -98,7 +98,7 @@
         </a>
 
         {{-- Livewire Component Wrapper --}}
-        <div class="flex-1 relative z-10">
+        <div class="flex-1 h-full relative z-10">
             @livewire('dashboard-chat', ['mode' => 'full'])
         </div>
 
