@@ -8,7 +8,7 @@
         $monthlyProfit = collect($dailySales)->sum('total_profit');
         $daysFilled = collect($dailySales)->count();
         $bestDay = collect($dailySales)->sortByDesc('total_revenue')->first();
-        
+
         $cards = [
             [
                 'title' => 'Total Omset',
@@ -19,9 +19,9 @@
                 'border' => 'border-l-4 border-blue-500',
             ],
             [
-                'title' => 'Total Profit Bulan Ini',
+                'title' => 'Profit Kotor (Gross)',
                 'value' => '+Rp ' . number_format($monthlyProfit, 0, ',', '.'),
-                'desc' => 'Margin: ' . ($monthlyRevenue > 0 ? round(($monthlyProfit / $monthlyRevenue) * 100, 1) : 0) . '%',
+                'desc' => 'Margin Produk: ' . ($monthlyRevenue > 0 ? round(($monthlyProfit / $monthlyRevenue) * 100, 1) : 0) . '%',
                 'bg_icon' => 'bg-green-50 dark:bg-green-900/20',
                 'text_color' => 'text-green-600 dark:text-green-400',
                 'border' => 'border-l-4 border-green-500',
@@ -38,25 +38,25 @@
     @endphp
 
     <div class="p-4 sm:p-6 lg:p-8 h-full">
-        
+
         <div class="flex flex-col xl:flex-row gap-6 h-full">
-            
+
             <div class="flex-1 order-2 xl:order-1 flex flex-col h-full">
-                
+
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white">
                         Kalender Penjualan
                     </h2>
-                    
+
                     <div class="flex items-center bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-1">
-                        <a href="{{ route('daily-checkin.index', ['date' => $startOfMonth->copy()->subMonth()->format('Y-m-d')]) }}" 
+                        <a href="{{ route('daily-checkin.index', ['date' => $startOfMonth->copy()->subMonth()->format('Y-m-d')]) }}"
                            class="p-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md text-gray-500 dark:text-gray-400 transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         </a>
                         <span class="px-4 font-semibold text-gray-900 dark:text-white text-sm min-w-[140px] text-center">
                             {{ $startOfMonth->translatedFormat('F Y') }}
                         </span>
-                        <a href="{{ route('daily-checkin.index', ['date' => $startOfMonth->copy()->addMonth()->format('Y-m-d')]) }}" 
+                        <a href="{{ route('daily-checkin.index', ['date' => $startOfMonth->copy()->addMonth()->format('Y-m-d')]) }}"
                            class="p-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md text-gray-500 dark:text-gray-400 transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </a>
@@ -97,11 +97,11 @@
                                 @endif
 
                                 <div class="flex justify-between items-start mb-1">
-                                    <span class="text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full 
+                                    <span class="text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full
                                         {{ $isToday ? 'bg-indigo-600 text-white shadow-sm' : ($isCurrentMonth ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600') }}">
                                         {{ $currentDate->day }}
                                     </span>
-                                    
+
                                     @if ($dailySale)
                                         <div class="w-2 h-2 rounded-full bg-green-500"></div>
                                     @endif
