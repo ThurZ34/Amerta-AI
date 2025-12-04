@@ -3,7 +3,7 @@
 @section('header', 'Riwayat Keuangan')
 
 @section('content')
-    <div class="min-h-screen bg-gray-50/50 dark:bg-gray-950 py-8 px-4" x-data="financeApp({
+    <div class="min-h-screen bg-gray-200/50 dark:bg-gray-950 py-8 px-4" x-data="financeApp({
         riwayats: {{ Js::from($riwayats) }},
         scanResult: {{ Js::from(session('scan_result')) }},
         categories: {{ Js::from($categories ?? []) }}
