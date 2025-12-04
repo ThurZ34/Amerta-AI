@@ -115,8 +115,6 @@ class DailyCheckinController extends Controller
                             'cost' => $produk->modal,
                         ]);
 
-                        // Decrement stock
-                        $produk->decrement('inventori', $qty);
 
                         CashJournal::create([
                             'business_id' => auth()->user()->business->id,
@@ -232,13 +230,7 @@ class DailyCheckinController extends Controller
         DB::beginTransaction();
 
         try {
-            // Step 1: Restore stock from old data
-            foreach ($dailySale->items as $oldItem) {
-                $produk = Produk::find($oldItem->produk_id);
-                if ($produk) {
-                    $produk->increment('inventori', $oldItem->quantity);
-                }
-            }
+            // Step 1: Delete old daily sale items
 
             // Step 2: Delete old cash journal entries for this date
             CashJournal::where('business_id', auth()->user()->business->id)
@@ -270,8 +262,6 @@ class DailyCheckinController extends Controller
                             'cost' => $produk->modal,
                         ]);
 
-                        // Decrement stock with new data
-                        $produk->decrement('inventori', $qty);
 
                         CashJournal::create([
                             'business_id' => auth()->user()->business->id,

@@ -8,7 +8,7 @@
         editModalOpen: false,
         deleteModalOpen: false,
         // Default Data
-        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, min_stock: 10, jenis_produk: '' },
+        selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, jenis_produk: '' },
         search: '',
     
         // --- LOGIC IMAGE PREVIEW ---
@@ -26,8 +26,6 @@
                 nama_produk: '',
                 modal: 0,
                 harga_jual: 0,
-                inventori: 0,
-                min_stock: 10,
                 jenis_produk: ''
             };
             this.imagePreview = null;
@@ -235,10 +233,6 @@
                     @php
                         $profit = $produk->harga_jual - $produk->modal;
                         $margin = $produk->harga_jual > 0 ? round(($profit / $produk->harga_jual) * 100) : 0;
-                        $isLowStock =
-                            isset($produk->inventori) &&
-                            isset($produk->min_stock) &&
-                            $produk->inventori <= $produk->min_stock;
                     @endphp
 
                     <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group"
@@ -482,21 +476,7 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Stok
-                                        Awal</label>
-                                    <input type="number" name="inventori" x-model="selectedProduk.inventori" required
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Stok
-                                        Minimum (Alert)</label>
-                                    <input type="number" name="min_stock" x-model="selectedProduk.min_stock"
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow"
-                                        placeholder="Default: 10">
-                                </div>
-                            </div>
+
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Jenis

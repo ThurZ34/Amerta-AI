@@ -196,14 +196,6 @@ class Dashboard extends Component
             }
         }
 
-        // --- LOW STOCK ALERT ---
-        // Assuming $businessId is available in this context, e.g., from authenticated user or a property.
-        // For demonstration, let's assume a placeholder value if not explicitly defined elsewhere.
-        // If $businessId is not defined, this line will cause an error.
-        $businessId = Auth::user()->business_id;
-        $lowStockProducts = Produk::where('business_id', $businessId)
-            ->whereColumn('inventori', '<=', 'min_stock')
-            ->get();
 
         // ✅ PERBAIKAN UTAMA: Menggunakan extends() dan section() agar sesuai layout blade biasa
         return view('livewire.dashboard', compact(
@@ -217,8 +209,7 @@ class Dashboard extends Component
             'chartData',
             'expenseLabels',
             'expenseData',
-            'aiMessage',
-            'lowStockProducts'
+            'aiMessage'
         ))
             ->extends('layouts.app') // Pastikan ini sesuai nama file layout Anda (resources/views/layouts/app.blade.php)
             ->section('content');    // Pastikan ini sesuai nama @yield('content') di layout Anda
