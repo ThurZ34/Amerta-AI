@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Riwayat;
+use App\Models\DailySale;
 use App\Models\CashJournal;
 use App\Models\Coa;
 use App\Services\GeminiService;
@@ -19,14 +20,67 @@ class RiwayatController extends Controller
         $this->geminiService = $geminiService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $business = auth()->user()->business;
+        
+        // Get Filter Parameters (Default to Current Month/Year)
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+
+        // 1. Get Manual Riwayat
         $riwayats = Riwayat::where('business_id', $business->id)
+            ->whereMonth('tanggal_pembelian', $month)
+            ->whereYear('tanggal_pembelian', $year)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('riwayat.index', compact('riwayats'));
+        // 2. Get Daily Sales (Automated Income)
+        $dailySales = DailySale::where('business_id', $business->id)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->with('items.produk')
+            ->get()
+            ->map(function ($sale) {
+                // Calculate Gross Profit (Revenue - HPP)
+                $grossProfit = $sale->items->sum(function ($item) {
+                    return ($item->price - $item->cost) * $item->quantity;
+                });
+
+                // Build detailed description
+                $itemDetails = $sale->items->map(function ($item) {
+                    return "{$item->quantity}x {$item->produk->nama_produk}";
+                })->take(3)->join(', ');
+                
+                if ($sale->items->count() > 3) {
+                    $itemDetails .= ', dll';
+                }
+
+                $description = "Profit dari penjualan: {$itemDetails}";
+
+                // Create a structure compatible with Riwayat model
+                return (object) [
+                    'id' => 'daily_sale_' . $sale->id, // Unique ID for frontend key
+                    'is_manual' => false, // Flag to disable edit/delete
+                    'nama_barang' => 'Profit Penjualan Harian',
+                    'tanggal_pembelian' => $sale->date->format('Y-m-d'),
+                    'total_harga' => $grossProfit,
+                    'keterangan' => $description,
+                    'bukti_pembayaran' => null,
+                    'jenis' => 'pendapatan',
+                    'metode_pembayaran' => 'Kas',
+                    'created_at' => $sale->created_at,
+                ];
+            });
+
+        // 3. Merge and Sort
+        $mergedRiwayats = $riwayats->concat($dailySales)->sortByDesc('tanggal_pembelian')->values();
+
+        return view('riwayat.index', [
+            'riwayats' => $mergedRiwayats,
+            'currentMonth' => $month,
+            'currentYear' => $year
+        ]);
     }
 
     public function scan(Request $request)
