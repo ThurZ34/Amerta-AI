@@ -122,6 +122,19 @@
                             </svg>
                         </div>
                         <span class="text-sm font-bold text-gray-500 dark:text-gray-400">Saldo Kas</span>
+                        <div x-data="{ open: false }" class="relative">
+                            <button @mouseenter="open = true" @mouseleave="open = false"
+                                class="text-gray-400 hover:text-indigo-500 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </button>
+                            <div x-show="open" x-transition
+                                class="absolute left-0 bottom-full mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-lg z-10">
+                                Total Pemasukan - Total Pengeluaran (Uang Tunai saat ini)
+                            </div>
+                        </div>
                     </div>
                     <h3 class="text-2xl lg:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Rp
                         {{ number_format($cashBalance, 0, ',', '.') }}</h3>
@@ -140,6 +153,19 @@
                                 </svg>
                             </div>
                             <span class="text-sm font-bold text-gray-500 dark:text-gray-400">Omset</span>
+                            <div x-data="{ open: false }" class="relative">
+                                <button @mouseenter="open = true" @mouseleave="open = false"
+                                    class="text-gray-400 hover:text-emerald-500 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </button>
+                                <div x-show="open" x-transition
+                                    class="absolute left-0 bottom-full mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-lg z-10">
+                                    Total Penjualan Kotor bulan ini (Belum dikurangi modal)
+                                </div>
+                            </div>
                         </div>
                         <span
                             class="text-xs font-bold px-2.5 py-1 rounded-lg {{ $growthPercentage >= 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300' }}">
@@ -162,6 +188,19 @@
                             </svg>
                         </div>
                         <span class="text-sm font-bold text-gray-500 dark:text-gray-400">Pengeluaran</span>
+                        <div x-data="{ open: false }" class="relative">
+                            <button @mouseenter="open = true" @mouseleave="open = false"
+                                class="text-gray-400 hover:text-rose-500 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </button>
+                            <div x-show="open" x-transition
+                                class="absolute left-0 bottom-full mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-lg z-10">
+                                Total Biaya Operasional + Belanja Bahan Baku bulan ini
+                            </div>
+                        </div>
                     </div>
                     <h3 class="text-2xl lg:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Rp
                         {{ number_format($expenseThisMonth, 0, ',', '.') }}</h3>
@@ -180,6 +219,19 @@
                             </svg>
                         </div>
                         <span class="text-sm font-bold text-gray-500 dark:text-gray-400">Profit Bersih</span>
+                        <div x-data="{ open: false }" class="relative">
+                            <button @mouseenter="open = true" @mouseleave="open = false"
+                                class="text-gray-400 hover:text-indigo-500 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </button>
+                            <div x-show="open" x-transition
+                                class="absolute right-0 bottom-full mb-2 w-56 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-lg z-10">
+                                Omset - (Modal Barang + Biaya Operasional). Ini keuntungan bersih Anda.
+                            </div>
+                        </div>
                     </div>
                     <h3
                         class="text-2xl lg:text-3xl font-black {{ $profitThisMonth >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400' }} tracking-tight">
@@ -422,12 +474,6 @@
                 @endif
             </div>
 
-            <a href="{{ route('expenses.create') }}"
-                class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-2xl shadow-indigo-600/50 flex items-center justify-center hover:bg-indigo-700 hover:scale-110 transition z-50">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-            </a>
 
         </div>
     </div>

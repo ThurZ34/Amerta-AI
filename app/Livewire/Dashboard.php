@@ -139,11 +139,13 @@ class Dashboard extends Component
         }
 
         // --- 3. CHART ALOKASI BIAYA ---
-        $expenseAllocationQuery = CashJournal::outflows()
-            ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
-            ->join('coa', 'cash_journals.coa_id', '=', 'coa.id')
-            ->select('coa.name', DB::raw('sum(amount) as total'))
-            ->groupBy('coa.name')
+        // --- 3. CHART ALOKASI BIAYA ---
+        // Menggunakan data dari Riwayat agar kategori sesuai input user
+        $expenseAllocationQuery = \App\Models\Riwayat::where('business_id', $businessId)
+            ->where('jenis', 'pengeluaran')
+            ->whereBetween('tanggal_pembelian', [$startOfMonth, $endOfMonth])
+            ->select('kategori', DB::raw('sum(total_harga) as total'))
+            ->groupBy('kategori')
             ->orderByDesc('total')
             ->limit(5)
             ->get();
@@ -152,7 +154,10 @@ class Dashboard extends Component
             $expenseLabels = ['Belum Ada Pengeluaran'];
             $expenseData = [1];
         } else {
-            $expenseLabels = $expenseAllocationQuery->pluck('name');
+            // Map null category to 'Lain-lain' or 'Tanpa Kategori'
+            $expenseLabels = $expenseAllocationQuery->map(function ($item) {
+                return $item->kategori ?: 'Lain-lain';
+            });
             $expenseData = $expenseAllocationQuery->pluck('total');
         }
 

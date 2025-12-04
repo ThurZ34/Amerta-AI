@@ -14,14 +14,12 @@ return new class extends Migration
         Schema::create('riwayats', function (Blueprint $table) {
             $table->id();
             $table->foreignId('business_id')->constrained()->onDelete('cascade');
+            $table->date('tanggal_pembelian');
             $table->string('nama_barang');
-            $table->string('jumlah');
-            $table->string('harga_satuan');
+            $table->string('keterangan')->nullable();
             $table->string('total_harga');
-            $table->string('inventori');
-            $table->enum('jenis', ['pengeluaran', 'pendapatan']);
-            $table->string('metode_pembayaran');
-            $table->longtext('keterangan');
+            $table->string('bukti_pembayaran')->nullable();
+            $table->string('jenis')->default('pengeluaran');
             $table->timestamps();
         });
     }

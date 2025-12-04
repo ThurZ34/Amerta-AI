@@ -1,106 +1,41 @@
 @extends('layouts.app')
 
-@section('header', 'Riwayat Transaksi')
+@section('header', 'Riwayat Keuangan')
 
 @section('content')
-    <div class="min-h-screen bg-gray-50/50 dark:bg-gray-950 py-8 px-4" x-data="{
-        activeTab: 'pengeluaran',
-        showModal: false,
-        isEditing: false,
-        editId: null,
-        // Data Dummy untuk kalkulasi total (Nanti bisa diganti backend logic)
+    <div class="min-h-screen bg-gray-50/50 dark:bg-gray-950 py-8 px-4" x-data="financeApp({
         riwayats: {{ Js::from($riwayats) }},
+        scanResult: {{ Js::from(session('scan_result')) }},
+        categories: {{ Js::from($categories ?? []) }}
+    })">
 
-        formData: {
-            nama_barang: '',
-            jumlah: '',
-            harga_satuan: '',
-            total_harga: '',
-            inventori: '',
-            jenis: 'pengeluaran',
-            metode_pembayaran: '',
-            keterangan: ''
-        },
-
-        init() {
-        },
-
-        // Hitung Total Otomatis saat ngetik
-        calculateTotal() {
-            const jumlah = parseFloat(this.formData.jumlah) || 0;
-            const hargaSatuan = parseFloat(this.formData.harga_satuan) || 0;
-            this.formData.total_harga = (jumlah * hargaSatuan).toString();
-        },
-
-        // Filter Data di Frontend (Bisa juga dari backend)
-        get filteredRiwayats() {
-            return this.riwayats.filter(r => r.jenis === this.activeTab);
-        },
-
-        // Hitung Total Uang di Tab Aktif
-        get currentTotal() {
-            return this.filteredRiwayats.reduce((acc, curr) => acc + parseFloat(curr.total_harga), 0);
-        },
-
-        openAddModal(jenis) {
-            this.formData = {
-                nama_barang: '',
-                jumlah: '',
-                harga_satuan: '',
-                total_harga: '',
-                inventori: '',
-                jenis: jenis,
-                metode_pembayaran: '',
-                keterangan: ''
-            };
-            this.isEditing = false;
-            this.showModal = true;
-        },
-
-        openEditModal(riwayat) {
-            this.formData = { ...riwayat }; // Spread operator untuk copy object
-            this.isEditing = true;
-            this.editId = riwayat.id;
-            this.showModal = true;
-        },
-
-        formatRupiah(angka) {
-            return new Intl.NumberFormat('id-ID').format(angka);
-        },
-
-        // Format currency for display (adds Rp. and thousand separators)
-        formatCurrency(value) {
-            if (!value) return '';
-            const number = parseFloat(value);
-            if (isNaN(number)) return '';
-            return 'Rp. ' + new Intl.NumberFormat('id-ID').format(number);
-        },
-
-        // Parse currency input (removes Rp. and dots)
-        parseCurrency(value) {
-            if (!value) return '';
-            return value.toString().replace(/[^0-9]/g, '');
-        },
-
-        // Handle harga satuan input
-        updateHargaSatuan(event) {
-            const rawValue = this.parseCurrency(event.target.value);
-            this.formData.harga_satuan = rawValue;
-            event.target.value = this.formatCurrency(rawValue);
-            this.calculateTotal();
-        },
-
-        // Get formatted display value for harga satuan
-        get displayHargaSatuan() {
-            return this.formatCurrency(this.formData.harga_satuan);
-        },
-
-        // Get formatted display value for total harga
-        get displayTotalHarga() {
-            return this.formatCurrency(this.formData.total_harga);
-        },
-    }">
         <div class="max-w-2xl mx-auto space-y-6">
+
+            <form id="scanForm" action="{{ route('riwayat.scan') }}" method="POST" enctype="multipart/form-data"
+                class="hidden">
+                @csrf
+                <input type="file" id="scanInput" name="receipt_image" accept="image/*" @change="submitScan()">
+            </form>
+
+            <!-- Filter Section -->
+            <form action="{{ route('riwayat.index') }}" method="GET" class="flex gap-3 mb-6 relative z-20">
+                <select name="month" onchange="this.form.submit()"
+                    class="w-full px-4 py-2.5 rounded-xl border-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500 font-medium">
+                    @foreach (range(1, 12) as $m)
+                        <option value="{{ $m }}" {{ $currentMonth == $m ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+                        </option>
+                    @endforeach
+                </select>
+                <select name="year" onchange="this.form.submit()"
+                    class="w-1/3 px-4 py-2.5 rounded-xl border-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500 font-medium">
+                    @foreach (range(date('Y'), date('Y') - 5) as $y)
+                        <option value="{{ $y }}" {{ $currentYear == $y ? 'selected' : '' }}>
+                            {{ $y }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
 
             <div class="relative overflow-hidden rounded-3xl p-6 shadow-xl transition-all duration-500"
                 :class="activeTab === 'pengeluaran' ? 'bg-gradient-to-br from-rose-500 to-orange-600' :
@@ -112,6 +47,7 @@
                 <div class="relative z-10 text-gray-900 dark:text-white text-center">
                     <p class="text-sm font-medium opacity-90 uppercase tracking-wider"
                         x-text="activeTab === 'pengeluaran' ? 'Total Pengeluaran' : 'Total Pendapatan'"></p>
+
                     <h2 class="text-4xl font-black mt-2 tracking-tight">
                         Rp <span x-text="formatRupiah(currentTotal)"></span>
                     </h2>
@@ -124,6 +60,17 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             <span>Tambah Manual</span>
+                        </button>
+
+                        <button @click="triggerScan()" x-show="activeTab === 'pengeluaran'"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-lg hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>Scan Struk</span>
                         </button>
                     </div>
                 </div>
@@ -165,7 +112,8 @@
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                </svg> <svg x-show="activeTab === 'pendapatan'" class="w-6 h-6" fill="none"
+                                </svg>
+                                <svg x-show="activeTab === 'pendapatan'" class="w-6 h-6" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -178,8 +126,11 @@
                                 <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                     <span class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 font-medium"
                                         x-text="riwayat.metode_pembayaran"></span>
-                                    <span>•</span>
-                                    <span x-text="riwayat.jumlah + ' unit'"></span>
+                                    <span x-show="riwayat.kategori"
+                                        class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-medium"
+                                        x-text="riwayat.kategori"></span>
+                                    <span x-show="riwayat.is_manual === false" x-text="riwayat.keterangan"
+                                        class="truncate max-w-[150px] sm:max-w-xs"></span>
                                 </div>
                             </div>
                         </div>
@@ -193,23 +144,46 @@
 
                             <div
                                 class="flex items-center justify-end gap-3 mt-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button @click="openEditModal(riwayat)"
-                                    class="text-xs font-medium hover:text-indigo-600 hover:underline"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                    </svg></button>
-                                <form :action="`{{ route('riwayat.index') }}/${riwayat.id}`" method="POST"
-                                    class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="text-xs font-medium hover:text-red-500 transition-colors"
-                                        onclick="return confirm('Hapus data ini?')"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                    </svg></button>
-                                </form>
+
+                                <!-- Badge for Automated Entry -->
+                                <template x-if="riwayat.is_manual === false">
+                                    <span
+                                        class="px-2 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-bold uppercase tracking-wider rounded-md">
+                                        Otomatis
+                                    </span>
+                                </template>
+
+                                <!-- Action Buttons (Only for Manual Entries) -->
+                                <template x-if="riwayat.is_manual !== false">
+                                    <div class="flex items-center gap-3">
+                                        <button @click="openEditModal(riwayat)"
+                                            class="text-xs font-medium hover:text-indigo-600 hover:underline">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                            </svg>
+                                        </button>
+
+                                        <form :action="`{{ route('riwayat.index') }}/${riwayat.id}`" method="POST"
+                                            class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="text-xs font-medium hover:text-red-500 transition-colors"
+                                                onclick="return confirm('Hapus data ini?')">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                    class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </template>
                             </div>
                         </div>
-
                     </div>
                 </template>
 
@@ -238,7 +212,7 @@
                     x-transition:leave-end="opacity-0 translate-y-4 scale-95">
 
                     <form :action="isEditing ? `{{ route('riwayat.index') }}/${editId}` : '{{ route('riwayat.store') }}'"
-                        method="POST">
+                        method="POST" enctype="multipart/form-data">
                         @csrf
                         <template x-if="isEditing"><input type="hidden" name="_method" value="PUT"></template>
                         <input type="hidden" name="jenis" x-model="formData.jenis">
@@ -251,44 +225,15 @@
                                     'text-emerald-700 dark:text-emerald-400'"
                                 x-text="isEditing ? 'Edit Data' : 'Tambah ' + (formData.jenis === 'pengeluaran' ? 'Pengeluaran' : 'Pendapatan')">
                             </h3>
-                            <button type="button" @click="showModal = false"
-                                class="text-gray-400 hover:text-gray-600"><svg class="w-6 h-6" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
+                            <button type="button" @click="showModal = false" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M6 18L18 6M6 6l12 12" />
-                                </svg></button>
+                                </svg>
+                            </button>
                         </div>
 
                         <div class="p-6 space-y-5 max-h-[65vh] overflow-y-auto custom-scrollbar">
-
-                            <div class="text-center">
-                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total
-                                    Harga</label>
-                                <input type="hidden" name="total_harga" x-model="formData.total_harga">
-                                <div class="w-full text-center text-3xl font-black bg-transparent p-0 text-gray-900 dark:text-white"
-                                    x-text="displayTotalHarga || 'Rp. 0'"></div>
-                                <p class="text-xs text-gray-400 italic mt-1">*Otomatis dihitung</p>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Jumlah</label>
-                                    <input type="number" name="jumlah" x-model="formData.jumlah"
-                                        @input="calculateTotal()" required
-                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Harga Satuan</label>
-                                    <input type="hidden" name="harga_satuan" x-model="formData.harga_satuan">
-                                    <input type="text"
-                                        @input="updateHargaSatuan($event)"
-                                        :value="displayHargaSatuan"
-                                        required
-                                        placeholder="Rp. 0"
-                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow">
-                                </div>
-                            </div>
-
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Nama Barang</label>
                                 <input type="text" name="nama_barang" x-model="formData.nama_barang" required
@@ -296,22 +241,50 @@
                                     class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow">
                             </div>
 
+                            <div x-show="formData.jenis === 'pengeluaran'">
+                                <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Kategori</label>
+                                <input type="text" name="kategori" x-model="formData.kategori" list="categoryList"
+                                    placeholder="Cth: Bahan Baku, Listrik, Gaji"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                                <datalist id="categoryList">
+                                    <template x-for="cat in categories" :key="cat">
+                                        <option :value="cat"></option>
+                                    </template>
+                                    <!-- Default Suggestions -->
+                                    <option value="Bahan Baku"></option>
+                                    <option value="Listrik & Air"></option>
+                                    <option value="Gaji Karyawan"></option>
+                                    <option value="Sewa Tempat"></option>
+                                    <option value="Transportasi"></option>
+                                    <option value="Pemasaran"></option>
+                                    <option value="Lain-lain"></option>
+                                </datalist>
+                            </div>
+
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Inventori</label>
-                                    <input type="text" name="inventori" x-model="formData.inventori" required
-                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Tanggal
+                                        Pembelian</label>
+                                    <input type="date" name="tanggal_pembelian" x-model="formData.tanggal_pembelian"
+                                        required
+                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Pembayaran</label>
-                                    <select name="metode_pembayaran" x-model="formData.metode_pembayaran" required
-                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
-                                        <option value="">Pilih...</option>
-                                        <option value="Tunai">Tunai</option>
-                                        <option value="Transfer">Transfer</option>
-                                        <option value="E-Wallet">E-Wallet</option>
-                                    </select>
+                                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Total Harga</label>
+                                    <input type="hidden" name="total_harga" x-model="formData.total_harga">
+                                    <input type="text" @input="updateTotalHarga($event)" :value="displayTotalHarga"
+                                        required placeholder="Rp. 0"
+                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow">
                                 </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Bukti Pembayaran</label>
+                                <input type="file" name="bukti_pembayaran" accept="image/*"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                                <p class="text-xs text-gray-400 mt-1" x-show="isEditing && formData.bukti_pembayaran">
+                                    *Upload file baru untuk mengganti bukti pembayaran lama.
+                                </p>
                             </div>
 
                             <div>
@@ -336,4 +309,112 @@
         </div>
 
     </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('financeApp', ({
+                riwayats,
+                scanResult,
+                categories
+            }) => ({
+                activeTab: 'pengeluaran',
+                showModal: false,
+                isEditing: false,
+                editId: null,
+                riwayats: riwayats,
+                categories: categories,
+                formData: {
+                    nama_barang: '',
+                    kategori: '',
+                    tanggal_pembelian: '',
+                    total_harga: '',
+                    keterangan: '',
+                    bukti_pembayaran: '',
+                    jenis: 'pengeluaran'
+                },
+
+                init() {
+                    // Cek jika ada hasil scan dari session
+                    if (scanResult) {
+                        this.handleScanResult(scanResult);
+                    }
+                },
+
+                handleScanResult(scanData) {
+                    this.formData = {
+                        nama_barang: (scanData.items && scanData.items.length > 0) ? scanData.items
+                            .join(', ') : (scanData.merchant_name || 'Belanja'),
+                        tanggal_pembelian: scanData.transaction_date || new Date().toISOString()
+                            .split('T')[0],
+                        total_harga: scanData.total_amount || 0,
+                        keterangan: 'Scan Struk: ' + (scanData.merchant_name || '') + ' (' + (
+                            scanData.transaction_date || '') + ')',
+                        bukti_pembayaran: '',
+                        jenis: 'pengeluaran' // Default ke pengeluaran jika scan
+                    };
+                    this.activeTab = 'pengeluaran';
+                    this.showModal = true;
+                },
+
+                get filteredRiwayats() {
+                    return this.riwayats.filter(r => r.jenis === this.activeTab);
+                },
+
+                get currentTotal() {
+                    return this.filteredRiwayats.reduce((acc, curr) => acc + parseFloat(curr
+                        .total_harga), 0);
+                },
+
+                openAddModal(jenis) {
+                    this.formData = {
+                        nama_barang: '',
+                        kategori: '',
+                        tanggal_pembelian: new Date().toISOString().split('T')[0],
+                        total_harga: '',
+                        keterangan: '',
+                        bukti_pembayaran: '',
+                        jenis: jenis
+                    };
+                    this.isEditing = false;
+                    this.showModal = true;
+                },
+
+                openEditModal(riwayat) {
+                    this.formData = {
+                        ...riwayat
+                    };
+                    this.isEditing = true;
+                    this.editId = riwayat.id;
+                    this.showModal = true;
+                },
+
+                formatRupiah(angka) {
+                    return new Intl.NumberFormat('id-ID').format(angka);
+                },
+
+                // Get formatted display value for input
+                get displayTotalHarga() {
+                    if (!this.formData.total_harga) return '';
+                    return 'Rp. ' + this.formatRupiah(this.formData.total_harga);
+                },
+
+                // Handle total harga input (strip characters)
+                updateTotalHarga(event) {
+                    const rawValue = event.target.value.replace(/[^0-9]/g, '');
+                    this.formData.total_harga = rawValue;
+                    // Force update input value visually handled by get displayTotalHarga binding usually,
+                    // but for smooth typing in input field:
+                    event.target.value = 'Rp. ' + this.formatRupiah(rawValue);
+                },
+
+                triggerScan() {
+                    document.getElementById('scanInput').click();
+                },
+
+                submitScan() {
+                    document.getElementById('scanForm').submit();
+                }
+            }));
+        });
+    </script>
 @endsection

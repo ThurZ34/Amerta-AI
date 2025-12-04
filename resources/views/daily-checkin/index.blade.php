@@ -19,7 +19,7 @@
                 'border' => 'border-l-4 border-blue-500',
             ],
             [
-                'title' => 'Total Profit',
+                'title' => 'Total Profit Bulan Ini',
                 'value' => '+Rp ' . number_format($monthlyProfit, 0, ',', '.'),
                 'desc' => 'Margin: ' . ($monthlyRevenue > 0 ? round(($monthlyProfit / $monthlyRevenue) * 100, 1) : 0) . '%',
                 'bg_icon' => 'bg-green-50 dark:bg-green-900/20',

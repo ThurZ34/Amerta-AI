@@ -278,7 +278,7 @@
                         </div>
                     </a>
 
-                    <a href="{{ route('expenses.create') }}"
+                    <a href="{{ route('riwayat.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
                             class="absolute top-0 right-0 w-24 h-24 bg-rose-50 dark:bg-rose-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">

@@ -8,18 +8,23 @@ class Riwayat extends Model
 {
     protected $fillable = [
         'business_id',
+        'tanggal_pembelian',
         'nama_barang',
-        'jumlah',
-        'harga_satuan',
-        'total_harga',
-        'inventori',
-        'jenis',
-        'metode_pembayaran',
         'keterangan',
+        'total_harga',
+        'bukti_pembayaran',
+        'jenis',
+        'kategori',
+        'cash_journal_id',
     ];
 
     public function business()
     {
         return $this->belongsTo(Business::class);
+    }
+
+    public function cashJournal()
+    {
+        return $this->belongsTo(CashJournal::class);
     }
 }
