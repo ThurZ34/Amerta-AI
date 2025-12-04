@@ -13,7 +13,6 @@ class produk extends Model
         'nama_produk',
         'modal',
         'harga_jual',
-        'total_terjual',
         'jenis_produk',
         'gambar',
     ];
