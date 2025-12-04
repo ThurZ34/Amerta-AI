@@ -50,8 +50,8 @@ class ProdukController extends Controller
                 // Fallback if JSON parsing fails
                 return response()->json([
                     'price' => $request->modal * 1.3, // Default 30% margin
-                    'reason' => "AI sedang sibuk. Ini adalah estimasi margin standar 30%. (" . Str::limit($response, 50) . ")",
-                    'is_fallback' => true
+                    'reason' => 'AI sedang sibuk. Ini adalah estimasi margin standar 30%. ('.Str::limit($response, 50).')',
+                    'is_fallback' => true,
                 ]);
             }
         } catch (\Exception $e) {
@@ -59,11 +59,19 @@ class ProdukController extends Controller
         }
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // Get month from request or use current month
+        $month = $request->input('month', now()->format('Y-m'));
+
         $produks = Produk::where('business_id', auth()->user()->business?->id)->latest()->get();
 
-        return view('produk.index', compact('produks'));
+        // Calculate total_terjual per bulan for each product
+        $produks->each(function ($produk) use ($month) {
+            $produk->total_terjual_bulan_ini = $produk->getTotalTerjualPerBulan($month);
+        });
+
+        return view('produk.index', compact('produks', 'month'));
     }
 
     public function store(Request $request)
@@ -72,8 +80,7 @@ class ProdukController extends Controller
             'nama_produk' => 'required|string|max:255',
             'modal' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
-            'inventori' => 'required|integer|min:0',
-            'min_stock' => 'nullable|integer|min:0',
+            'total_terjual' => 'required|integer|min:0',
             'jenis_produk' => 'required|string|max:255',
             'gambar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -100,8 +107,7 @@ class ProdukController extends Controller
             'nama_produk' => 'required|string|max:255',
             'modal' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
-            'inventori' => 'required|integer|min:0',
-            'min_stock' => 'nullable|integer|min:0',
+            'total_terjual' => 'required|integer|min:0',
             'jenis_produk' => 'required|string|max:255',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Changed to nullable
         ]);

@@ -10,15 +10,15 @@
         // Default Data
         selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, min_stock: 10, jenis_produk: '' },
         search: '',
-
+    
         // --- LOGIC IMAGE PREVIEW ---
         imagePreview: null,
-
+    
         // --- LOGIC AI SUGGESTION ---
         suggestingPrice: false,
         aiReason: '',
         aiError: '',
-
+    
         // Fungsi Reset Form
         resetForm() {
             this.selectedProduk = {
@@ -33,24 +33,24 @@
             this.imagePreview = null;
             this.aiReason = '';
             this.aiError = '';
-
+    
             if (document.getElementById('fileInput')) {
                 document.getElementById('fileInput').value = '';
             }
         },
-
+    
         // Fungsi Tanya AI
         async suggestPrice() {
             this.aiError = '';
             this.aiReason = '';
-
+    
             if (!this.selectedProduk.nama_produk || !this.selectedProduk.modal || !this.selectedProduk.jenis_produk) {
                 this.aiError = 'Mohon isi Nama Produk, Modal, dan Jenis Produk terlebih dahulu.';
                 return;
             }
-
+    
             this.suggestingPrice = true;
-
+    
             try {
                 // Pastikan route ini ada di web.php
                 const response = await fetch('{{ route('produk.suggest-price') }}', {
@@ -65,9 +65,9 @@
                         jenis_produk: this.selectedProduk.jenis_produk
                     })
                 });
-
+    
                 const data = await response.json();
-
+    
                 if (data.price) {
                     this.selectedProduk.harga_jual = data.price;
                     this.aiReason = data.reason;
@@ -81,7 +81,7 @@
                 this.suggestingPrice = false;
             }
         },
-
+    
         // Format currency for display (adds Rp. and thousand separators)
         formatCurrency(value) {
             if (!value) return '';
@@ -89,37 +89,37 @@
             if (isNaN(number)) return '';
             return 'Rp. ' + new Intl.NumberFormat('id-ID').format(number);
         },
-
+    
         // Parse currency input (removes Rp. and dots)
         parseCurrency(value) {
             if (!value) return '';
             return value.toString().replace(/[^0-9]/g, '');
         },
-
+    
         // Handle modal input
         updateModal(event) {
             const rawValue = this.parseCurrency(event.target.value);
             this.selectedProduk.modal = rawValue;
             event.target.value = this.formatCurrency(rawValue);
         },
-
+    
         // Handle harga jual input
         updateHargaJual(event) {
             const rawValue = this.parseCurrency(event.target.value);
             this.selectedProduk.harga_jual = rawValue;
             event.target.value = this.formatCurrency(rawValue);
         },
-
+    
         // Get formatted display value for modal
         get displayModal() {
             return this.formatCurrency(this.selectedProduk.modal);
         },
-
+    
         // Get formatted display value for harga jual
         get displayHargaJual() {
             return this.formatCurrency(this.selectedProduk.harga_jual);
         },
-
+    
         // Fungsi Handle File Upload
         fileChosen(event) {
             const file = event.target.files[0];
@@ -127,12 +127,12 @@
                 this.imagePreview = URL.createObjectURL(file);
             }
         },
-
+    
         openCreateModal() {
             this.resetForm();
             this.createModalOpen = true;
         },
-
+    
         openEditModal(produk) {
             this.selectedProduk = JSON.parse(JSON.stringify(produk));
             if (produk.gambar) {
@@ -142,12 +142,12 @@
             }
             this.editModalOpen = true;
         },
-
+    
         openDeleteModal(produk) {
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
         },
-
+    
         closeModals() {
             this.createModalOpen = false;
             this.editModalOpen = false;
@@ -158,32 +158,55 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Katalog Produk</h2>
-                    <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Kelola produk dan harga untuk laporan harian.
-                    </p>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Katalog Produk</h2>
+                    <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">Kelola produk dan lihat penjualan bulanan</p>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                    <div class="relative group w-full sm:w-64">
+                    <!-- Month Filter -->
+                    <form method="GET" action="{{ route('produk.index') }}" class="w-full sm:w-auto">
+                        <select name="month" onchange="this.form.submit()"
+                            class="w-full sm:w-auto px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm text-gray-900 dark:text-gray-100">
+                            @php
+                                $currentMonth = request('month', now()->format('Y-m'));
+                                $months = [];
+                                for ($i = 0; $i < 12; $i++) {
+                                    $date = now()->subMonths($i);
+                                    $months[] = [
+                                        'value' => $date->format('Y-m'),
+                                        'label' => $date->translatedFormat('F Y'),
+                                    ];
+                                }
+                            @endphp
+                            @foreach ($months as $monthOption)
+                                <option value="{{ $monthOption['value'] }}"
+                                    {{ $currentMonth == $monthOption['value'] ? 'selected' : '' }}>
+                                    {{ $monthOption['label'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+
+                    <!-- Search -->
+                    <div class="relative group w-full sm:w-48">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
                         <input type="text" x-model="search" placeholder="Cari produk..."
-                            class="pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full transition-all shadow-sm text-gray-900 dark:text-gray-100">
+                            class="pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full transition-all shadow-sm text-gray-900 dark:text-gray-100">
                     </div>
 
                     <button @click="openCreateModal()"
-                        class="inline-flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-sm hover:shadow transition-all active:scale-95 text-sm whitespace-nowrap">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="inline-flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-sm hover:shadow transition-all active:scale-95 text-sm whitespace-nowrap">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
-                        Tambah Produk
+                        Tambah
                     </button>
                 </div>
             </div>
@@ -207,44 +230,48 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-20">
                 @forelse ($produks as $produk)
                     @php
                         $profit = $produk->harga_jual - $produk->modal;
                         $margin = $produk->harga_jual > 0 ? round(($profit / $produk->harga_jual) * 100) : 0;
-                        $stokAman = $produk->inventori > ($produk->min_stock ?? 10);
+                        $isLowStock =
+                            isset($produk->inventori) &&
+                            isset($produk->min_stock) &&
+                            $produk->inventori <= $produk->min_stock;
                     @endphp
 
-                    <div class="product-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden group"
+                    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                         x-show="search === '' || '{{ strtolower($produk->nama_produk) }}'.includes(search.toLowerCase())">
 
-                        <div class="aspect-[4/3] w-full bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
+                        <!-- Product Image -->
+                        <div class="aspect-[4/3] w-full bg-gray-100 dark:bg-gray-700 relative">
                             @if ($produk->gambar)
                                 <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                                    class="w-full h-full object-cover">
                             @else
                                 <div
-                                    class="w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-gray-600 bg-gray-50 dark:bg-gray-800">
-                                    <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-gray-600">
+                                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                         </path>
                                     </svg>
-                                    <span class="text-xs font-medium">No Image</span>
                                 </div>
                             @endif
 
-                            <div class="absolute top-3 left-3">
+                            <!-- Category Badge -->
+                            <div class="absolute top-2 left-2">
                                 <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-gray-700 dark:text-gray-300 shadow-sm border border-gray-200 dark:border-gray-700">
+                                    class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-gray-700 dark:text-gray-300 shadow-sm">
                                     {{ $produk->jenis_produk }}
                                 </span>
                             </div>
 
-                            <div
-                                class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
+                            <!-- Action Buttons -->
+                            <div class="absolute top-2 right-2 flex gap-1.5">
                                 <button @click='openEditModal(@json($produk))'
-                                    class="p-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm border border-gray-200 dark:border-gray-700 transition-colors"
+                                    class="p-1.5 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm transition-colors"
                                     title="Edit">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -252,7 +279,7 @@
                                     </svg>
                                 </button>
                                 <button @click="openDeleteModal({{ $produk }})"
-                                    class="p-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 shadow-sm border border-gray-200 dark:border-gray-700 transition-colors"
+                                    class="p-1.5 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 shadow-sm transition-colors"
                                     title="Hapus">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -262,45 +289,46 @@
                             </div>
                         </div>
 
-                        <div class="p-4 flex-1 flex flex-col">
-                            <div class="mb-3">
-                                <h3 class="text-base font-semibold text-gray-900 dark:text-white leading-tight mb-1 line-clamp-1"
-                                    title="{{ $produk->nama_produk }}">
-                                    {{ $produk->nama_produk }}
-                                </h3>
-                                <div class="flex items-baseline gap-2">
-                                    <span class="text-lg font-bold text-gray-900 dark:text-white">Rp
-                                        {{ number_format($produk->harga_jual, 0, ',', '.') }}</span>
-                                    <span class="text-xs text-gray-400 line-through">Rp
-                                        {{ number_format($produk->modal, 0, ',', '.') }}</span>
-                                </div>
+                        <!-- Product Info -->
+                        <div class="p-3">
+                            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1 line-clamp-1"
+                                title="{{ $produk->nama_produk }}">
+                                {{ $produk->nama_produk }}
+                            </h3>
+
+                            <div class="flex items-baseline gap-1.5 mb-3">
+                                <span class="text-base font-bold text-gray-900 dark:text-white">
+                                    Rp {{ number_format($produk->harga_jual, 0, ',', '.') }}
+                                </span>
+                                <span class="text-[10px] text-gray-400 line-through">
+                                    Rp {{ number_format($produk->modal, 0, ',', '.') }}
+                                </span>
                             </div>
 
-                            <div class="mt-auto pt-3 border-t border-gray-100 dark:border-gray-700 grid grid-cols-2 gap-3">
+                            <!-- Stats Grid -->
+                            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
                                 <div>
-                                    <p
-                                        class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-medium tracking-wide">
+                                    <p class="text-[9px] text-gray-500 dark:text-gray-400 uppercase font-medium mb-0.5">
                                         Profit</p>
-                                    <p class="text-sm font-semibold text-green-600 dark:text-green-400">
-                                        +Rp {{ number_format($profit, 0, ',', '.') }}
+                                    <p class="text-xs font-semibold text-green-600 dark:text-green-400">
+                                        +{{ number_format($profit, 0, ',', '.') }}
                                     </p>
                                 </div>
-                                <div class="text-right">
-                                    <p
-                                        class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-medium tracking-wide">
-                                        Stok</p>
-                                    <p
-                                        class="text-sm font-semibold {{ $stokAman ? 'text-gray-700 dark:text-gray-300' : 'text-red-600 dark:text-red-400' }}">
-                                        {{ $produk->inventori }}
+                                <div>
+                                    <p class="text-[9px] text-gray-500 dark:text-gray-400 uppercase font-medium mb-0.5">
+                                        Margin</p>
+                                    <p class="text-xs font-semibold text-blue-600 dark:text-blue-400">
+                                        {{ $margin }}%
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] text-gray-500 dark:text-gray-400 uppercase font-medium mb-0.5">
+                                        Terjual</p>
+                                    <p class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                                        {{ $produk->total_terjual_bulan_ini ?? 0 }} unit
                                     </p>
                                 </div>
                             </div>
-                            @if (!$stokAman)
-                                <p
-                                    class="text-xs text-red-600 dark:text-red-400 font-medium mt-2 text-center bg-red-50 dark:bg-red-900/20 py-1 rounded-md">
-                                    Stok ini akan segera habis
-                                </p>
-                            @endif
                         </div>
                     </div>
                 @empty
@@ -413,12 +441,10 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">HPP per unit</label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">HPP
+                                        per unit</label>
                                     <input type="hidden" name="modal" x-model="selectedProduk.modal">
-                                    <input type="text"
-                                        @input="updateModal($event)"
-                                        :value="displayModal"
-                                        required
+                                    <input type="text" @input="updateModal($event)" :value="displayModal" required
                                         placeholder="Rp. 0"
                                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                 </div>
@@ -445,11 +471,8 @@
                                         </button>
                                     </label>
                                     <input type="hidden" name="harga_jual" x-model="selectedProduk.harga_jual">
-                                    <input type="text"
-                                        @input="updateHargaJual($event)"
-                                        :value="displayHargaJual"
-                                        required
-                                        placeholder="Rp. 0"
+                                    <input type="text" @input="updateHargaJual($event)" :value="displayHargaJual"
+                                        required placeholder="Rp. 0"
                                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                                     <p x-show="aiReason" x-text="aiReason"
                                         class="mt-1 text-xs text-indigo-600 dark:text-indigo-400 italic"></p>
