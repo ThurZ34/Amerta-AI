@@ -98,7 +98,7 @@ class Dashboard extends Component
                     $date = Carbon::createFromDate($now->year, $now->month, $i);
                     $chartLabels[] = (string) $i;
                     // Jika tanggal belum lewat, isi 0 biar grafiknya ga turun tajam di masa depan
-                    $chartData[] = $date->gt($now) ? 0 : CashJournal::inflows()
+                    $chartData[] = CashJournal::inflows()
                         ->whereDate('transaction_date', $date)
                         ->sum('amount');
                 }

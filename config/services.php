@@ -40,4 +40,10 @@ return [
         'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
     ],
 
+    'google' => [
+        'client_id' => '978500845192-bqbtuoomfc9e7rks2coorp8f5noiq2am.apps.googleusercontent.com',
+        'client_secret' => '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',
+        'redirect' => 'http://127.0.0.1:8000/auth/google/callback',
+    ],
+
 ];
