@@ -10,7 +10,7 @@
         editId: null,
         // Data Dummy untuk kalkulasi total (Nanti bisa diganti backend logic)
         riwayats: {{ Js::from($riwayats) }},
-    
+
         formData: {
             nama_barang: '',
             jumlah: '',
@@ -21,40 +21,27 @@
             metode_pembayaran: '',
             keterangan: ''
         },
-    
+
         init() {
-            @if (session('scan_result')) const scanData = @json(session('scan_result'));
-                this.formData = {
-                    nama_barang: (scanData.items && scanData.items.length > 0) ? scanData.items.join(', ') : (scanData.merchant_name || 'Belanja'),
-                    jumlah: 1,
-                    harga_satuan: scanData.total_amount || 0,
-                    total_harga: scanData.total_amount || 0,
-                    inventori: 0,
-                    jenis: 'pengeluaran',
-                    metode_pembayaran: 'Tunai',
-                    keterangan: 'Scan Struk: ' + (scanData.merchant_name || '') + ' (' + (scanData.transaction_date || '') + ')'
-                };
-                this.activeTab = 'pengeluaran';
-                this.showModal = true; @endif
         },
-    
+
         // Hitung Total Otomatis saat ngetik
         calculateTotal() {
             const jumlah = parseFloat(this.formData.jumlah) || 0;
             const hargaSatuan = parseFloat(this.formData.harga_satuan) || 0;
             this.formData.total_harga = (jumlah * hargaSatuan).toString();
         },
-    
+
         // Filter Data di Frontend (Bisa juga dari backend)
         get filteredRiwayats() {
             return this.riwayats.filter(r => r.jenis === this.activeTab);
         },
-    
+
         // Hitung Total Uang di Tab Aktif
         get currentTotal() {
             return this.filteredRiwayats.reduce((acc, curr) => acc + parseFloat(curr.total_harga), 0);
         },
-    
+
         openAddModal(jenis) {
             this.formData = {
                 nama_barang: '',
@@ -69,18 +56,18 @@
             this.isEditing = false;
             this.showModal = true;
         },
-    
+
         openEditModal(riwayat) {
             this.formData = { ...riwayat }; // Spread operator untuk copy object
             this.isEditing = true;
             this.editId = riwayat.id;
             this.showModal = true;
         },
-    
+
         formatRupiah(angka) {
             return new Intl.NumberFormat('id-ID').format(angka);
         },
-    
+
         // Format currency for display (adds Rp. and thousand separators)
         formatCurrency(value) {
             if (!value) return '';
@@ -88,13 +75,13 @@
             if (isNaN(number)) return '';
             return 'Rp. ' + new Intl.NumberFormat('id-ID').format(number);
         },
-    
+
         // Parse currency input (removes Rp. and dots)
         parseCurrency(value) {
             if (!value) return '';
             return value.toString().replace(/[^0-9]/g, '');
         },
-    
+
         // Handle harga satuan input
         updateHargaSatuan(event) {
             const rawValue = this.parseCurrency(event.target.value);
@@ -102,33 +89,18 @@
             event.target.value = this.formatCurrency(rawValue);
             this.calculateTotal();
         },
-    
+
         // Get formatted display value for harga satuan
         get displayHargaSatuan() {
             return this.formatCurrency(this.formData.harga_satuan);
         },
-    
+
         // Get formatted display value for total harga
         get displayTotalHarga() {
             return this.formatCurrency(this.formData.total_harga);
         },
-    
-        triggerScan() {
-            document.getElementById('scanInput').click();
-        },
-    
-        submitScan() {
-            document.getElementById('scanForm').submit();
-        }
     }">
         <div class="max-w-2xl mx-auto space-y-6">
-
-            <!-- Hidden Scan Form -->
-            <form id="scanForm" action="{{ route('riwayat.scan') }}" method="POST" enctype="multipart/form-data"
-                class="hidden">
-                @csrf
-                <input type="file" id="scanInput" name="receipt_image" accept="image/*" @change="submitScan()">
-            </form>
 
             <div class="relative overflow-hidden rounded-3xl p-6 shadow-xl transition-all duration-500"
                 :class="activeTab === 'pengeluaran' ? 'bg-gradient-to-br from-rose-500 to-orange-600' :
@@ -152,17 +124,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             <span>Tambah Manual</span>
-                        </button>
-
-                        <button @click="triggerScan()"
-                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-lg hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span>Scan Struk</span>
                         </button>
                     </div>
                 </div>
@@ -319,7 +280,7 @@
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Harga Satuan</label>
                                     <input type="hidden" name="harga_satuan" x-model="formData.harga_satuan">
-                                    <input type="text" 
+                                    <input type="text"
                                         @input="updateHargaSatuan($event)"
                                         :value="displayHargaSatuan"
                                         required
