@@ -241,7 +241,7 @@
                                     class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow">
                             </div>
 
-                            <div>
+                            <div x-show="formData.jenis === 'pengeluaran'">
                                 <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Kategori</label>
                                 <input type="text" name="kategori" x-model="formData.kategori" list="categoryList"
                                     placeholder="Cth: Bahan Baku, Listrik, Gaji"

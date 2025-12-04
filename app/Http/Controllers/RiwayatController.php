@@ -79,6 +79,7 @@ class RiwayatController extends Controller
         // Get existing categories for suggestions
         $categories = Riwayat::where('business_id', $business->id)
             ->whereNotNull('kategori')
+            ->where('jenis', 'pengeluaran'  )
             ->distinct()
             ->pluck('kategori')
             ->sort()
