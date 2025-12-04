@@ -241,14 +241,14 @@
                             $produk->inventori <= $produk->min_stock;
                     @endphp
 
-                    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group"
                         x-show="search === '' || '{{ strtolower($produk->nama_produk) }}'.includes(search.toLowerCase())">
 
                         <!-- Product Image -->
-                        <div class="aspect-[4/3] w-full bg-gray-100 dark:bg-gray-700 relative">
+                        <div class="aspect-[4/3] w-full bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
                             @if ($produk->gambar)
                                 <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}"
-                                    class="w-full h-full object-cover">
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                             @else
                                 <div
                                     class="w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-gray-600">
@@ -268,8 +268,9 @@
                                 </span>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="absolute top-2 right-2 flex gap-1.5">
+                            <!-- Action Buttons (Show on Hover) -->
+                            <div
+                                class="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <button @click='openEditModal(@json($produk))'
                                     class="p-1.5 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm transition-colors"
                                     title="Edit">

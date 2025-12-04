@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('header', 'Input Penjualan Harian')
+@section('header', 'Edit Penjualan Harian')
 
 @section('content')
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24" x-data="{ isLoading: false }">
 
         <!-- Loading Overlay -->
         <div x-show="isLoading"
-            class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm transition-opacity"
+            class="fixed inset-0 z-100 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm transition-opacity"
             x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;" x-cloak>
@@ -15,8 +15,8 @@
                 <div
                     class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-indigo-500 border-t-transparent mb-4">
                 </div>
-                <h3 class="text-xl font-bold text-white tracking-wide">Menganalisa Data...</h3>
-                <p class="text-gray-300 mt-2 text-sm font-light">Amerta sedang memproses laporan Anda.</p>
+                <h3 class="text-xl font-bold text-white tracking-wide">Mengupdate Data...</h3>
+                <p class="text-gray-300 mt-2 text-sm font-light">Amerta sedang memproses perubahan Anda.</p>
             </div>
         </div>
 
@@ -25,15 +25,15 @@
             <!-- Header Section -->
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                 <div>
-                    <a href="{{ route('daily-checkin.index') }}"
+                    <a href="{{ route('daily-checkin.show', $dailySale->id) }}"
                         class="inline-flex items-center text-sm text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition mb-2">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        Kembali ke Kalender
+                        Kembali ke Detail
                     </a>
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Input Penjualan</h2>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Edit Penjualan</h2>
                 </div>
 
                 <!-- Date Badge -->
@@ -49,24 +49,24 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Laporan
                             Tanggal</p>
                         <p class="text-sm font-bold text-gray-900 dark:text-white">
-                            {{ \Carbon\Carbon::parse($date)->translatedFormat('l, d F Y') }}</p>
+                            {{ $dailySale->date->translatedFormat('l, d F Y') }}</p>
                     </div>
                 </div>
             </div>
 
-            <form action="{{ route('daily-checkin.store') }}" method="POST" @submit="isLoading = true">
+            <form action="{{ route('daily-checkin.update', $dailySale->id) }}" method="POST" @submit="isLoading = true">
                 @csrf
-                <input type="hidden" name="date" value="{{ $date }}">
+                @method('PUT')
 
                 <!-- Product Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-20">
                     @forelse ($produks as $produk)
-                        <div x-data="{ count: 0 }"
+                        <div x-data="{ count: {{ $existingSales[$produk->id] ?? 0 }} }"
                             class="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500 transition-all duration-300 p-3 flex gap-4 items-center">
 
                             <!-- Image Thumbnail -->
                             <div
-                                class="w-20 h-20 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden relative">
+                                class="w-20 h-20 shrink-0 bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden relative">
                                 @if ($produk->gambar)
                                     <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}"
                                         class="w-full h-full object-cover">
@@ -110,7 +110,7 @@
 
                                         <input type="number" name="sales[{{ $produk->id }}]" x-model="count"
                                             min="0"
-                                            class="w-10 text-center bg-transparent border-none p-0 text-sm font-bold text-gray-800 dark:text-white focus:ring-0 appearance-none [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none">
+                                            class="w-10 text-center bg-transparent border-none p-0 text-sm font-bold text-gray-800 dark:text-white focus:ring-0 appearance-none [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none">
 
                                         <button type="button" @click="count++"
                                             class="w-7 h-7 flex items-center justify-center rounded-md text-gray-500 hover:bg-white dark:hover:bg-gray-600 hover:text-indigo-600 dark:hover:text-indigo-400 hover:shadow-sm transition-all">
@@ -151,14 +151,20 @@
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Pastikan data yang diinput sudah
                                     sesuai.</p>
                             </div>
-                            <button type="submit"
-                                class="w-full sm:w-auto flex-1 sm:flex-none justify-center inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span>Simpan & Analisa</span>
-                            </button>
+                            <div class="flex gap-3 w-full sm:w-auto">
+                                <a href="{{ route('daily-checkin.show', $dailySale->id) }}"
+                                    class="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-3 px-6 rounded-xl transition-all">
+                                    Batal
+                                </a>
+                                <button type="submit"
+                                    class="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>Update & Analisa</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 @endif
