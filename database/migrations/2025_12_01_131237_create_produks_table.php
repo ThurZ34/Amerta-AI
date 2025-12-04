@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('nama_produk');
             $table->integer('modal');
             $table->integer('harga_jual');
-            $table->integer('inventori');
+            $table->integer('total_terjual');
             $table->string('jenis_produk');
             $table->timestamps();
         });

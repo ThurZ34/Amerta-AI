@@ -59,43 +59,7 @@
 
         <main class="-mt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 relative z-10">
 
-            @if ($lowStockProducts->count() > 0)
-                <div x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300"
-                    x-transition:leave-start="opacity-100 transform translate-x-0"
-                    x-transition:leave-end="opacity-0 transform translate-x-full"
-                    class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl shadow-lg relative">
-                    <button @click="show = false" class="absolute top-2 right-2 text-red-400 hover:text-red-600 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                            </path>
-                        </svg>
-                    </button>
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3 pr-6">
-                            <h3 class="text-sm leading-5 font-bold text-red-800">
-                                Perhatian: Stok Menipis
-                            </h3>
-                            <div class="mt-2 text-sm leading-5 text-red-700">
-                                <ul class="list-disc pl-5 space-y-1">
-                                    @foreach ($lowStockProducts as $product)
-                                        <li>
-                                            <span class="font-bold">{{ $product->nama_produk }}</span>
-                                            (Sisa: {{ $product->inventori }})
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
+
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
@@ -210,10 +174,6 @@
                                 {{ $product->nama_produk }}
                             </h4>
                             <div class="flex items-center gap-2 mt-1">
-                                <span
-                                    class="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-bold">
-                                    Stok: {{ $product->inventori }}
-                                </span>
                                 <span class="text-[10px] text-gray-500">Favorit Pelanggan</span>
                             </div>
                         </div>

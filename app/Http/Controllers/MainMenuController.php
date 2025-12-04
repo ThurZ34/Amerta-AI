@@ -31,14 +31,8 @@ class MainMenuController extends Controller
 
         $profitYesterday = $revenueYesterday - $expenseYesterday;
 
-        // 2. Stock Warnings
-        $lowStockProducts = Produk::where('business_id', $businessId)
-            ->whereColumn('inventori', '<=', 'min_stock')
-            ->limit(5)
-            ->get();
-
         // 3. Amerta Insight
-        $insight = $this->generateInsight($profitYesterday, $lowStockProducts);
+        $insight = $this->generateInsight($profitYesterday);
 
         // 4. Monthly Target
         $business = $user->business;
@@ -61,7 +55,6 @@ class MainMenuController extends Controller
 
         return view('main_menu', compact(
             'profitYesterday',
-            'lowStockProducts',
             'insight',
             'targetRevenue',
             'revenueThisMonth',
@@ -126,7 +119,7 @@ class MainMenuController extends Controller
         return $streak;
     }
 
-    private function generateInsight($profit, $lowStock)
+    private function generateInsight($profit)
     {
         $messages = [];
 
@@ -139,13 +132,8 @@ class MainMenuController extends Controller
             $messages[] = "Belum ada aktivitas keuangan yang signifikan kemarin.";
         }
 
-        // Stock Insight
-        if ($lowStock->count() > 0) {
-            $messages[] = "Perhatian! Ada " . $lowStock->count() . " produk yang stoknya menipis. Segera lakukan restock.";
-        }
-
-        // General Motivation if no issues
-        if ($profit >= 0 && $lowStock->count() == 0) {
+        // General Motivation
+        if ($profit >= 0) {
             $messages[] = "Semua sistem berjalan lancar. Fokus pada pengembangan bisnis hari ini!";
         }
 

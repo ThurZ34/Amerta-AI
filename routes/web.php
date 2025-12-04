@@ -5,6 +5,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\GoogleAuthController;
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
 
@@ -19,9 +20,14 @@ Route::get('lang/{locale}', function ($locale) {
     return redirect()->back();
 })->name('lang.switch');
 
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/setup-bisnis', [SurveyController::class, 'index'])->name('setup-bisnis');
-    
+
     Route::get('/dashboard-selection', [App\Http\Controllers\DashboardSelectionController::class, 'index'])->name('dashboard-selection');
     Route::post('/dashboard-selection/join', [App\Http\Controllers\DashboardSelectionController::class, 'join'])->name('dashboard-selection.join');
     Route::middleware(['ensure.business.complete'])->group(function () {
@@ -32,6 +38,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/daily-checkin/create', [DailyCheckinController::class, 'create'])->name('daily-checkin.create');
         Route::post('/daily-checkin', [DailyCheckinController::class, 'store'])->name('daily-checkin.store');
         Route::get('/daily-checkin/{id}', [DailyCheckinController::class, 'show'])->name('daily-checkin.show');
+        Route::get('/daily-checkin/{id}/edit', [DailyCheckinController::class, 'edit'])->name('daily-checkin.edit');
+        Route::put('/daily-checkin/{id}', [DailyCheckinController::class, 'update'])->name('daily-checkin.update');
 
         Route::get('/amerta', function () {
             return view('amerta');

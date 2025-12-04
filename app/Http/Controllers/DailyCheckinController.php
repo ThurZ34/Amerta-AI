@@ -28,26 +28,24 @@ class DailyCheckinController extends Controller
         $startOfMonth = Carbon::parse($date)->startOfMonth();
         $endOfMonth = Carbon::parse($date)->endOfMonth();
 
-        $dailySales = DailySale::where('daily_sales.business_id', auth()->user()->business->id)
+        $dailySales = DailySale::where('business_id', auth()->user()->business->id)
             ->whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->leftJoin('cash_journals', function ($join) {
-                $join->on('daily_sales.date', '=', 'cash_journals.transaction_date')
-                     ->where('cash_journals.business_id', auth()->user()->business->id);
-            })
-            ->select(
-                'daily_sales.*',
-                DB::raw('COALESCE(SUM(CASE WHEN cash_journals.is_inflow = 1 THEN cash_journals.amount ELSE 0 END), 0) as total_revenue'),
-                DB::raw('COALESCE(SUM(CASE WHEN cash_journals.is_inflow = 1 THEN cash_journals.amount ELSE -cash_journals.amount END), 0) as total_profit')
-            )
-            ->groupBy(
-                'daily_sales.id',
-                'daily_sales.business_id',
-                'daily_sales.date',
-                'daily_sales.ai_analysis',
-                'daily_sales.created_at',
-                'daily_sales.updated_at'
-            )
+            ->with('items')
             ->get()
+            ->map(function ($sale) {
+                $revenue = $sale->items->sum(function($item) {
+                    return $item->price * $item->quantity;
+                });
+
+                $hpp = $sale->items->sum(function($item) {
+                    return $item->cost * $item->quantity;
+                });
+
+                $sale->total_revenue = $revenue;
+                $sale->total_profit = $revenue - $hpp;
+
+                return $sale;
+            })
             ->keyBy(fn($sale) => $sale->date->format('Y-m-d'));
 
         return view('daily-checkin.index', compact('dailySales', 'startOfMonth', 'endOfMonth'));
@@ -117,8 +115,6 @@ class DailyCheckinController extends Controller
                             'cost' => $produk->modal,
                         ]);
 
-                        // Decrement stock
-                        $produk->decrement('inventori', $qty);
 
                         CashJournal::create([
                             'business_id' => auth()->user()->business->id,
@@ -189,5 +185,132 @@ class DailyCheckinController extends Controller
         $dailySale->total_profit = $totalRevenue - $totalCost;
 
         return view('daily-checkin.show', compact('dailySale'));
+    }
+
+    public function edit($id)
+    {
+        $dailySale = DailySale::where('business_id', auth()->user()->business->id)
+            ->with('items.produk')
+            ->findOrFail($id);
+
+        $produks = Produk::where('business_id', auth()->user()->business->id)->get();
+
+        // Create array of existing sales data for pre-population
+        $existingSales = [];
+        foreach ($dailySale->items as $item) {
+            $existingSales[$item->produk_id] = $item->quantity;
+        }
+
+        return view('daily-checkin.edit', compact('dailySale', 'produks', 'existingSales'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $dailySale = DailySale::where('business_id', auth()->user()->business->id)
+            ->findOrFail($id);
+
+        $request->validate([
+            'sales' => 'required|array',
+            'sales.*' => 'required|integer|min:0',
+        ]);
+
+        $salesData = [];
+        $totalRevenue = 0;
+        $totalCost = 0;
+        $totalProfit = 0;
+
+        $coaRevenue = Coa::where('name', 'Penjualan Produk')->first();
+        $coaCost = Coa::where('name', 'Beban Bahan Baku')->first();
+
+        if (!$coaRevenue || !$coaCost) {
+            Log::error("COA not found for sales transaction update");
+            return back()->withInput()->withErrors('Konfigurasi Akun Keuangan (COA) belum lengkap. Harap cek data seeder.');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Step 1: Delete old daily sale items
+
+            // Step 2: Delete old cash journal entries for this date
+            CashJournal::where('business_id', auth()->user()->business->id)
+                ->whereDate('transaction_date', $dailySale->date)
+                ->where('coa_id', $coaRevenue->id)
+                ->delete();
+
+            // Step 3: Delete old daily sale items
+            DailySaleItem::where('daily_sale_id', $dailySale->id)->delete();
+
+            // Step 4: Create new items and adjust stock
+            foreach ($request->sales as $produkId => $qty) {
+                if ($qty > 0) {
+                    $produk = Produk::find($produkId);
+                    if ($produk) {
+                        $revenue = $produk->harga_jual * $qty;
+                        $cost = $produk->modal * $qty;
+                        $profit = $revenue - $cost;
+
+                        $totalRevenue += $revenue;
+                        $totalCost += $cost;
+                        $totalProfit += $profit;
+
+                        DailySaleItem::create([
+                            'daily_sale_id' => $dailySale->id,
+                            'produk_id' => $produk->id,
+                            'quantity' => $qty,
+                            'price' => $produk->harga_jual,
+                            'cost' => $produk->modal,
+                        ]);
+
+
+                        CashJournal::create([
+                            'business_id' => auth()->user()->business->id,
+                            'transaction_date' => $dailySale->date,
+                            'coa_id' => $coaRevenue->id,
+                            'amount' => $revenue,
+                            'is_inflow' => true,
+                            'payment_method' => 'Kas',
+                            'description' => "Penjualan {$qty} unit {$produk->nama_produk}",
+                        ]);
+
+                        $salesData[] = [
+                            'name' => $produk->nama_produk,
+                            'qty' => $qty,
+                            'revenue' => $revenue,
+                            'profit' => $profit,
+                        ];
+                    }
+                }
+            }
+
+            // Step 5: Re-generate AI analysis
+            $prompt = 'Analisis penjualan harian saya untuk tanggal '.Carbon::parse($dailySale->date)->translatedFormat('l, d F Y').":\n";
+            foreach ($salesData as $data) {
+                $prompt .= "- {$data['name']}: Terjual {$data['qty']} unit. Profit: Rp ".number_format($data['profit'], 0, ',', '.')."\n";
+            }
+            $prompt .= "\nTotal Omset: Rp ".number_format($totalRevenue, 0, ',', '.');
+            $prompt .= "\nTotal Profit: Rp ".number_format($totalProfit, 0, ',', '.');
+            $prompt .= "\n\nBerikan evaluasi singkat, apakah ini untung atau rugi? Jika untung besar, beri ucapan selamat yang memotivasi. Jika rugi atau untung tipis, beri saran konkret untuk meningkatkan penjualan besok. Gunakan bahasa yang santai dan suportif.";
+
+            $business = auth()->user()->business;
+            if (! $business) {
+                throw new \Exception('Bisnis tidak ditemukan. Silakan setup bisnis terlebih dahulu.');
+            }
+
+            $aiResponse = $this->geminiService->sendChat($prompt, $business);
+
+            $dailySale->update([
+                'ai_analysis' => $aiResponse,
+            ]);
+
+            DB::commit();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Error during DailySale update: " . $e->getMessage());
+            return back()->withInput()->withErrors('Terjadi kesalahan saat mengupdate data: ' . $e->getMessage());
+        }
+
+        return redirect()->route('daily-checkin.show', $dailySale->id)->with('success', 'Data berhasil diupdate!');
     }
 }

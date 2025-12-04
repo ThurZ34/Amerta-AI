@@ -6,6 +6,7 @@ use App\Models\CashJournal;
 use App\Models\Produk;
 use App\Services\GeminiService;
 use App\Models\DailySaleItem;
+use \App\Models\Riwayat;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -51,17 +52,18 @@ class Dashboard extends Component
             ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
             ->sum('amount');
 
+        $expenseBahanBakuOnly = Riwayat::where('business_id', $businessId)
+            ->where('jenis', 'pengeluaran') // Pastikan hanya ambil pengeluaran
+            ->whereBetween('tanggal_pembelian', [$startOfMonth, $endOfMonth]) // Perhatikan nama kolom tanggal di riwayat
+            ->where('kategori', 'like', '%Bahan Baku%') // Filter string kategori
+            ->sum('total_harga');
+
         $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth) {
             $q->whereBetween('date', [$startOfMonth, $endOfMonth]);
         })
             ->sum(DB::raw('cost * quantity'));
 
-        $operationalExpense = CashJournal::outflows()
-            ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
-            ->whereHas('coa', function ($q) {
-                $q->where('name', '!=', 'Beban Bahan Baku');
-            })
-            ->sum('amount');
+        $operationalExpense = $expenseThisMonth - $expenseBahanBakuOnly;
 
         $profitThisMonth = $revenueThisMonth - $hppThisMonth - $operationalExpense;
 
@@ -98,7 +100,7 @@ class Dashboard extends Component
                     $date = Carbon::createFromDate($now->year, $now->month, $i);
                     $chartLabels[] = (string) $i;
                     // Jika tanggal belum lewat, isi 0 biar grafiknya ga turun tajam di masa depan
-                    $chartData[] = $date->gt($now) ? 0 : CashJournal::inflows()
+                    $chartData[] = CashJournal::inflows()
                         ->whereDate('transaction_date', $date)
                         ->sum('amount');
                 }
@@ -131,7 +133,7 @@ class Dashboard extends Component
                 for ($i = 6; $i >= 0; $i--) {
                     $date = Carbon::today()->subDays($i);
                     $chartLabels[] = $date->translatedFormat('l');
-                    $chartData[] =CashJournal::inflows()
+                    $chartData[] = CashJournal::inflows()
                         ->whereDate('transaction_date', $date)
                         ->sum('amount');
                 }
@@ -194,14 +196,6 @@ class Dashboard extends Component
             }
         }
 
-        // --- LOW STOCK ALERT ---
-        // Assuming $businessId is available in this context, e.g., from authenticated user or a property.
-        // For demonstration, let's assume a placeholder value if not explicitly defined elsewhere.
-        // If $businessId is not defined, this line will cause an error.
-        $businessId = Auth::user()->business_id;
-        $lowStockProducts = Produk::where('business_id', $businessId)
-            ->whereColumn('inventori', '<=', 'min_stock')
-            ->get();
 
         // ✅ PERBAIKAN UTAMA: Menggunakan extends() dan section() agar sesuai layout blade biasa
         return view('livewire.dashboard', compact(
@@ -215,8 +209,7 @@ class Dashboard extends Component
             'chartData',
             'expenseLabels',
             'expenseData',
-            'aiMessage',
-            'lowStockProducts'
+            'aiMessage'
         ))
             ->extends('layouts.app') // Pastikan ini sesuai nama file layout Anda (resources/views/layouts/app.blade.php)
             ->section('content');    // Pastikan ini sesuai nama @yield('content') di layout Anda
