@@ -6,6 +6,7 @@ use App\Models\CashJournal;
 use App\Models\Produk;
 use App\Services\GeminiService;
 use App\Models\DailySaleItem;
+use \App\Models\Riwayat;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -51,18 +52,18 @@ class Dashboard extends Component
             ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
             ->sum('amount');
 
+        $expenseBahanBakuOnly = Riwayat::where('business_id', $businessId)
+            ->where('jenis', 'pengeluaran') // Pastikan hanya ambil pengeluaran
+            ->whereBetween('tanggal_pembelian', [$startOfMonth, $endOfMonth]) // Perhatikan nama kolom tanggal di riwayat
+            ->where('kategori', 'like', '%Bahan Baku%') // Filter string kategori
+            ->sum('total_harga');
+
         $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth) {
             $q->whereBetween('date', [$startOfMonth, $endOfMonth]);
         })
             ->sum(DB::raw('cost * quantity'));
 
-        $operationalExpense = CashJournal::outflows()
-            ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
-            ->whereHas('coa', function ($q) {
-                // Filter semua yang mengandung kata "Bahan Baku"
-                $q->where('name', 'not like', '%Bahan Baku%');
-            })
-            ->sum('amount');
+        $operationalExpense = $expenseThisMonth - $expenseBahanBakuOnly;
 
         $profitThisMonth = $revenueThisMonth - $hppThisMonth - $operationalExpense;
 
@@ -132,7 +133,7 @@ class Dashboard extends Component
                 for ($i = 6; $i >= 0; $i--) {
                     $date = Carbon::today()->subDays($i);
                     $chartLabels[] = $date->translatedFormat('l');
-                    $chartData[] =CashJournal::inflows()
+                    $chartData[] = CashJournal::inflows()
                         ->whereDate('transaction_date', $date)
                         ->sum('amount');
                 }
