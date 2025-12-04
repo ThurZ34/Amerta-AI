@@ -14,10 +14,16 @@ class Riwayat extends Model
         'total_harga',
         'bukti_pembayaran',
         'jenis',
+        'cash_journal_id',
     ];
 
     public function business()
     {
         return $this->belongsTo(Business::class);
+    }
+
+    public function cashJournal()
+    {
+        return $this->belongsTo(CashJournal::class);
     }
 }
