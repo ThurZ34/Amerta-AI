@@ -28,26 +28,24 @@ class DailyCheckinController extends Controller
         $startOfMonth = Carbon::parse($date)->startOfMonth();
         $endOfMonth = Carbon::parse($date)->endOfMonth();
 
-        $dailySales = DailySale::where('daily_sales.business_id', auth()->user()->business->id)
+        $dailySales = DailySale::where('business_id', auth()->user()->business->id)
             ->whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->leftJoin('cash_journals', function ($join) {
-                $join->on('daily_sales.date', '=', 'cash_journals.transaction_date')
-                     ->where('cash_journals.business_id', auth()->user()->business->id);
-            })
-            ->select(
-                'daily_sales.*',
-                DB::raw('COALESCE(SUM(CASE WHEN cash_journals.is_inflow = 1 THEN cash_journals.amount ELSE 0 END), 0) as total_revenue'),
-                DB::raw('COALESCE(SUM(CASE WHEN cash_journals.is_inflow = 1 THEN cash_journals.amount ELSE -cash_journals.amount END), 0) as total_profit')
-            )
-            ->groupBy(
-                'daily_sales.id',
-                'daily_sales.business_id',
-                'daily_sales.date',
-                'daily_sales.ai_analysis',
-                'daily_sales.created_at',
-                'daily_sales.updated_at'
-            )
+            ->with('items')
             ->get()
+            ->map(function ($sale) {
+                $revenue = $sale->items->sum(function($item) {
+                    return $item->price * $item->quantity;
+                });
+
+                $hpp = $sale->items->sum(function($item) {
+                    return $item->cost * $item->quantity;
+                });
+
+                $sale->total_revenue = $revenue;
+                $sale->total_profit = $revenue - $hpp;
+
+                return $sale;
+            })
             ->keyBy(fn($sale) => $sale->date->format('Y-m-d'));
 
         return view('daily-checkin.index', compact('dailySales', 'startOfMonth', 'endOfMonth'));
