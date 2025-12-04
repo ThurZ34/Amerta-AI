@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\CashJournal;
 use App\Models\Produk;
 use App\Services\GeminiService;
+use App\Models\DailySaleItem;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +50,12 @@ class Dashboard extends Component
             ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
             ->sum('amount');
 
-        $profitThisMonth = $revenueThisMonth - $expenseThisMonth;
+        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth) {
+            $q->whereBetween('date', [$startOfMonth, $endOfMonth]);
+        })
+        ->sum(DB::raw('cost * quantity'));
+
+        $profitThisMonth = $revenueThisMonth - $hppThisMonth - $expenseThisMonth;
 
         $revenueLastMonth = CashJournal::inflows()
             ->whereBetween('transaction_date', [$startOfMonth->copy()->subMonth(), $endOfMonth->copy()->subMonth()])
