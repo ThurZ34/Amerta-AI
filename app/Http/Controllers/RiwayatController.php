@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Riwayat;
 use App\Services\GeminiService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class RiwayatController extends Controller
 {
@@ -21,7 +22,7 @@ class RiwayatController extends Controller
         $riwayats = Riwayat::where('business_id', $business->id)
             ->orderBy('created_at', 'desc')
             ->get();
-        
+
         return view('riwayat.index', compact('riwayats'));
     }
 
@@ -35,7 +36,7 @@ class RiwayatController extends Controller
             $path = $request->file('receipt_image')->store('receipts', 'public');
             $data = $this->geminiService->analyzeReceipt($path);
 
-            if (!$data) {
+            if (! $data) {
                 return back()->with('error', 'Gagal menganalisa struk. Pastikan gambar jelas.');
             }
 
@@ -46,7 +47,7 @@ class RiwayatController extends Controller
                 ->with('success', 'Struk berhasil dianalisa! Silakan cek data sebelum disimpan.');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -54,27 +55,28 @@ class RiwayatController extends Controller
     {
         $request->validate([
             'nama_barang' => 'required|string|max:255',
-            'jumlah' => 'required|numeric|min:0',
-            'harga_satuan' => 'required|numeric|min:0',
+            'tanggal_pembelian' => 'required|date',
             'total_harga' => 'required|numeric|min:0',
-            'inventori' => 'required|numeric|min:0',
-            'jenis' => 'required|in:pengeluaran,pendapatan',
-            'metode_pembayaran' => 'required|string',
             'keterangan' => 'nullable|string',
+            'bukti_pembayaran' => 'nullable|image|max:5120',
+            'jenis' => 'required|in:pengeluaran,pendapatan',
         ]);
 
         $business = auth()->user()->business;
+        $path = null;
+
+        if ($request->hasFile('bukti_pembayaran')) {
+            $path = $request->file('bukti_pembayaran')->store('receipts', 'public');
+        }
 
         Riwayat::create([
             'business_id' => $business->id,
             'nama_barang' => $request->nama_barang,
-            'jumlah' => $request->jumlah,
-            'harga_satuan' => $request->harga_satuan,
+            'tanggal_pembelian' => $request->tanggal_pembelian,
             'total_harga' => $request->total_harga,
-            'inventori' => $request->inventori,
-            'jenis' => $request->jenis,
-            'metode_pembayaran' => $request->metode_pembayaran,
             'keterangan' => $request->keterangan,
+            'bukti_pembayaran' => $path,
+            'jenis' => $request->jenis,
         ]);
 
         return redirect()->route('riwayat.index')->with('success', 'Data berhasil ditambahkan.');
@@ -84,17 +86,24 @@ class RiwayatController extends Controller
     {
         $request->validate([
             'nama_barang' => 'required|string|max:255',
-            'jumlah' => 'required|numeric|min:0',
-            'harga_satuan' => 'required|numeric|min:0',
+            'tanggal_pembelian' => 'required|date',
             'total_harga' => 'required|numeric|min:0',
-            'inventori' => 'required|numeric|min:0',
-            'jenis' => 'required|in:pengeluaran,pendapatan',
-            'metode_pembayaran' => 'required|string',
             'keterangan' => 'nullable|string',
+            'bukti_pembayaran' => 'nullable|image|max:5120',
+            'jenis' => 'required|in:pengeluaran,pendapatan',
         ]);
 
         $riwayat = Riwayat::where('business_id', auth()->user()->business->id)->findOrFail($id);
-        $riwayat->update($request->all());
+        $data = $request->except('bukti_pembayaran');
+
+        if ($request->hasFile('bukti_pembayaran')) {
+            if ($riwayat->bukti_pembayaran) {
+                Storage::disk('public')->delete($riwayat->bukti_pembayaran);
+            }
+            $data['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('receipts', 'public');
+        }
+
+        $riwayat->update($data);
 
         return redirect()->route('riwayat.index')->with('success', 'Data berhasil diperbarui.');
     }
@@ -102,6 +111,11 @@ class RiwayatController extends Controller
     public function destroy($id)
     {
         $riwayat = Riwayat::where('business_id', auth()->user()->business->id)->findOrFail($id);
+
+        if ($riwayat->bukti_pembayaran) {
+            Storage::disk('public')->delete($riwayat->bukti_pembayaran);
+        }
+
         $riwayat->delete();
 
         return redirect()->route('riwayat.index')->with('success', 'Data berhasil dihapus.');
