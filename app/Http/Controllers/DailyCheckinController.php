@@ -130,16 +130,6 @@ class DailyCheckinController extends Controller
                             'description' => "Penjualan {$qty} unit {$produk->nama_produk}",
                         ]);
 
-                        CashJournal::create([
-                            'business_id' => auth()->user()->business->id,
-                            'transaction_date' => $request->date,
-                            'coa_id' => $coaCost->id,
-                            'amount' => $cost,
-                            'is_inflow' => false,
-                            'payment_method' => 'Kas',
-                            'description' => "Pengeluaran modal (HPP) untuk {$qty} unit {$produk->nama_produk}",
-                        ]);
-
                         $salesData[] = [
                             'name' => $produk->nama_produk,
                             'qty' => $qty,
@@ -186,11 +176,17 @@ class DailyCheckinController extends Controller
             ->with('items.produk')
             ->findOrFail($id);
 
-        $totalRevenue = CashJournal::where('business_id', auth()->user()->business->id)->inflows()->whereDate('transaction_date', $dailySale->date)->sum('amount');
-        $totalExpense = CashJournal::where('business_id', auth()->user()->business->id)->outflows()->whereDate('transaction_date', $dailySale->date)->sum('amount');
+        $totalRevenue = 0;
+        $totalCost = 0;
+
+        foreach($dailySale->items as $item) {
+            $totalRevenue += $item->price * $item->quantity;
+
+            $totalCost += $item->cost * $item->quantity;
+        }
 
         $dailySale->total_revenue = $totalRevenue;
-        $dailySale->total_profit = $totalRevenue - $totalExpense;
+        $dailySale->total_profit = $totalRevenue - $totalCost;
 
         return view('daily-checkin.show', compact('dailySale'));
     }
