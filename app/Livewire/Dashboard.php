@@ -36,6 +36,7 @@ class Dashboard extends Component
         $now = Carbon::now();
         $startOfMonth = $now->copy()->startOfMonth();
         $endOfMonth = $now->copy()->endOfMonth();
+        $businessId = auth()->user()->business->id;
 
         // --- 1. RINGKASAN KEUANGAN ---
         $totalInflow = CashJournal::inflows()->sum('amount');
@@ -53,9 +54,16 @@ class Dashboard extends Component
         $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth) {
             $q->whereBetween('date', [$startOfMonth, $endOfMonth]);
         })
-        ->sum(DB::raw('cost * quantity'));
+            ->sum(DB::raw('cost * quantity'));
 
-        $profitThisMonth = $revenueThisMonth - $hppThisMonth - $expenseThisMonth;
+        $operationalExpense = CashJournal::outflows()
+            ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
+            ->whereHas('coa', function ($q) {
+                $q->where('name', '!=', 'Beban Bahan Baku');
+            })
+            ->sum('amount');
+
+        $profitThisMonth = $revenueThisMonth - $hppThisMonth - $operationalExpense;
 
         $revenueLastMonth = CashJournal::inflows()
             ->whereBetween('transaction_date', [$startOfMonth->copy()->subMonth(), $endOfMonth->copy()->subMonth()])
@@ -73,11 +81,11 @@ class Dashboard extends Component
         $chartData = [];
 
         switch ($this->range) {
-            case 'day': // Per Jam Hari Ini
+            case 'day':
                 for ($i = 0; $i <= 23; $i++) {
                     $chartLabels[] = sprintf('%02d:00', $i);
                     $chartData[] = CashJournal::inflows()
-                        ->whereDate('transaction_date', Carbon::today())
+                        ->whereDate('transaction_date', \Carbon\Carbon::today())
                         ->whereTime('created_at', '>=', sprintf('%02d:00:00', $i))
                         ->whereTime('created_at', '<=', sprintf('%02d:59:59', $i))
                         ->sum('amount');
@@ -89,33 +97,25 @@ class Dashboard extends Component
                 for ($i = 1; $i <= $daysInMonth; $i++) {
                     $date = Carbon::createFromDate($now->year, $now->month, $i);
                     $chartLabels[] = (string) $i;
-
-                    if ($date->gt($now)) {
-                        $chartData[] = 0;
-                    } else {
-                        $chartData[] = CashJournal::inflows()
-                            ->whereDate('transaction_date', $date)
-                            ->sum('amount');
-                    }
+                    // Jika tanggal belum lewat, isi 0 biar grafiknya ga turun tajam di masa depan
+                    $chartData[] = $date->gt($now) ? 0 : CashJournal::inflows()
+                        ->whereDate('transaction_date', $date)
+                        ->sum('amount');
                 }
                 break;
 
             case 'year':
                 for ($i = 1; $i <= 12; $i++) {
                     $date = Carbon::createFromDate($now->year, $i, 1);
-                    if ($date->gt($now)) {
-                        $chartData[] = 0;
-                    } else {
-                        $chartData[] = CashJournal::inflows()
-                            ->whereYear('transaction_date', $now->year)
-                            ->whereMonth('transaction_date', $i)
-                            ->sum('amount');
-                    }
                     $chartLabels[] = $date->translatedFormat('M');
+                    $chartData[] = $date->gt($now) ? 0 : CashJournal::inflows()
+                        ->whereYear('transaction_date', $now->year)
+                        ->whereMonth('transaction_date', $i)
+                        ->sum('amount');
                 }
                 break;
 
-            case 'decade': // Per Tahun (10 Tahun Terakhir)
+            case 'decade':
                 $currentYear = $now->year;
                 for ($i = 9; $i >= 0; $i--) {
                     $year = $currentYear - $i;
@@ -127,11 +127,11 @@ class Dashboard extends Component
                 break;
 
             case 'week':
-            default: // 7 Hari Terakhir
+            default:
                 for ($i = 6; $i >= 0; $i--) {
                     $date = Carbon::today()->subDays($i);
                     $chartLabels[] = $date->translatedFormat('l');
-                    $chartData[] = CashJournal::inflows()
+                    $chartData[] =CashJournal::inflows()
                         ->whereDate('transaction_date', $date)
                         ->sum('amount');
                 }
@@ -164,7 +164,7 @@ class Dashboard extends Component
 
         // Pesan Semangat Amerta (Quotes) - AI Generated & Session Based
         $aiMessage = null;
-        if (! Session::has('amerta_insight_dismissed')) {
+        if (!Session::has('amerta_insight_dismissed')) {
             if (Session::has('amerta_insight_quote')) {
                 $aiMessage = Session::get('amerta_insight_quote');
             } else {
