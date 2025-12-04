@@ -301,7 +301,7 @@
                                     mudah.</p>
                             </div>
                         </div>
-                    </a> --}}
+                    </a> 
                 </div>
 
                 <div class="space-y-6">
