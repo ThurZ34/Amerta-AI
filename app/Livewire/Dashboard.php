@@ -59,7 +59,8 @@ class Dashboard extends Component
         $operationalExpense = CashJournal::outflows()
             ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
             ->whereHas('coa', function ($q) {
-                $q->where('name', '!=', 'Beban Bahan Baku');
+                // Filter semua yang mengandung kata "Bahan Baku"
+                $q->where('name', 'not like', '%Bahan Baku%');
             })
             ->sum('amount');
 
@@ -98,7 +99,7 @@ class Dashboard extends Component
                     $date = Carbon::createFromDate($now->year, $now->month, $i);
                     $chartLabels[] = (string) $i;
                     // Jika tanggal belum lewat, isi 0 biar grafiknya ga turun tajam di masa depan
-                    $chartData[] = $date->gt($now) ? 0 : CashJournal::inflows()
+                    $chartData[] = CashJournal::inflows()
                         ->whereDate('transaction_date', $date)
                         ->sum('amount');
                 }
