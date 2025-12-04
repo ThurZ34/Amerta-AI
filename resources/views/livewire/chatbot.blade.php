@@ -117,7 +117,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                        Halo, {{ Auth::user()->name }}!
+                        Hallo, {{ Auth::user()->name }}!
                     </h3>
                     <p class="text-gray-500 dark:text-gray-400 max-w-md mb-8">
                         Saya Amerta, asisten bisnis pribadi Anda. Ada yang bisa saya bantu analisa hari ini?
