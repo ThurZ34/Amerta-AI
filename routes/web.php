@@ -32,8 +32,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/daily-checkin/create', [DailyCheckinController::class, 'create'])->name('daily-checkin.create');
         Route::post('/daily-checkin', [DailyCheckinController::class, 'store'])->name('daily-checkin.store');
         Route::get('/daily-checkin/{id}', [DailyCheckinController::class, 'show'])->name('daily-checkin.show');
-        Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
-        Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
 
         Route::get('/amerta', function () {
             return view('amerta');
