@@ -135,7 +135,7 @@
                 <input type="hidden" name="hapus_gambar" :value="deleteImage ? '1' : '0'">
 
                 {{-- 2. MAIN IDENTITY CARD --}}
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 p-6 mb-6 relative overflow-hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 p-6 mb-6 relative overflow-visible">
                     {{-- Decorative Background --}}
                     <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50 dark:bg-indigo-900/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
@@ -188,12 +188,12 @@
                                     <input type="text" name="nama_bisnis"
                                         value="{{ old('nama_bisnis', optional($business)->nama_bisnis ?? '') }}"
                                         placeholder="Contoh: Kopi Kenangan"
-                                        class="w-full text-xl font-bold text-gray-900 dark:text-white bg-white dark:bg-gray-900 border-b-2 border-gray-200 dark:border-gray-700 focus:border-indigo-500 focus:ring-0 px-0 py-2 placeholder-gray-300 transition-colors">
+                                        class="w-full text-xl font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-3 py-2 placeholder-gray-400 transition-all">
                                 </template>
                                 @error('nama_bisnis') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            <div class="relative max-w-sm" x-data="{ open: false }">
+                            <div class="relative max-w-sm">
                                 <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Kategori</label>
                                 <template x-if="!isEditing">
                                     <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium border border-indigo-100 dark:border-indigo-800">
@@ -201,14 +201,14 @@
                                     </span>
                                 </template>
                                 <template x-if="isEditing">
-                                    <div class="relative">
+                                    <div class="relative z-50">
                                         <input type="hidden" name="kategori" :value="selectedCategory">
                                         <div class="relative">
                                             <input type="text" x-model="categorySearch"
                                                 @focus="showCategoryDropdown = true"
                                                 @click.away="showCategoryDropdown = false"
                                                 :placeholder="selectedCategory || 'Cari Kategori...'"
-                                                class="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all">
+                                                class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm text-gray-900 dark:text-white transition-all">
                                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                 <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
                                             </div>
@@ -219,7 +219,7 @@
                                             x-transition:enter="transition ease-out duration-100"
                                             x-transition:enter-start="opacity-0 scale-95"
                                             x-transition:enter-end="opacity-100 scale-100"
-                                            class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl max-h-56 overflow-y-auto custom-scrollbar">
+                                            class="absolute z-[100] w-full mt-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl max-h-56 overflow-y-auto custom-scrollbar">
                                             <template x-for="category in filteredCategories" :key="category">
                                                 <button type="button" @click="selectCategory(category)"
                                                     class="w-full text-left px-4 py-2.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-sm text-gray-700 dark:text-gray-200 transition-colors"
@@ -263,7 +263,7 @@
                                         </p>
                                     </template>
                                     <template x-if="isEditing">
-                                        <textarea name="tujuan_utama" rows="3" class="w-full rounded-xl border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white text-sm" placeholder="Contoh: Menjadi kedai kopi nomor 1 di Jakarta Selatan">{{ old('tujuan_utama', $business?->tujuan_utama) }}</textarea>
+                                        <textarea name="tujuan_utama" rows="3" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-gray-900 dark:text-white text-sm px-3 py-2.5 placeholder-gray-400" placeholder="Contoh: Menjadi kedai kopi nomor 1 di Jakarta Selatan">{{ old('tujuan_utama', $business?->tujuan_utama) }}</textarea>
                                     </template>
                                 </div>
 
@@ -277,7 +277,7 @@
                                         </div>
                                     </template>
                                     <template x-if="isEditing">
-                                        <textarea name="alamat" rows="3" class="w-full rounded-xl border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white text-sm" placeholder="Jalan Sudirman No. 1...">{{ old('alamat', $business?->alamat) }}</textarea>
+                                        <textarea name="alamat" rows="3" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-gray-900 dark:text-white text-sm px-3 py-2.5 placeholder-gray-400" placeholder="Jalan Sudirman No. 1...">{{ old('alamat', $business?->alamat) }}</textarea>
                                     </template>
                                 </div>
                             </div>
@@ -291,9 +291,9 @@
                         <div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
                             
-                            <h4 class="text-sm font-semibold text-indigo-100 uppercase tracking-wide mb-4">Kode Tim</h4>
+                            <h4 class="text-sm font-semibold text-gray-950 dark:text-indigo-100 uppercase tracking-wide mb-4">Kode Tim</h4>
                             <div class="flex items-center gap-2" x-data="{ copied: false }">
-                                <code class="flex-1 bg-white/20 backdrop-blur-sm border border-white/20 px-4 py-3 rounded-xl text-lg font-mono font-bold tracking-widest text-center shadow-inner">
+                                <code class="flex-1 bg-white/20 backdrop-blur-sm text-gray-900 dark:text-white border border-white/20 px-4 py-3 rounded-xl text-lg font-mono font-bold tracking-widest text-center shadow-inner">
                                     {{ optional($business)->invite_code ?? '---' }}
                                 </code>
                                 <button type="button" @click="navigator.clipboard.writeText('{{ optional($business)->invite_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
@@ -302,7 +302,7 @@
                                     <svg x-show="copied" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                                 </button>
                             </div>
-                            <p class="text-xs text-indigo-200 mt-3 leading-relaxed">Bagikan kode ini kepada staff Anda untuk bergabung ke dalam workspace ini.</p>
+                            <p class="text-xs text-gray-900 dark:text-indigo-200 mt-3 leading-relaxed">Bagikan kode ini kepada staff Anda untuk bergabung ke dalam workspace ini.</p>
                         </div>
 
                         {{-- Details Card --}}
@@ -316,7 +316,7 @@
                                         <p class="font-medium text-gray-800 dark:text-gray-200">{{ optional($business)->target_pasar ?? '-' }}</p>
                                     </template>
                                     <template x-if="isEditing">
-                                        <input type="text" name="target_pasar" value="{{ old('target_pasar', $business?->target_pasar) }}" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-600 text-sm bg-gray-50 dark:bg-gray-900 dark:text-white" placeholder="Cth: Remaja">
+                                        <input type="text" name="target_pasar" value="{{ old('target_pasar', $business?->target_pasar) }}" class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 px-3 py-2.5 placeholder-gray-400" placeholder="Cth: Remaja">
                                     </template>
                                 </div>
                                 <div class="border-t border-gray-100 dark:border-gray-700"></div>
@@ -327,7 +327,7 @@
                                         <p class="font-medium text-gray-800 dark:text-gray-200">{{ optional($business)->jumlah_tim ?? '0' }} Orang</p>
                                     </template>
                                     <template x-if="isEditing">
-                                        <input type="number" name="jumlah_tim" value="{{ old('jumlah_tim', $business?->jumlah_tim) }}" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-600 text-sm bg-gray-50 dark:bg-gray-900 dark:text-white" placeholder="0">
+                                        <input type="number" name="jumlah_tim" value="{{ old('jumlah_tim', $business?->jumlah_tim) }}" class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 px-3 py-2.5 placeholder-gray-400" placeholder="0">
                                     </template>
                                 </div>
                                 <div class="border-t border-gray-100 dark:border-gray-700"></div>
@@ -338,7 +338,7 @@
                                         <p class="font-medium text-gray-800 dark:text-gray-200 font-mono">{{ optional($business)->telepon ?? '-' }}</p>
                                     </template>
                                     <template x-if="isEditing">
-                                        <input type="text" name="telepon" value="{{ old('telepon', $business?->telepon) }}" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-600 text-sm bg-gray-50 dark:bg-gray-900 dark:text-white" placeholder="0812...">
+                                        <input type="text" name="telepon" value="{{ old('telepon', $business?->telepon) }}" class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 px-3 py-2.5 placeholder-gray-400" placeholder="0812...">
                                     </template>
                                 </div>
                             </div>
@@ -349,7 +349,7 @@
 
                 {{-- SAVE BAR (Floating) --}}
                 <div x-show="isEditing" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-10" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-10" x-cloak
-                    class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-2xl px-6 py-4 flex items-center gap-4 w-[90%] max-w-2xl">
+                    class="fixed bottom-6 right-6 z-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-2xl px-6 py-4 flex items-center gap-4 max-w-2xl">
                     <div class="flex-1">
                         <p class="text-sm font-semibold text-gray-900 dark:text-white">Perubahan belum disimpan</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">Pastikan data sudah benar sebelum menyimpan.</p>
