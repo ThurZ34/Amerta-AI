@@ -10,15 +10,15 @@
         // Default Data
         selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, inventori: 0, min_stock: 10, jenis_produk: '' },
         search: '',
-    
+
         // --- LOGIC IMAGE PREVIEW ---
         imagePreview: null,
-    
+
         // --- LOGIC AI SUGGESTION ---
         suggestingPrice: false,
         aiReason: '',
         aiError: '',
-    
+
         // Fungsi Reset Form
         resetForm() {
             this.selectedProduk = {
@@ -33,24 +33,24 @@
             this.imagePreview = null;
             this.aiReason = '';
             this.aiError = '';
-    
+
             if (document.getElementById('fileInput')) {
                 document.getElementById('fileInput').value = '';
             }
         },
-    
+
         // Fungsi Tanya AI
         async suggestPrice() {
             this.aiError = '';
             this.aiReason = '';
-    
+
             if (!this.selectedProduk.nama_produk || !this.selectedProduk.modal || !this.selectedProduk.jenis_produk) {
                 this.aiError = 'Mohon isi Nama Produk, Modal, dan Jenis Produk terlebih dahulu.';
                 return;
             }
-    
+
             this.suggestingPrice = true;
-    
+
             try {
                 // Pastikan route ini ada di web.php
                 const response = await fetch('{{ route('produk.suggest-price') }}', {
@@ -65,9 +65,9 @@
                         jenis_produk: this.selectedProduk.jenis_produk
                     })
                 });
-    
+
                 const data = await response.json();
-    
+
                 if (data.price) {
                     this.selectedProduk.harga_jual = data.price;
                     this.aiReason = data.reason;
@@ -81,7 +81,7 @@
                 this.suggestingPrice = false;
             }
         },
-    
+
         // Format currency for display (adds Rp. and thousand separators)
         formatCurrency(value) {
             if (!value) return '';
@@ -89,37 +89,37 @@
             if (isNaN(number)) return '';
             return 'Rp. ' + new Intl.NumberFormat('id-ID').format(number);
         },
-    
+
         // Parse currency input (removes Rp. and dots)
         parseCurrency(value) {
             if (!value) return '';
             return value.toString().replace(/[^0-9]/g, '');
         },
-    
+
         // Handle modal input
         updateModal(event) {
             const rawValue = this.parseCurrency(event.target.value);
             this.selectedProduk.modal = rawValue;
             event.target.value = this.formatCurrency(rawValue);
         },
-    
+
         // Handle harga jual input
         updateHargaJual(event) {
             const rawValue = this.parseCurrency(event.target.value);
             this.selectedProduk.harga_jual = rawValue;
             event.target.value = this.formatCurrency(rawValue);
         },
-    
+
         // Get formatted display value for modal
         get displayModal() {
             return this.formatCurrency(this.selectedProduk.modal);
         },
-    
+
         // Get formatted display value for harga jual
         get displayHargaJual() {
             return this.formatCurrency(this.selectedProduk.harga_jual);
         },
-    
+
         // Fungsi Handle File Upload
         fileChosen(event) {
             const file = event.target.files[0];
@@ -127,12 +127,12 @@
                 this.imagePreview = URL.createObjectURL(file);
             }
         },
-    
+
         openCreateModal() {
             this.resetForm();
             this.createModalOpen = true;
         },
-    
+
         openEditModal(produk) {
             this.selectedProduk = JSON.parse(JSON.stringify(produk));
             if (produk.gambar) {
@@ -142,12 +142,12 @@
             }
             this.editModalOpen = true;
         },
-    
+
         openDeleteModal(produk) {
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
         },
-    
+
         closeModals() {
             this.createModalOpen = false;
             this.editModalOpen = false;
@@ -413,10 +413,9 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Modal
-                                        (HPP)</label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">HPP per unit</label>
                                     <input type="hidden" name="modal" x-model="selectedProduk.modal">
-                                    <input type="text" 
+                                    <input type="text"
                                         @input="updateModal($event)"
                                         :value="displayModal"
                                         required
@@ -426,7 +425,7 @@
                                 <div>
                                     <label
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex justify-between items-center">
-                                        Harga Jual
+                                        Harga Jual per unit
                                         <button type="button" @click="suggestPrice()" :disabled="suggestingPrice"
                                             class="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-1 rounded-md hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors flex items-center gap-1 disabled:opacity-50">
                                             <svg x-show="!suggestingPrice" class="w-3 h-3" fill="none"
@@ -446,7 +445,7 @@
                                         </button>
                                     </label>
                                     <input type="hidden" name="harga_jual" x-model="selectedProduk.harga_jual">
-                                    <input type="text" 
+                                    <input type="text"
                                         @input="updateHargaJual($event)"
                                         :value="displayHargaJual"
                                         required
