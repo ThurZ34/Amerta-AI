@@ -3,7 +3,20 @@
 @section('header', 'Analisa Penjualan Anda')
 
 @section('content')
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8" x-data="{ isLoading: false }">
+        <!-- Loading Overlay -->
+        <div x-show="isLoading"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm transition-opacity"
+            x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;" x-cloak>
+            <div class="text-center">
+                <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4">
+                </div>
+                <h3 class="text-xl font-bold text-white">Sedang Menganalisa...</h3>
+                <p class="text-gray-300 mt-2">Mohon tunggu sebentar, Amerta sedang bekerja.</p>
+            </div>
+        </div>
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <div class="mb-8 flex items-center justify-between">
@@ -20,7 +33,7 @@
 
             <div
                 class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
-                <form action="{{ route('daily-checkin.store') }}" method="POST">
+                <form action="{{ route('daily-checkin.store') }}" method="POST" @submit="isLoading = true">
                     @csrf
                     <input type="hidden" name="date" value="{{ $date }}">
 
