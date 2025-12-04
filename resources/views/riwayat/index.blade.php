@@ -5,7 +5,8 @@
 @section('content')
     <div class="min-h-screen bg-gray-50/50 dark:bg-gray-950 py-8 px-4" x-data="financeApp({
         riwayats: {{ Js::from($riwayats) }},
-        scanResult: {{ Js::from(session('scan_result')) }}
+        scanResult: {{ Js::from(session('scan_result')) }},
+        categories: {{ Js::from($categories ?? []) }}
     })">
 
         <div class="max-w-2xl mx-auto space-y-6">
@@ -17,7 +18,7 @@
             </form>
 
             <!-- Filter Section -->
-            <form action="{{ route('riwayat.index') }}" method="GET" class="flex gap-3 mb-6">
+            <form action="{{ route('riwayat.index') }}" method="GET" class="flex gap-3 mb-6 relative z-20">
                 <select name="month" onchange="this.form.submit()"
                     class="w-full px-4 py-2.5 rounded-xl border-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500 font-medium">
                     @foreach (range(1, 12) as $m)
@@ -125,6 +126,9 @@
                                 <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                     <span class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 font-medium"
                                         x-text="riwayat.metode_pembayaran"></span>
+                                    <span x-show="riwayat.kategori"
+                                        class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-medium"
+                                        x-text="riwayat.kategori"></span>
                                     <span x-show="riwayat.is_manual === false" x-text="riwayat.keterangan"
                                         class="truncate max-w-[150px] sm:max-w-xs"></span>
                                 </div>
@@ -237,6 +241,26 @@
                                     class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow">
                             </div>
 
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Kategori</label>
+                                <input type="text" name="kategori" x-model="formData.kategori" list="categoryList"
+                                    placeholder="Cth: Bahan Baku, Listrik, Gaji"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                                <datalist id="categoryList">
+                                    <template x-for="cat in categories" :key="cat">
+                                        <option :value="cat"></option>
+                                    </template>
+                                    <!-- Default Suggestions -->
+                                    <option value="Bahan Baku"></option>
+                                    <option value="Listrik & Air"></option>
+                                    <option value="Gaji Karyawan"></option>
+                                    <option value="Sewa Tempat"></option>
+                                    <option value="Transportasi"></option>
+                                    <option value="Pemasaran"></option>
+                                    <option value="Lain-lain"></option>
+                                </datalist>
+                            </div>
+
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Tanggal
@@ -290,15 +314,18 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('financeApp', ({
                 riwayats,
-                scanResult
+                scanResult,
+                categories
             }) => ({
                 activeTab: 'pengeluaran',
                 showModal: false,
                 isEditing: false,
                 editId: null,
                 riwayats: riwayats,
+                categories: categories,
                 formData: {
                     nama_barang: '',
+                    kategori: '',
                     tanggal_pembelian: '',
                     total_harga: '',
                     keterangan: '',
@@ -341,6 +368,7 @@
                 openAddModal(jenis) {
                     this.formData = {
                         nama_barang: '',
+                        kategori: '',
                         tanggal_pembelian: new Date().toISOString().split('T')[0],
                         total_harga: '',
                         keterangan: '',

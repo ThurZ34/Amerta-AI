@@ -14,6 +14,7 @@ class Riwayat extends Model
         'total_harga',
         'bukti_pembayaran',
         'jenis',
+        'kategori',
         'cash_journal_id',
     ];
 

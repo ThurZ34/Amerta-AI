@@ -76,10 +76,19 @@ class RiwayatController extends Controller
         // 3. Merge and Sort
         $mergedRiwayats = $riwayats->concat($dailySales)->sortByDesc('tanggal_pembelian')->values();
 
+        // Get existing categories for suggestions
+        $categories = Riwayat::where('business_id', $business->id)
+            ->whereNotNull('kategori')
+            ->distinct()
+            ->pluck('kategori')
+            ->sort()
+            ->values();
+
         return view('riwayat.index', [
             'riwayats' => $mergedRiwayats,
             'currentMonth' => $month,
-            'currentYear' => $year
+            'currentYear' => $year,
+            'categories' => $categories
         ]);
     }
 
@@ -158,7 +167,10 @@ class RiwayatController extends Controller
                 'total_harga' => $request->total_harga,
                 'keterangan' => $request->keterangan,
                 'bukti_pembayaran' => $path,
+                'keterangan' => $request->keterangan,
+                'bukti_pembayaran' => $path,
                 'jenis' => $request->jenis,
+                'kategori' => $request->kategori,
                 'cash_journal_id' => $cashJournal ? $cashJournal->id : null,
             ]);
 
