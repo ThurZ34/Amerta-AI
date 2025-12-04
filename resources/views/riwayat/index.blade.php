@@ -402,7 +402,7 @@
                 updateTotalHarga(event) {
                     const rawValue = event.target.value.replace(/[^0-9]/g, '');
                     this.formData.total_harga = rawValue;
-                    // Force update input value visually handled by get displayTotalHarga binding usually, 
+                    // Force update input value visually handled by get displayTotalHarga binding usually,
                     // but for smooth typing in input field:
                     event.target.value = 'Rp. ' + this.formatRupiah(rawValue);
                 },
