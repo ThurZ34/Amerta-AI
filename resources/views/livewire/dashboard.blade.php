@@ -320,7 +320,7 @@
                         <h4 class="text-xl font-bold text-gray-900 dark:text-white">Transaksi Terakhir</h4>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Arus kas masuk dan keluar terbaru</p>
                     </div>
-                    <a href="{{ route('daily-checkin.index') }}"
+                    <a href="{{ route('riwayat.index') }}"
                         class="group flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 px-5 py-2.5 rounded-xl transition">
                         Lihat Semua
                         <svg class="w-4 h-4 group-hover:translate-x-1 transition" fill="none"
