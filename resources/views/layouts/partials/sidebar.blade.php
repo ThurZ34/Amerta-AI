@@ -61,18 +61,6 @@
             <span>Laporan Harian</span>
         </a>
 
-        <a href="{{ route('expenses.create') }}"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group
-            {{ request()->routeIs('expenses.create')
-                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-600 dark:text-white'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white' }}">
-            <svg class="w-5 h-5 {{ request()->routeIs('expenses.create') ? 'text-indigo-700 dark:text-white' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 dark:group-hover:text-white' }} transition-colors"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span>Catat Pengeluaran</span>
-        </a>
-
         <a href="{{ route('riwayat.index') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group
             {{ request()->routeIs('riwayat.index')
