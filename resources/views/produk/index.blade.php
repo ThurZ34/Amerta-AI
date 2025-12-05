@@ -164,27 +164,44 @@
 
                 <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                     <!-- Month Filter -->
-                    <form method="GET" action="{{ route('produk.index') }}" class="w-full sm:w-auto">
+                    <form method="GET" action="{{ route('produk.index') }}"
+                        class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
+
+                        {{-- Dropdown Bulan --}}
                         <select name="month" onchange="this.form.submit()"
                             class="w-full sm:w-auto px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm text-gray-900 dark:text-gray-100">
                             @php
-                                $currentMonth = request('month', now()->format('Y-m'));
-                                $months = [];
-                                for ($i = 0; $i < 12; $i++) {
-                                    $date = now()->subMonths($i);
-                                    $months[] = [
-                                        'value' => $date->format('Y-m'),
-                                        'label' => $date->translatedFormat('F Y'),
-                                    ];
-                                }
+                                // Ambil bulan dari request, atau default ke bulan ini
+                                $currentMonth = request('month', now()->format('m'));
                             @endphp
-                            @foreach ($months as $monthOption)
-                                <option value="{{ $monthOption['value'] }}"
-                                    {{ $currentMonth == $monthOption['value'] ? 'selected' : '' }}>
-                                    {{ $monthOption['label'] }}
+
+                            @foreach (range(1, 12) as $m)
+                                @php
+                                    $monthValue = sprintf('%02d', $m); // Format jadi 01, 02, dst.
+                                @endphp
+                                <option value="{{ $monthValue }}" {{ $currentMonth == $monthValue ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
                                 </option>
                             @endforeach
                         </select>
+
+                        {{-- Dropdown Tahun --}}
+                        <select name="year" onchange="this.form.submit()"
+                            class="w-full sm:w-auto px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm text-gray-900 dark:text-gray-100">
+                            @php
+                                // Ambil tahun dari request, atau default ke tahun ini
+                                $currentYear = request('year', now()->format('Y'));
+                                $startYear = 2020;
+                                $thisYear = now()->year;
+                            @endphp
+
+                            @foreach (range($thisYear, $startYear) as $y)
+                                <option value="{{ $y }}" {{ $currentYear == $y ? 'selected' : '' }}>
+                                    {{ $y }}
+                                </option>
+                            @endforeach
+                        </select>
+
                     </form>
 
                     <!-- Search -->

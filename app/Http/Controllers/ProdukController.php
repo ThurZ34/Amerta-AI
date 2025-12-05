@@ -62,16 +62,17 @@ class ProdukController extends Controller
     public function index(Request $request)
     {
         // Get month from request or use current month
-        $month = $request->input('month', now()->format('Y-m'));
+        $month = $request->input('month', now()->format('m'));
+        $year = $request->input('year', now()->format('Y'));
 
         $produks = Produk::where('business_id', auth()->user()->business?->id)->latest()->get();
 
         // Calculate total_terjual per bulan for each product
-        $produks->each(function ($produk) use ($month) {
-            $produk->total_terjual_bulan_ini = $produk->getTotalTerjualPerBulan($month);
+        $produks->each(function ($produk) use ($month, $year) {
+            $produk->total_terjual_bulan_ini = $produk->getTotalTerjualPerBulan($month, $year);
         });
 
-        return view('produk.index', compact('produks', 'month'));
+        return view('produk.index', compact('produks', 'month', 'year'));
     }
 
     public function store(Request $request)
