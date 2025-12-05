@@ -12,7 +12,6 @@ class SurveyController extends Controller
 {
     public function index()
     {
-        // Jika user sudah punya bisnis, redirect ke dashboard
         if (Auth::user()->business()->exists()) {
             return redirect()->route('dashboard');
         }
@@ -22,12 +21,11 @@ class SurveyController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi data (sesuai name di form html kamu)
         $validated = $request->validate([
             'nama_bisnis' => 'required|string',
             'status_bisnis' => 'required',
             'kategori_bisnis' => 'required',
-            'kategori_manual' => 'nullable|string', // Handle input "Lainnya"
+            'kategori_manual' => 'nullable|string',
             'channel_penjualan' => 'required',
             'target_pasar' => 'required',
             'range_omset' => 'required',
@@ -35,21 +33,18 @@ class SurveyController extends Controller
             'tujuan_utama' => 'required',
         ]);
 
-        // Logic untuk Kategori Lainnya
         $kategoriFinal = $validated['kategori_bisnis'];
         if ($kategoriFinal === 'Lainnya' && !empty($validated['kategori_manual'])) {
             $kategoriFinal = $validated['kategori_manual'];
         }
 
-        // Find or create category
         $category = Category::firstOrCreate(
             ['name' => $kategoriFinal],
             ['created_at' => now(), 'updated_at' => now()]
         );
 
-        // Simpan ke Database via Relasi User
         $business = Business::create([
-            'user_id' => Auth::id(), // <--- INI PALING PENTING (Memasukkan ID user login)
+            'user_id' => Auth::id(),
             'category_id' => $category->id,
             'nama_bisnis' => $validated['nama_bisnis'],
             'status_bisnis' => $validated['status_bisnis'],
@@ -63,6 +58,8 @@ class SurveyController extends Controller
         $user = Auth::user();
         $user->business_id = $business->id;
         $user->save();
+
+        session()->flash('first_time_entry', true);
 
         return redirect()->route('dashboard');
     }
