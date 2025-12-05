@@ -6,6 +6,7 @@ use App\Models\Riwayat;
 use App\Models\DailySale;
 use App\Models\CashJournal;
 use App\Models\Coa;
+use App\Models\Produk;
 use App\Services\GeminiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,14 @@ class RiwayatController extends Controller
     public function __construct(GeminiService $geminiService)
     {
         $this->geminiService = $geminiService;
+    }
+
+    public function kasir()
+    {
+        $business = auth()->user()->business;
+        $products = Produk::where('business_id', $business->id)->get();
+        
+        return view('riwayat.kasir', compact('products'));
     }
 
     public function index(Request $request)
