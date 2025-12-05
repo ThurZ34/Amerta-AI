@@ -230,18 +230,16 @@ class DailyCheckinController extends Controller
         DB::beginTransaction();
 
         try {
-            // Step 1: Delete old daily sale items
-
-            // Step 2: Delete old cash journal entries for this date
+            // Step 1: Delete old cash journal entries for this date
             CashJournal::where('business_id', auth()->user()->business->id)
                 ->whereDate('transaction_date', $dailySale->date)
                 ->where('coa_id', $coaRevenue->id)
                 ->delete();
 
-            // Step 3: Delete old daily sale items
+            // Step 2: Delete old daily sale items
             DailySaleItem::where('daily_sale_id', $dailySale->id)->delete();
 
-            // Step 4: Create new items and adjust stock
+            // Step 3: Create new items
             foreach ($request->sales as $produkId => $qty) {
                 if ($qty > 0) {
                     $produk = Produk::find($produkId);

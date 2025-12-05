@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('nama_produk');
             $table->integer('modal');
             $table->integer('harga_jual');
-            $table->integer('total_terjual');
             $table->string('jenis_produk');
             $table->timestamps();
         });
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('produks');
+        Schema::dropIfExists('produk');
     }
 };

@@ -80,7 +80,6 @@ class ProdukController extends Controller
             'nama_produk' => 'required|string|max:255',
             'modal' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
-            'total_terjual' => 'required|integer|min:0',
             'jenis_produk' => 'required|string|max:255',
             'gambar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -107,7 +106,6 @@ class ProdukController extends Controller
             'nama_produk' => 'required|string|max:255',
             'modal' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
-            'total_terjual' => 'required|integer|min:0',
             'jenis_produk' => 'required|string|max:255',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Changed to nullable
         ]);

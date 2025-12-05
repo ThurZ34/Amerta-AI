@@ -168,8 +168,6 @@ class RiwayatController extends Controller
                 'total_harga' => $request->total_harga,
                 'keterangan' => $request->keterangan,
                 'bukti_pembayaran' => $path,
-                'keterangan' => $request->keterangan,
-                'bukti_pembayaran' => $path,
                 'jenis' => $request->jenis,
                 'kategori' => $request->kategori,
                 'cash_journal_id' => $cashJournal ? $cashJournal->id : null,
