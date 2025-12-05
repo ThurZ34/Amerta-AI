@@ -50,7 +50,6 @@
             this.suggestingPrice = true;
 
             try {
-                // Pastikan route ini ada di web.php
                 const response = await fetch('{{ route('produk.suggest-price') }}', {
                     method: 'POST',
                     headers: {
@@ -204,7 +203,6 @@
 
                     </form>
 
-                    <!-- Search -->
                     <div class="relative group w-full sm:w-48">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

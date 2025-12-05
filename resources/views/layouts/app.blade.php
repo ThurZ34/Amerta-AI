@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50" x-data="{
-    darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
-    toggleTheme() {
-        this.darkMode = !this.darkMode;
-        localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
-        if (this.darkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50"
+    x-data="{
+        darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+        toggleTheme() {
+            this.darkMode = !this.darkMode;
+            localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+            if (this.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
         }
-    }
-}"
-    :class="{ 'dark': darkMode }">
+    }" :class="{ 'dark': darkMode }">
 
 <head>
     <meta charset="utf-8">
@@ -21,8 +21,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
-                '(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
@@ -37,56 +36,35 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 
+    {{-- BARU: SweetAlert2 CDN --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
-        marked.use({
-            breaks: true,
-            gfm: true
-        });
+        marked.use({ breaks: true, gfm: true });
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
-        [x-cloak] {
-            display: none !important;
-        }
-
-        .chat-scroll::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .chat-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .chat-scroll::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 20px;
-        }
-
-        .dark .chat-scroll::-webkit-scrollbar-thumb {
-            background-color: #4f46e5;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        [x-cloak] { display: none !important; }
+        .chat-scroll::-webkit-scrollbar { width: 5px; }
+        .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+        .chat-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        .dark .chat-scroll::-webkit-scrollbar-thumb { background-color: #4f46e5; }
     </style>
 </head>
 
-<body
-    class="h-full antialiased text-gray-900 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
+<body class="h-full antialiased text-gray-900 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
     x-data="{ sidebarOpen: false }">
 
     {{-- 1. LAYOUT UTAMA (Sidebar & Content) --}}
@@ -99,10 +77,7 @@
             class="fixed inset-0 bg-gray-900/80 z-40 md:hidden">
         </div>
 
-        @unless (request()->routeIs('main_menu') ||
-                request()->routeIs('amerta') ||
-                request()->routeIs('dashboard-selection') ||
-                request()->routeIs('dashboard-selection.join'))
+        @unless (request()->routeIs('main_menu') || request()->routeIs('amerta') || request()->routeIs('dashboard-selection') || request()->routeIs('dashboard-selection.join'))
             @include('layouts.partials.sidebar')
         @endunless
 
@@ -249,7 +224,46 @@
         </div>
     @endunless
 
+    @if (session('first_time_entry'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const businessName = "{{ Auth::user()->business->nama_bisnis ?? 'Bisnis Anda' }}";
+                const isDarkMode = document.documentElement.classList.contains('dark');
+
+                const bgColor = isDarkMode ? '#1f2937' : '#ffffff';
+                const textColor = isDarkMode ? '#f9fafb' : '#111827';
+
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'py-2 px-3',
+                        title: 'text-sm font-semibold',
+                        htmlContainer: 'text-xs mt-1',
+                    },
+                    width: '280px',
+                    background: bgColor,
+                    color: textColor,
+
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+                    icon: "success",
+                    title: "Selamat Datang!",
+                    text: `Selamat bergabung dengan ${businessName}.`,
+                    iconColor: '#4f46e5'
+                });
+            });
+        </script>
+    @endif
+
     @livewireScripts
 </body>
-
 </html>

@@ -21,10 +21,12 @@ class DashboardSelectionController extends Controller
         ]);
 
         $business = Business::where('invite_code', $request->invite_code)->firstOrFail();
-        
+
         $user = Auth::user();
         $user->business_id = $business->id;
         $user->save();
+
+        session()->flash('first_time_entry', true);
 
         return redirect()->route('dashboard')->with('success', 'Berhasil bergabung dengan tim ' . $business->nama_bisnis);
     }
