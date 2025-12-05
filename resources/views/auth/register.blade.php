@@ -10,14 +10,7 @@
         <p class="text-gray-500 dark:text-gray-400">Mulai perjalanan anda bersama kami.</p>
     </div>
 
-    <button class="w-full flex items-center justify-center gap-3 border border-gray-300 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition bg-white dark:bg-gray-800">
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Daftar dengan Google</span>
-    </button>
-
     <div class="relative flex py-2 items-center">
-        <div class="grow border-t border-gray-200 dark:border-gray-700"></div>
-        <span class="shrink-0 mx-4 text-gray-400 text-sm">atau dengan email</span>
         <div class="grow border-t border-gray-200 dark:border-gray-700"></div>
     </div>
 
