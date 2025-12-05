@@ -102,6 +102,12 @@ class Dashboard extends Component
             $prompt .= "- Profit: Rp " . number_format($profitThisMonth, 0, ',', '.') . "\n";
             $prompt .= "- Saldo kas: Rp " . number_format($cashBalance, 0, ',', '.') . "\n\n";
 
+            $prompt .= "PENTING: Format jawabanmu menggunakan HTML tag agar rapi di website:\n";
+            $prompt .= "- Gunakan tag <b>...</b> untuk menebalkan kata kunci (JANGAN pakai markdown **).\n";
+            $prompt .= "- Gunakan tag <br> untuk ganti baris/enter.\n";
+            $prompt .= "- Gunakan tag <ul> dan <li> untuk membuat list poin-poin saran.\n";
+            $prompt .= "- Gaya bahasa tetap santai.\n\n";
+
             if ($status === 'SEHAT') {
                 // Bisnis sehat - cukup kata semangat, penjualan naik turun itu normal
                 $prompt .= "Bisnis ini SEHAT dengan skor {$score}/100. Berikan 1-2 kalimat motivasi singkat. ";

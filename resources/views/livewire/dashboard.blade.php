@@ -420,10 +420,10 @@
                                                         <p
                                                             class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1">
                                                             Saran Amerta AI</p>
-                                                        <p
-                                                            class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                                                            {{ $businessHealth['message'] ?? 'Terus pantau perkembangan bisnis Anda!' }}
-                                                        </p>
+                                                        <div
+                                                            class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed space-y-2">
+                                                            {!! $businessHealth['message'] ?? 'Terus pantau perkembangan bisnis Anda!' !!}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
