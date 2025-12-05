@@ -118,6 +118,7 @@
         </div>
     </div>
 
+    @unless (request()->routeIs('dashboard-selection') || request()->routeIs('dashboard-selection.join') || request()->routeIs('main_menu'))
     {{-- 2. WIDGET CHAT --}}
     <div x-data="{
         chatOpen: false,
@@ -244,6 +245,7 @@
             </div>
         </div>
     </div>
+@endunless
 
     @livewireScripts
 </body>

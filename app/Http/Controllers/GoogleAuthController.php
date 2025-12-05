@@ -47,7 +47,7 @@ class GoogleAuthController extends Controller
             if ($user->business_id) {
                 return redirect()->intended('dashboard');
             } else {
-                return redirect('setup-bisnis');
+                return redirect('dashboard-selection');
             }
          } catch (Exception $e) {
             return redirect('/login')->with('error', 'Login Google Gagal: ' . $e->getMessage());

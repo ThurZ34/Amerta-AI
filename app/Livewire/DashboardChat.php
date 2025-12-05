@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Services\GeminiService;
+use App\Services\KolosalService; // <--- UBAH DI SINI (Ganti GeminiService jadi KolosalService)
 use Livewire\WithFileUploads;
 use App\Models\ChatHistory;
 use Illuminate\Support\Facades\Auth;
@@ -80,7 +80,7 @@ class DashboardChat extends Component
         }
 
         if ($this->mode === 'full') {
-            
+
             if (!$this->conversationId) {
                 $title = Str::limit($messageText ?? 'Image Analysis', 30);
                 $conversation = Conversation::create([
@@ -117,7 +117,7 @@ class DashboardChat extends Component
     }
 
     #[On('process-ai-reply')]
-    public function generateAiReply(GeminiService $gemini)
+    public function generateAiReply(KolosalService $aiService) // <--- UBAH DI SINI (Inject KolosalService)
     {
         $business = Auth::user()->business;
         $userMessage = '';
@@ -141,9 +141,12 @@ class DashboardChat extends Component
         }
 
         try {
-            $aiReply = $gemini->sendChat($userMessage, $business, $imagePath);
+            // Panggil service Kolosal
+            $aiReply = $aiService->sendChat($userMessage, $business, $imagePath);
         } catch (\Exception $e) {
-            $aiReply = "Maaf Bos, koneksi terputus. Coba lagi ya.";
+            // Log error asli untuk debugging developer jika perlu
+            // Log::error($e->getMessage());
+            $aiReply = "Maaf Bos, koneksi ke Amerta terputus. Coba lagi ya.";
         }
 
         if ($this->mode === 'full') {
