@@ -32,6 +32,119 @@ class Dashboard extends Component
         Session::put('amerta_insight_dismissed', true);
     }
 
+    protected function getBusinessHealth($revenueThisMonth, $expenseThisMonth, $profitThisMonth, $cashBalance)
+    {
+        // Check session cache (valid for 24 hours - AI advice once per day)
+        $cacheKey = 'business_health_' . auth()->user()->business_id;
+        if (Session::has($cacheKey)) {
+            $cached = Session::get($cacheKey);
+            if (Carbon::parse($cached['generated_at'])->diffInHours(now()) < 24) {
+                return $cached;
+            }
+        }
+
+        // Calculate health score (0-100)
+        $score = 50; // Base score
+
+        // 1. Profit margin analysis (+/- 20 points)
+        if ($revenueThisMonth > 0) {
+            $profitMargin = ($profitThisMonth / $revenueThisMonth) * 100;
+            if ($profitMargin >= 20) {
+                $score += 20;
+            } elseif ($profitMargin >= 10) {
+                $score += 10;
+            } elseif ($profitMargin >= 0) {
+                $score += 0;
+            } else {
+                $score -= 20; // Loss
+            }
+        }
+
+        // 2. Cash balance analysis (+/- 15 points)
+        if ($cashBalance > 0) {
+            $score += 15;
+        } elseif ($cashBalance >= -500000) {
+            $score += 0;
+        } else {
+            $score -= 15;
+        }
+
+        // 3. Revenue existence (+/- 15 points)
+        if ($revenueThisMonth > 0) {
+            $score += 15;
+        } else {
+            $score -= 10;
+        }
+
+        // Determine status
+        if ($score >= 70) {
+            $status = 'SEHAT';
+            $statusColor = 'emerald';
+            $statusEmoji = '💪';
+        } elseif ($score >= 40) {
+            $status = 'WASPADA';
+            $statusColor = 'amber';
+            $statusEmoji = '⚠️';
+        } else {
+            $status = 'KRITIS';
+            $statusColor = 'rose';
+            $statusEmoji = '🚨';
+        }
+
+        // Generate AI message based on status (once per day)
+        try {
+            $geminiService = app(GeminiService::class);
+            $business = auth()->user()->business;
+
+            $prompt = "Kamu adalah konsultan bisnis UMKM bernama Amerta. Data bisnis bulan ini:\n";
+            $prompt .= "- Omset: Rp " . number_format($revenueThisMonth, 0, ',', '.') . "\n";
+            $prompt .= "- Pengeluaran: Rp " . number_format($expenseThisMonth, 0, ',', '.') . "\n";
+            $prompt .= "- Profit: Rp " . number_format($profitThisMonth, 0, ',', '.') . "\n";
+            $prompt .= "- Saldo kas: Rp " . number_format($cashBalance, 0, ',', '.') . "\n\n";
+
+            if ($status === 'SEHAT') {
+                // Bisnis sehat - cukup kata semangat, penjualan naik turun itu normal
+                $prompt .= "Bisnis ini SEHAT dengan skor {$score}/100. Berikan 1-2 kalimat motivasi singkat. ";
+                $prompt .= "Ingatkan bahwa fluktuasi penjualan itu normal dan pertahankan konsistensi. Gunakan emoji dan bahasa santai.";
+            } elseif ($status === 'WASPADA') {
+                // Perlu perhatian - beri saran perbaikan
+                $prompt .= "Bisnis ini perlu PERHATIAN dengan skor {$score}/100. ";
+                $prompt .= "Berikan 2 saran KONKRET dan SPESIFIK untuk memperbaiki kondisi. ";
+                $prompt .= "Fokus pada: (1) cara meningkatkan omset atau (2) cara mengurangi pengeluaran. Bahasa santai.";
+            } else {
+                // Kritis - saran urgent
+                $prompt .= "Bisnis ini dalam kondisi KRITIS dengan skor {$score}/100. ";
+                $prompt .= "Berikan 2-3 langkah URGENT yang harus segera dilakukan untuk menyelamatkan bisnis. ";
+                $prompt .= "Prioritaskan: (1) menstabilkan cash flow (2) menghentikan kebocoran uang. Tegas tapi suportif.";
+            }
+
+            $message = $geminiService->sendChat($prompt, $business);
+        } catch (\Exception $e) {
+            // Fallback messages based on status
+            if ($status === 'SEHAT') {
+                $message = 'Bisnis kamu berjalan bagus! Fluktuasi penjualan itu normal, yang penting konsisten. Pertahankan! 🔥';
+            } elseif ($status === 'WASPADA') {
+                $message = 'Perlu sedikit perhatian. Coba review pengeluaran dan cari cara meningkatkan penjualan minggu ini.';
+            } else {
+                $message = 'Kondisi perlu tindakan segera. Fokus stabilkan cash flow dan tunda pengeluaran yang bisa ditunda.';
+            }
+        }
+
+        $health = [
+            'score' => max(0, min(100, $score)),
+            'status' => $status,
+            'statusColor' => $statusColor,
+            'statusEmoji' => $statusEmoji,
+            'message' => $message,
+            'generated_at' => now()->toDateTimeString(),
+        ];
+
+        // Cache result
+        Session::put($cacheKey, $health);
+
+        return $health;
+    }
+
     public function render()
     {
         $now = Carbon::now();
@@ -197,6 +310,9 @@ class Dashboard extends Component
         }
 
 
+        // --- 5. BUSINESS HEALTH ---
+        $businessHealth = $this->getBusinessHealth($revenueThisMonth, $expenseThisMonth, $profitThisMonth, $cashBalance);
+
         // ✅ PERBAIKAN UTAMA: Menggunakan extends() dan section() agar sesuai layout blade biasa
         return view('livewire.dashboard', compact(
             'cashBalance',
@@ -209,7 +325,8 @@ class Dashboard extends Component
             'chartData',
             'expenseLabels',
             'expenseData',
-            'aiMessage'
+            'aiMessage',
+            'businessHealth'
         ))
             ->extends('layouts.app') // Pastikan ini sesuai nama file layout Anda (resources/views/layouts/app.blade.php)
             ->section('content');    // Pastikan ini sesuai nama @yield('content') di layout Anda
