@@ -80,6 +80,7 @@
         @unless (request()->routeIs('main_menu') || request()->routeIs('amerta') || request()->routeIs('dashboard-selection') || request()->routeIs('dashboard-selection.join'))
             @include('layouts.partials.sidebar')
         @endunless
+        
 
         <div class="flex-1 flex flex-col min-w-0 h-full">
             @unless (request()->routeIs('dashboard-selection') || request()->routeIs('dashboard-selection.join'))

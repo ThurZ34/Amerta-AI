@@ -96,7 +96,7 @@
                             </button>
                             <div x-show="open" x-transition
                                 class="absolute left-0 bottom-full mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-lg z-10">
-                                Total Pemasukan - Total Pengeluaran (Uang Tunai saat ini)
+                                Uang fisik anda saat ini
                             </div>
                         </div>
                     </div>
@@ -162,7 +162,7 @@
                             </button>
                             <div x-show="open" x-transition
                                 class="absolute left-0 bottom-full mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-lg z-10">
-                                Total Biaya Operasional + Belanja Bahan Baku bulan ini
+                                Saldo Kas - Biaya Operasional (Kecuali bahan baku karena sudah masuk HPP)
                             </div>
                         </div>
                     </div>
