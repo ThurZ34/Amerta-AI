@@ -1,12 +1,36 @@
 <div class="flex h-full relative bg-gray-50 dark:bg-gray-900 transition-colors duration-300 overflow-hidden"
-    x-data="{ sidebarOpen: false }">
+    x-data="{
+        sidebarOpen: false,
+        imageModalOpen: false,
+        activeImage: null,
+        openImage(src) {
+            this.activeImage = src;
+            this.imageModalOpen = true;
+        },
+        closeImage() {
+            this.imageModalOpen = false;
+            setTimeout(() => this.activeImage = null, 300);
+        }
+    }">
+    <div x-show="imageModalOpen"
+        class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+        x-transition.opacity.duration.300ms style="display: none;" x-cloak>
 
-    {{-- SIDEBAR (History) - Only for Full Mode --}}
+        <button @click="closeImage()"
+            class="absolute top-4 right-4 text-white/70 hover:text-white z-50 p-2 bg-black/50 rounded-full">
+            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <img :src="activeImage" @click.outside="closeImage()"
+            class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl">
+    </div>
+
     @if ($mode === 'full')
         <div class="absolute inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transform transition-transform duration-300 ease-in-out flex flex-col border-r border-gray-200 dark:border-gray-800"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
 
-            {{-- New Chat Button --}}
             <div class="p-4">
                 <button wire:click="newChat" @click="sidebarOpen = false"
                     class="w-full flex items-center gap-2 px-4 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-xl transition-colors border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-900 dark:text-white">
@@ -17,7 +41,6 @@
                 </button>
             </div>
 
-            {{-- History List --}}
             <div class="flex-1 overflow-y-auto px-2 space-y-1 custom-scrollbar">
                 <div class="px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">Riwayat</div>
                 @foreach ($conversations as $conversation)
@@ -28,7 +51,6 @@
                 @endforeach
             </div>
 
-            {{-- User Profile (Bottom) --}}
             <div class="p-4 border-t border-gray-200 dark:border-gray-800">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold">
@@ -43,8 +65,6 @@
             </div>
         </div>
 
-        {{-- Mobile Overlay --}}
-        {{-- Overlay --}}
         <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 z-20"
             x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300"
@@ -52,10 +72,8 @@
         </div>
     @endif
 
-    {{-- MAIN CHAT AREA --}}
     <div class="flex-1 flex flex-col h-full relative w-full">
 
-        {{-- Header --}}
         <div
             class="h-16 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 sm:px-6 bg-white/90 dark:bg-gray-900/90 backdrop-blur z-10">
             <div class="flex items-center gap-3">
@@ -87,8 +105,7 @@
             </div>
         </div>
 
-        {{-- Chat Messages --}}
-        <div class="flex-1 overflow-y-auto chat-scroll p-4 sm:p-6 space-y-6" id="chat-container">
+        <div class="flex-1 overflow-y-auto chat-scroll p-4 sm:p-6 space-y-6" pb-6id="chat-container">
 
             @if ($totalChats > $limit && $mode === 'full')
                 <div x-intersect="$wire.loadMore()" class="flex justify-center py-2">
@@ -169,7 +186,8 @@
                                 class="bg-indigo-600 text-white p-4 rounded-2xl rounded-tr-none max-w-[85%] sm:max-w-[75%] text-sm shadow-md flex flex-col gap-2">
                                 @if ($chat->image_path)
                                     <img src="{{ asset('storage/' . $chat->image_path) }}"
-                                        class="rounded-lg w-full max-w-[200px] h-auto object-cover border border-indigo-500">
+                                        @click="openImage('{{ asset('storage/' . $chat->image_path) }}')"
+                                        class="rounded-lg w-full max-w-[200px] h-auto object-cover border border-indigo-500 cursor-pointer hover:opacity-90 transition-opacity">
                                 @endif
                                 <p>{{ $chat->message }}</p>
                             </div>
@@ -180,27 +198,76 @@
                                 class="w-8 h-8 rounded-full bg-indigo-600 shrink-0 flex items-center justify-center text-white text-xs font-bold shadow-md mt-1">
                                 AI</div>
                             <div x-data="{
-                                copied: false,
-                                copyToClipboard() {
-                                    navigator.clipboard.writeText(@js($chat->message)).then(() => {
-                                        this.copied = true;
-                                        setTimeout(() => this.copied = false, 2000);
+                                rawMessage: @js($chat->message),
+                                renderedMessage: '',
+                                expanded: false,
+                                isOverflowing: false,
+                                init() {
+                                    if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                                        this.renderedMessage = DOMPurify.sanitize(marked.parse(this.rawMessage));
+                                    } else {
+                                        this.renderedMessage = this.rawMessage;
+                                    }
+
+                                    $nextTick(() => {
+                                        if ($refs.content.scrollHeight > 160) {
+                                            this.isOverflowing = true;
+                                        }
                                     });
                                 }
                             }"
-                                class="relative bg-white dark:bg-gray-800 px-5 py-4 rounded-2xl rounded-tl-none border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 shadow-sm text-sm leading-relaxed w-full">
-                                <div
-                                    class="prose prose-sm prose-indigo dark:prose-invert max-w-none prose-p:my-2 prose-headings:mb-2 prose-headings:mt-4">
-                                    <div x-data
-                                        x-html="DOMPurify.sanitize(marked.parse(@js($chat->message)))"></div>
+                                class="relative bg-white dark:bg-gray-800 rounded-2xl rounded-tl-none border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 shadow-sm text-sm leading-relaxed w-full">
+
+                                <div class="px-5 py-4">
+                                    <div x-ref="content"
+                                        class="prose prose-sm prose-indigo dark:prose-invert max-w-none
+                    prose-p:leading-relaxed prose-p:my-2 prose-li:ml-4 prose-ul:list-disc prose-ol:list-decimal
+                    overflow-hidden transition-all duration-500 ease-in-out"
+                                        :class="expanded ? 'max-h-full' : 'max-h-[160px]'">
+
+                                        <div x-html="renderedMessage"></div>
+
+                                        <div x-show="!expanded && isOverflowing"
+                                            class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white dark:from-gray-800 to-transparent pointer-events-none">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div
-                                    class="absolute -bottom-6 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex justify-end">
+
+                                <div x-show="isOverflowing" class="w-full flex justify-center pb-2">
+                                    <button @click="expanded = !expanded"
+                                        class="flex items-center gap-1 px-4 py-1 text-xs font-medium text-gray-500 hover:text-indigo-600 transition-colors rounded-full border border-gray-200 bg-white shadow-sm z-10 -mt-3">
+                                        <span x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'"></span>
+                                        <svg class="w-4 h-4 transition-transform duration-300"
+                                            :class="expanded ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <div x-data="{
+                                    copied: false,
+                                    copyToClipboard() {
+                                        navigator.clipboard.writeText(this.rawMessage).then(() => {
+                                            this.copied = true;
+                                            setTimeout(() => this.copied = false, 2000);
+                                        });
+                                    }
+                                }"
+                                    class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                     <button @click="copyToClipboard()"
-                                        class="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-all duration-200"
-                                        :class="copied ? 'text-green-600 bg-green-50 dark:bg-green-900/20' :
-                                            'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'">
-                                        <span x-text="copied ? 'Disalin!' : 'Copy'"></span>
+                                        class="p-1 text-gray-400 hover:text-indigo-600">
+                                        <svg x-show="!copied" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                        <svg x-show="copied" class="w-4 h-4 text-green-500" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" x-cloak>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
@@ -227,8 +294,7 @@
             @endif
         </div>
 
-        {{-- Input Area --}}
-        <div class="p-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <div class="shrink-0 p-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-20">
             <div class="max-w-4xl mx-auto">
                 @if ($image)
                     <div class="mb-2 inline-block relative fade-in-up">
@@ -244,12 +310,35 @@
                     </div>
                 @endif
 
-                <form x-data="{ userMessage: '' }"
-                    @submit.prevent="if(userMessage.trim() !== '' || $wire.image) { $wire.sendMessage(userMessage); userMessage = ''; }"
-                    class="relative flex items-end gap-2 bg-gray-100 dark:bg-gray-800 rounded-2xl p-2 border border-transparent focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all">
+                <form x-data="{
+                    userMessage: '',
+                    adjustHeight() {
+                        $refs.inputArea.style.height = 'auto';
+                        $refs.inputArea.style.height = $refs.inputArea.scrollHeight + 'px';
+                    },
+                    submitForm() {
+                        if (this.userMessage.trim() !== '' || $wire.image) {
+                            $wire.sendMessage(this.userMessage);
+                            this.userMessage = '';
+                            $refs.inputArea.style.height = 'auto';
+                        }
+                    },
+                    handleEnter(e) {
+                        if (!e.shiftKey) {
+                            e.preventDefault();
+                            this.submitForm();
+                        } else {
+                            this.$nextTick(() => {
+                                this.adjustHeight();
+                                $refs.inputArea.scrollTop = $refs.inputArea.scrollHeight;
+                            });
+                        }
+                    }
+                }" @submit.prevent="submitForm()"
+                    class="relative flex items-end gap-2 bg-gray-100 dark:bg-gray-800 rounded-3xl p-2 border border-transparent focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all">
 
                     @if ($mode === 'full')
-                        <div class="pb-1 pl-1">
+                        <div class="pb-2 pl-2">
                             <input type="file" wire:model="image" id="file-upload" class="hidden"
                                 accept="image/*">
                             <label for="file-upload"
@@ -262,14 +351,15 @@
                         </div>
                     @endif
 
-                    <input type="text" x-model="userMessage" placeholder="Kirim pesan ke Amerta..."
-                        class="flex-1 bg-transparent border-none outline-none shadow-none ring-0 focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 py-3 px-2 max-h-32 overflow-y-auto"
-                        autocomplete="off" @if ($isThinking) disabled @endif>
+                    <textarea x-model="userMessage" x-ref="inputArea" rows="1" @input="adjustHeight()"
+                        @keydown.enter="handleEnter($event)" placeholder="Kirim pesan ke Amerta..."
+                        class="flex-1 bg-transparent border-none outline-none shadow-none ring-0 focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 py-3 px-2 resize-none max-h-[200px] overflow-y-auto custom-scrollbar leading-relaxed"
+                        autocomplete="off" @if ($isThinking) disabled @endif></textarea>
 
                     <button type="submit"
-                        class="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-1 mr-1"
+                        class="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-2 mr-2 shrink-0 h-10 w-10 flex items-center justify-center"
                         :disabled="(userMessage.trim() === '' && !$wire.image) || @js($isThinking)">
-                        <svg wire:loading.remove wire:target="sendMessage" class="w-5 h-5" fill="none"
+                        <svg wire:loading.remove wire:target="sendMessage" class="w-5 h-5 ml-0.5" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M5 12h14M12 5l7 7-7 7" />
