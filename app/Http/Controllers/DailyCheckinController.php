@@ -174,6 +174,8 @@ class DailyCheckinController extends Controller
             ->with('items.produk')
             ->findOrFail($id);
 
+        $produks = Produk::all();
+
         $totalRevenue = 0;
         $totalCost = 0;
 
@@ -186,7 +188,7 @@ class DailyCheckinController extends Controller
         $dailySale->total_revenue = $totalRevenue;
         $dailySale->total_profit = $totalRevenue - $totalCost;
 
-        return view('daily-checkin.show', compact('dailySale'));
+        return view('daily-checkin.show', compact('dailySale', 'produks'));
     }
 
     public function edit($id)
