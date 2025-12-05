@@ -71,7 +71,7 @@
                 @endif
             </div>
 
-            {{-- 2. STATS GRID --}}
+            {{-- 2. STATS GRID (4 Cards) --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {{-- Saldo --}}
                 <div
@@ -204,191 +204,143 @@
                 </div>
             </div>
 
-            {{-- 3. CHARTS SECTION --}}
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {{-- Sales Chart --}}
-                <div
-                    class="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-900 dark:text-white">Tren Penjualan</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Analisa performa omset seiring waktu
-                            </p>
-                        </div>
-
-                        {{-- Dropdown --}}
-                        <div class="relative">
-                            <select wire:model.live="range"
-                                class="appearance-none bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 py-2.5 pl-4 pr-10 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor:pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition">
-                                <option value="day">Hari Ini</option>
-                                <option value="week">7 Hari Terakhir</option>
-                                <option value="month">Bulan Ini</option>
-                                <option value="year">Tahun Ini</option>
-                            </select>
-                            <div
-                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </div>
-                        </div>
+            {{-- 3. TREN PENJUALAN (Full Width) --}}
+            <div
+                class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white">Tren Penjualan</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Analisa performa omset seiring waktu</p>
                     </div>
-
-                    <div class="relative h-80 w-full" wire:key="sales-chart-wrapper-{{ $range }}">
-                        <div wire:ignore class="h-full w-full"
-                            x-data='{ labels: @json($chartLabels), data: @json($chartData) }'
-                            x-init="const ctx = $el.querySelector('canvas').getContext('2d');
-                            const isDark = document.documentElement.classList.contains('dark');
-                            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-                            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
-                            gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
-                            
-                            new Chart(ctx, {
-                                type: 'line',
-                                data: {
-                                    labels: labels,
-                                    datasets: [{
-                                        label: 'Penjualan (Rp)',
-                                        data: data,
-                                        borderColor: '#6366f1',
-                                        backgroundColor: gradient,
-                                        fill: true,
-                                        tension: 0.4,
-                                        pointBackgroundColor: '#6366f1',
-                                        pointBorderColor: '#fff',
-                                        pointBorderWidth: 2,
-                                        pointRadius: 4,
-                                        pointHoverRadius: 6
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: { legend: { display: false } },
-                                    scales: {
-                                        y: { beginAtZero: true, grid: { borderDash: [4, 4], color: isDark ? '#374151' : '#f3f4f6' }, ticks: { font: { size: 11 }, color: '#9ca3af' } },
-                                        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#9ca3af' } }
-                                    }
-                                }
-                            });">
-                            <canvas></canvas>
+                    <div class="relative">
+                        <select wire:model.live="range"
+                            class="appearance-none bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 py-2.5 pl-4 pr-10 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                            <option value="day">Hari Ini</option>
+                            <option value="week">7 Hari Terakhir</option>
+                            <option value="month">Bulan Ini</option>
+                            <option value="year">Tahun Ini</option>
+                        </select>
+                        <div
+                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </div>
                     </div>
                 </div>
+                <div class="relative h-72 w-full" wire:key="sales-chart-wrapper-{{ $range }}">
+                    <div wire:ignore class="h-full w-full"
+                        x-data='{ labels: @json($chartLabels), data: @json($chartData) }'
+                        x-init="const ctx = $el.querySelector('canvas').getContext('2d');
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+                        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+                        gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: { labels: labels, datasets: [{ label: 'Penjualan (Rp)', data: data, borderColor: '#6366f1', backgroundColor: gradient, fill: true, tension: 0.4, pointBackgroundColor: '#6366f1', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6 }] },
+                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4], color: isDark ? '#374151' : '#f3f4f6' }, ticks: { font: { size: 11 }, color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#9ca3af' } } } }
+                        });">
+                        <canvas></canvas>
+                    </div>
+                </div>
+            </div>
 
-                {{-- Expense Chart (Alokasi Biaya) --}}
+            {{-- 4. ALOKASI BIAYA + KESEHATAN BISNIS (2 Columns, Horizontal Cards) --}}
+            @php
+                $colorMap = [
+                    'emerald' => [
+                        'text' => 'text-emerald-500',
+                        'ring' => 'text-emerald-500',
+                        'soft_bg' => 'bg-emerald-50 dark:bg-emerald-500/10',
+                    ],
+                    'amber' => [
+                        'text' => 'text-amber-500',
+                        'ring' => 'text-amber-500',
+                        'soft_bg' => 'bg-amber-50 dark:bg-amber-500/10',
+                    ],
+                    'rose' => [
+                        'text' => 'text-rose-500',
+                        'ring' => 'text-rose-500',
+                        'soft_bg' => 'bg-rose-50 dark:bg-rose-500/10',
+                    ],
+                    'gray' => [
+                        'text' => 'text-gray-400',
+                        'ring' => 'text-gray-300',
+                        'soft_bg' => 'bg-gray-100 dark:bg-gray-700',
+                    ],
+                ];
+                $statusKey = $businessHealth['statusColor'] ?? 'gray';
+                $colors = $colorMap[$statusKey];
+                $score = $businessHealth['score'] ?? 0;
+            @endphp
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {{-- Alokasi Biaya (Horizontal) --}}
                 <div
-                    class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
-                    <div>
-                        <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Alokasi Biaya</h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Distribusi pengeluaranmu</p>
-
-                        <div class="relative h-40 w-full flex justify-center"
+                    class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="flex flex-col sm:flex-row items-center gap-6">
+                        {{-- Chart --}}
+                        <div class="relative w-32 h-32 shrink-0"
                             wire:key="expense-chart-wrapper-{{ $range }}">
-                            <div wire:ignore class="h-full w-full flex justify-center"
+                            <div wire:ignore class="h-full w-full"
                                 x-data='{ labels: @json($expenseLabels), data: @json($expenseData) }'
                                 x-init="const ctx = $el.querySelector('canvas').getContext('2d');
                                 const bgColors = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#a855f7'];
                                 const isDummy = (data.length === 1 && labels[0] === 'Belum Ada Pengeluaran');
-                                
                                 new Chart(ctx, {
                                     type: 'doughnut',
-                                    data: {
-                                        labels: isDummy ? ['Belum ada data'] : labels,
-                                        datasets: [{
-                                            data: isDummy ? [1] : data,
-                                            backgroundColor: isDummy ? ['#f3f4f6'] : bgColors,
-                                            borderWidth: 0,
-                                            hoverOffset: 10
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        cutout: '70%',
-                                        plugins: { legend: { display: false } }
-                                    }
+                                    data: { labels: isDummy ? ['Belum ada data'] : labels, datasets: [{ data: isDummy ? [1] : data, backgroundColor: isDummy ? ['#f3f4f6'] : bgColors, borderWidth: 0 }] },
+                                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
                                 });">
                                 <canvas></canvas>
                             </div>
                         </div>
-                    </div>
-
-                    <div
-                        class="mt-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl text-center border border-gray-100 dark:border-gray-700">
-                        <span
-                            class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-widest">Total
-                            Pengeluaran</span>
-                        <p class="text-lg font-black text-gray-900 dark:text-white">Rp
-                            {{ number_format($expenseThisMonth, 0, ',', '.') }}</p>
-                    </div>
-                </div>
-
-                {{-- Business Health Card --}}
-                @php
-                    $colorMap = [
-                        'emerald' => [
-                            'text' => 'text-emerald-500',
-                            'ring' => 'text-emerald-500',
-                            'soft_bg' => 'bg-emerald-50 dark:bg-emerald-500/10',
-                        ],
-                        'amber' => [
-                            'text' => 'text-amber-500',
-                            'ring' => 'text-amber-500',
-                            'soft_bg' => 'bg-amber-50 dark:bg-amber-500/10',
-                        ],
-                        'rose' => [
-                            'text' => 'text-rose-500',
-                            'ring' => 'text-rose-500',
-                            'soft_bg' => 'bg-rose-50 dark:bg-rose-500/10',
-                        ],
-                        'gray' => [
-                            'text' => 'text-gray-400',
-                            'ring' => 'text-gray-300',
-                            'soft_bg' => 'bg-gray-100 dark:bg-gray-700',
-                        ],
-                    ];
-                    $statusKey = $businessHealth['statusColor'] ?? 'gray';
-                    $colors = $colorMap[$statusKey];
-                    $score = $businessHealth['score'] ?? 0;
-                    $circumference = 226;
-                    $offset = $circumference - ($score / 100) * $circumference;
-                @endphp
-
-                <div x-data="{ showModal: false }"
-                    class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-between cursor-pointer hover:shadow-lg transition"
-                    @click="showModal = true">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-lg font-bold text-gray-900 dark:text-white">Kesehatan Bisnis</h4>
-                            <span
-                                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $colors['soft_bg'] }} {{ $colors['text'] }}">
-                                {{ $businessHealth['status'] ?? 'N/A' }}
-                            </span>
-                        </div>
-
-                        {{-- Circular Gauge --}}
-                        <div class="relative w-32 h-32 mx-auto">
-                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
-                                <circle cx="64" cy="64" r="50" fill="none" stroke="currentColor"
-                                    stroke-width="10" class="text-gray-100 dark:text-gray-700" />
-                                <circle cx="64" cy="64" r="50" fill="none" stroke="currentColor"
-                                    stroke-width="10" stroke-dasharray="314"
-                                    stroke-dashoffset="{{ 314 - ($score / 100) * 314 }}" stroke-linecap="round"
-                                    class="{{ $colors['ring'] }} transition-all duration-1000 ease-out" />
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <span
-                                    class="text-3xl font-black text-gray-900 dark:text-white">{{ $score }}</span>
-                                <span class="text-[10px] uppercase font-bold text-gray-400">Skor</span>
+                        {{-- Info --}}
+                        <div class="flex-1 text-center sm:text-left">
+                            <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Alokasi Biaya</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Distribusi pengeluaranmu bulan ini
+                            </p>
+                            <div class="inline-block px-4 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                                <span class="text-[10px] text-gray-400 uppercase font-bold">Total</span>
+                                <p class="text-xl font-black text-gray-900 dark:text-white">Rp
+                                    {{ number_format($expenseThisMonth, 0, ',', '.') }}</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div
-                        class="mt-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl text-center border border-gray-100 dark:border-gray-700">
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Klik untuk lihat saran AI</span>
+                {{-- Kesehatan Bisnis (Horizontal) --}}
+                <div x-data="{ showModal: false }" @click="showModal = true"
+                    class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:shadow-lg transition">
+                    <div class="flex flex-col sm:flex-row items-center gap-6">
+                        {{-- Gauge --}}
+                        <div class="relative w-24 h-24 shrink-0">
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 96 96">
+                                <circle cx="48" cy="48" r="40" fill="none" stroke="currentColor"
+                                    stroke-width="8" class="text-gray-100 dark:text-gray-700" />
+                                <circle cx="48" cy="48" r="40" fill="none" stroke="currentColor"
+                                    stroke-width="8" stroke-dasharray="251"
+                                    stroke-dashoffset="{{ 251 - ($score / 100) * 251 }}" stroke-linecap="round"
+                                    class="{{ $colors['ring'] }} transition-all duration-1000" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span
+                                    class="text-2xl font-black text-gray-900 dark:text-white">{{ $score }}</span>
+                                <span class="text-[8px] uppercase font-bold text-gray-400">Skor</span>
+                            </div>
+                        </div>
+                        {{-- Info --}}
+                        <div class="flex-1 text-center sm:text-left">
+                            <div class="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                                <h4 class="text-lg font-bold text-gray-900 dark:text-white">Kesehatan Bisnis</h4>
+                                <span
+                                    class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $colors['soft_bg'] }} {{ $colors['text'] }}">{{ $businessHealth['status'] ?? 'N/A' }}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Analisis performa bisnis oleh AI
+                            </p>
+                            <span class="text-xs text-indigo-500 font-semibold">Klik untuk lihat saran AI →</span>
+                        </div>
                     </div>
 
                     {{-- Modal --}}
@@ -397,27 +349,16 @@
                         x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-150"
                         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                         @click.self="showModal = false">
-
-                        {{-- Backdrop --}}
                         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-
-                        {{-- Modal Content --}}
                         <div class="relative bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-lg w-full shadow-2xl"
                             x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
-                            x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-150"
-                            x-transition:leave-start="opacity-100 scale-100"
-                            x-transition:leave-end="opacity-0 scale-95" @click.stop>
-
-                            {{-- Close Button --}}
+                            x-transition:enter-end="opacity-100 scale-100" @click.stop>
                             <button @click="showModal = false"
-                                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><svg class="w-6 h-6"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-
-                            {{-- Header --}}
+                                </svg></button>
                             <div class="flex items-center gap-4 mb-6">
                                 <div class="relative w-16 h-16">
                                     <svg class="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
@@ -429,22 +370,16 @@
                                             stroke-dashoffset="{{ 314 - ($score / 100) * 314 }}"
                                             stroke-linecap="round" class="{{ $colors['ring'] }}" />
                                     </svg>
-                                    <div class="absolute inset-0 flex items-center justify-center">
-                                        <span
+                                    <div class="absolute inset-0 flex items-center justify-center"><span
                                             class="text-lg font-black text-gray-900 dark:text-white">{{ $score }}</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Analisis Kesehatan
-                                        Bisnis</h3>
+                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Kesehatan Bisnis</h3>
                                     <span
-                                        class="px-2 py-0.5 rounded-full text-xs font-bold uppercase {{ $colors['soft_bg'] }} {{ $colors['text'] }}">
-                                        {{ $businessHealth['status'] ?? 'N/A' }}
-                                    </span>
+                                        class="px-2 py-0.5 rounded-full text-xs font-bold uppercase {{ $colors['soft_bg'] }} {{ $colors['text'] }}">{{ $businessHealth['status'] ?? 'N/A' }}</span>
                                 </div>
                             </div>
-
-                            {{-- AI Message --}}
                             <div
                                 class="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-5 border border-indigo-100 dark:border-indigo-800">
                                 <div class="flex items-start gap-3">
@@ -459,20 +394,15 @@
                                     <div>
                                         <p
                                             class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-2">
-                                            Saran dari Amerta AI</p>
+                                            Saran Amerta AI</p>
                                         <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                                             {{ $businessHealth['message'] ?? 'Terus pantau perkembangan bisnis Anda!' }}
                                         </p>
                                     </div>
                                 </div>
                             </div>
-
-                            {{-- Footer --}}
-                            <div class="mt-6 flex justify-end">
-                                <button @click="showModal = false"
-                                    class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition">
-                                    Mengerti
-                                </button>
+                            <div class="mt-6 flex justify-end"><button @click="showModal = false"
+                                    class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition">Mengerti</button>
                             </div>
                         </div>
                     </div>
