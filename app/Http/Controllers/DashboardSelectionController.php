@@ -22,6 +22,12 @@ class DashboardSelectionController extends Controller
 
         $business = Business::where('invite_code', $request->invite_code)->firstOrFail();
 
+        if ($business->jumlah_tim <= 1) {
+            return back()
+            ->withErrors(['invite_code' => 'Maaf, bisnis ini sedang tidak menerima staff'])
+            ->withInput();
+        }
+
         $user = Auth::user();
         $user->business_id = $business->id;
         $user->save();
