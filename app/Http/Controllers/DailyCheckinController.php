@@ -28,6 +28,8 @@ class DailyCheckinController extends Controller
         $startOfMonth = Carbon::parse($date)->startOfMonth();
         $endOfMonth = Carbon::parse($date)->endOfMonth();
 
+        $produks = Produk::where('business_id', auth()->user()->business_id)->get();
+
         $dailySales = DailySale::where('business_id', auth()->user()->business->id)
             ->whereBetween('date', [$startOfMonth, $endOfMonth])
             ->with('items')
@@ -48,7 +50,7 @@ class DailyCheckinController extends Controller
             })
             ->keyBy(fn($sale) => $sale->date->format('Y-m-d'));
 
-        return view('daily-checkin.index', compact('dailySales', 'startOfMonth', 'endOfMonth'));
+        return view('daily-checkin.index', compact('dailySales', 'startOfMonth', 'endOfMonth', 'produks'));
     }
 
     public function create(Request $request)
