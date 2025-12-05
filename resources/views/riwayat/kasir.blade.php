@@ -136,7 +136,7 @@
                             <input type="hidden" name="jenis" value="pendapatan">
                             <input type="hidden" name="tanggal_pembelian" value="{{ date('Y-m-d') }}">
                             <input type="hidden" name="nama_barang" value="Penjualan Kasir">
-                            <input type="hidden" name="total_harga" :value="total">
+                            <input type="hidden" name="total_harga" :value="totalProfit">
                             <input type="hidden" name="keterangan" :value="generateDescription()">
                             
                             <button type="submit" 
@@ -165,6 +165,13 @@
             
             get total() {
                 return this.cart.reduce((acc, item) => acc + (item.harga_jual * item.qty), 0);
+            },
+
+            get totalProfit() {
+                return this.cart.reduce((acc, item) => {
+                    const cost = item.modal || 0;
+                    return acc + ((item.harga_jual - cost) * item.qty);
+                }, 0);
             },
             
             matchesSearch(productName) {
