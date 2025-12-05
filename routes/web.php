@@ -1,11 +1,10 @@
 <?php
 
 use App\Http\Controllers\DailyCheckinController;
-use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\SurveyController;
-use App\Http\Controllers\GoogleAuthController;
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +43,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/amerta', function () {
             return view('amerta');
         })->name('amerta');
+
+        Route::get('/marketing-tools', \App\Livewire\MarketingTools::class)->name('marketing-tools');
 
         Route::get('/main_menu', [\App\Http\Controllers\MainMenuController::class, 'index'])->name('main_menu');
         Route::post('/main_menu/update-target', [\App\Http\Controllers\MainMenuController::class, 'updateTarget'])->name('main_menu.update-target');

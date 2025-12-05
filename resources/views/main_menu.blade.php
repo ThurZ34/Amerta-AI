@@ -115,8 +115,7 @@
                                                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                                                         Tentukan target omset yang ingin Anda capai bulan ini.
                                                     </p>
-                                                    <input type="number" name="target_revenue"
-                                                        value="{{ $targetRevenue }}"
+                                                    <input type="number" name="target_revenue" value="{{ $targetRevenue }}"
                                                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
                                                         placeholder="Masukkan nominal target (Rp)">
                                                 </div>
@@ -246,7 +245,7 @@
                                     mudah.</p>
                             </div>
                         </div>
-                    </a> 
+                    </a>
                 </div>
 
                 <div class="space-y-6">
@@ -359,6 +358,31 @@
                                 <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Amerta AI Assistant</h4>
                                 <p class="text-sm text-gray-500 dark:text-indigo-200 ">Konsultasi cerdas untuk strategi
                                     bisnis Anda.</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('marketing-tools') }}"
+                        class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-pink-600/0 to-purple-600/0 dark:from-pink-900/30 dark:to-purple-900/30 transition-opacity">
+                        </div>
+
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-pink-50 dark:bg-pink-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
+                        </div>
+
+                        <div class="relative flex items-start gap-4 z-10">
+                            <div
+                                class="w-12 h-12 bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-500/30 dark:to-purple-500/30 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-pink-50 dark:border-pink-500/20 group-hover:rotate-12 transition-transform">
+                                <span class="text-2xl">🎨</span>
+                            </div>
+                            <div>
+                                <h4
+                                    class="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                                    AI Marketing Studio</h4>
+                                <p class="text-sm text-gray-500 dark:text-pink-200">Buat caption, promo & konten dengan AI.
+                                </p>
                             </div>
                         </div>
                     </a>
