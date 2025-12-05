@@ -344,65 +344,97 @@
                     </div>
 
                     {{-- Modal --}}
-                    <div x-show="showModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                    <div x-show="showModal" x-cloak class="fixed inset-0 z-50"
                         x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0"
                         x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-150"
-                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                        @click.self="showModal = false">
-                        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-                        <div class="relative bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-lg w-full shadow-2xl"
-                            x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
-                            x-transition:enter-end="opacity-100 scale-100" @click.stop>
-                            <button @click="showModal = false"
-                                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><svg class="w-6 h-6"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg></button>
-                            <div class="flex items-center gap-4 mb-6">
-                                <div class="relative w-16 h-16">
-                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
-                                        <circle cx="64" cy="64" r="50" fill="none"
-                                            stroke="currentColor" stroke-width="8"
-                                            class="text-gray-100 dark:text-gray-700" />
-                                        <circle cx="64" cy="64" r="50" fill="none"
-                                            stroke="currentColor" stroke-width="8" stroke-dasharray="314"
-                                            stroke-dashoffset="{{ 314 - ($score / 100) * 314 }}"
-                                            stroke-linecap="round" class="{{ $colors['ring'] }}" />
-                                    </svg>
-                                    <div class="absolute inset-0 flex items-center justify-center"><span
-                                            class="text-lg font-black text-gray-900 dark:text-white">{{ $score }}</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Kesehatan Bisnis</h3>
-                                    <span
-                                        class="px-2 py-0.5 rounded-full text-xs font-bold uppercase {{ $colors['soft_bg'] }} {{ $colors['text'] }}">{{ $businessHealth['status'] ?? 'N/A' }}</span>
-                                </div>
-                            </div>
-                            <div
-                                class="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-5 border border-indigo-100 dark:border-indigo-800">
-                                <div class="flex items-start gap-3">
-                                    <div
-                                        class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-800 flex items-center justify-center shrink-0">
-                                        <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-300" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
+                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                        {{-- Fixed Backdrop --}}
+                        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showModal = false"></div>
+                        {{-- Scrollable Content Wrapper --}}
+                        <div class="fixed inset-0 overflow-y-auto">
+                            <div class="min-h-full flex items-center justify-center p-4">
+                                {{-- Modal Content - SCROLLABLE & RESPONSIVE --}}
+                                <div class="relative bg-white dark:bg-gray-800 rounded-3xl p-5 sm:p-8 w-full max-w-2xl shadow-2xl my-8"
+                                    x-transition:enter="ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 scale-95"
+                                    x-transition:enter-end="opacity-100 scale-100" @click.stop>
+
+                                    {{-- Close Button --}}
+                                    <button @click="showModal = false"
+                                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
-                                    </div>
-                                    <div>
-                                        <p
-                                            class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-2">
-                                            Saran Amerta AI</p>
-                                        <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                                            {{ $businessHealth['message'] ?? 'Terus pantau perkembangan bisnis Anda!' }}
-                                        </p>
+                                    </button>
+
+                                    {{-- 2-Column Layout: Gauge Left, Message Right --}}
+                                    <div class="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                                        {{-- LEFT: Gauge + Status --}}
+                                        <div class="text-center shrink-0">
+                                            <div class="relative w-28 h-28 mx-auto mb-3">
+                                                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
+                                                    <circle cx="64" cy="64" r="50" fill="none"
+                                                        stroke="currentColor" stroke-width="10"
+                                                        class="text-gray-100 dark:text-gray-700" />
+                                                    <circle cx="64" cy="64" r="50" fill="none"
+                                                        stroke="currentColor" stroke-width="10"
+                                                        stroke-dasharray="314"
+                                                        stroke-dashoffset="{{ 314 - ($score / 100) * 314 }}"
+                                                        stroke-linecap="round"
+                                                        class="{{ $colors['ring'] }} transition-all duration-1000" />
+                                                </svg>
+                                                <div
+                                                    class="absolute inset-0 flex flex-col items-center justify-center">
+                                                    <span
+                                                        class="text-3xl font-black text-gray-900 dark:text-white">{{ $score }}</span>
+                                                    <span
+                                                        class="text-[9px] uppercase font-bold text-gray-400">Skor</span>
+                                                </div>
+                                            </div>
+                                            <span
+                                                class="inline-block px-3 py-1 rounded-full text-sm font-bold uppercase {{ $colors['soft_bg'] }} {{ $colors['text'] }}">
+                                                {{ $businessHealth['status'] ?? 'N/A' }}
+                                            </span>
+                                        </div>
+
+                                        {{-- RIGHT: Title + AI Message --}}
+                                        <div class="flex-1 min-w-0">
+                                            <h3
+                                                class="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center sm:text-left">
+                                                Analisis Kesehatan Bisnis</h3>
+
+                                            <div
+                                                class="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-4 border border-indigo-100 dark:border-indigo-800">
+                                                <div class="flex items-start gap-3">
+                                                    <div
+                                                        class="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-800 flex items-center justify-center shrink-0">
+                                                        <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-300"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <p
+                                                            class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1">
+                                                            Saran Amerta AI</p>
+                                                        <p
+                                                            class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                            {{ $businessHealth['message'] ?? 'Terus pantau perkembangan bisnis Anda!' }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-4 flex justify-end">
+                                                <button @click="showModal = false"
+                                                    class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition">Mengerti</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mt-6 flex justify-end"><button @click="showModal = false"
-                                    class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition">Mengerti</button>
                             </div>
                         </div>
                     </div>
@@ -416,7 +448,8 @@
                     class="p-8 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h4 class="text-xl font-bold text-gray-900 dark:text-white">Transaksi Terakhir</h4>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Arus kas masuk dan keluar terbaru</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Arus kas masuk dan keluar terbaru
+                        </p>
                     </div>
                     <a href="{{ route('riwayat.index') }}"
                         class="group flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 px-5 py-2.5 rounded-xl transition">
