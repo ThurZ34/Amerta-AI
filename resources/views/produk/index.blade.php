@@ -10,15 +10,13 @@
         // Default Data
         selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, jenis_produk: '' },
         search: '',
-    
-        // --- LOGIC IMAGE PREVIEW ---
+
         imagePreview: null,
-    
-        // --- LOGIC AI SUGGESTION ---
+
         suggestingPrice: false,
         aiReason: '',
         aiError: '',
-    
+
         // Fungsi Reset Form
         resetForm() {
             this.selectedProduk = {
@@ -31,26 +29,24 @@
             this.imagePreview = null;
             this.aiReason = '';
             this.aiError = '';
-    
+
             if (document.getElementById('fileInput')) {
                 document.getElementById('fileInput').value = '';
             }
         },
-    
-        // Fungsi Tanya AI
+
         async suggestPrice() {
             this.aiError = '';
             this.aiReason = '';
-    
+
             if (!this.selectedProduk.nama_produk || !this.selectedProduk.modal || !this.selectedProduk.jenis_produk) {
                 this.aiError = 'Mohon isi Nama Produk, Modal, dan Jenis Produk terlebih dahulu.';
                 return;
             }
-    
+
             this.suggestingPrice = true;
-    
+
             try {
-                // Pastikan route ini ada di web.php
                 const response = await fetch('{{ route('produk.suggest-price') }}', {
                     method: 'POST',
                     headers: {
@@ -63,9 +59,9 @@
                         jenis_produk: this.selectedProduk.jenis_produk
                     })
                 });
-    
+
                 const data = await response.json();
-    
+
                 if (data.price) {
                     this.selectedProduk.harga_jual = data.price;
                     this.aiReason = data.reason;
@@ -79,58 +75,51 @@
                 this.suggestingPrice = false;
             }
         },
-    
-        // Format currency for display (adds Rp. and thousand separators)
+
         formatCurrency(value) {
             if (!value) return '';
             const number = parseFloat(value);
             if (isNaN(number)) return '';
             return 'Rp. ' + new Intl.NumberFormat('id-ID').format(number);
         },
-    
-        // Parse currency input (removes Rp. and dots)
+
         parseCurrency(value) {
             if (!value) return '';
             return value.toString().replace(/[^0-9]/g, '');
         },
-    
-        // Handle modal input
+
         updateModal(event) {
             const rawValue = this.parseCurrency(event.target.value);
             this.selectedProduk.modal = rawValue;
             event.target.value = this.formatCurrency(rawValue);
         },
-    
-        // Handle harga jual input
+
         updateHargaJual(event) {
             const rawValue = this.parseCurrency(event.target.value);
             this.selectedProduk.harga_jual = rawValue;
             event.target.value = this.formatCurrency(rawValue);
         },
-    
-        // Get formatted display value for modal
+
         get displayModal() {
             return this.formatCurrency(this.selectedProduk.modal);
         },
-    
-        // Get formatted display value for harga jual
+
         get displayHargaJual() {
             return this.formatCurrency(this.selectedProduk.harga_jual);
         },
-    
-        // Fungsi Handle File Upload
+
         fileChosen(event) {
             const file = event.target.files[0];
             if (file) {
                 this.imagePreview = URL.createObjectURL(file);
             }
         },
-    
+
         openCreateModal() {
             this.resetForm();
             this.createModalOpen = true;
         },
-    
+
         openEditModal(produk) {
             this.selectedProduk = JSON.parse(JSON.stringify(produk));
             if (produk.gambar) {
@@ -140,12 +129,12 @@
             }
             this.editModalOpen = true;
         },
-    
+
         openDeleteModal(produk) {
             this.selectedProduk = produk;
             this.deleteModalOpen = true;
         },
-    
+
         closeModals() {
             this.createModalOpen = false;
             this.editModalOpen = false;
@@ -163,7 +152,6 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                    <!-- Month Filter -->
                     <form method="GET" action="{{ route('produk.index') }}" class="w-full sm:w-auto">
                         <select name="month" onchange="this.form.submit()"
                             class="w-full sm:w-auto px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm text-gray-900 dark:text-gray-100">
@@ -187,7 +175,6 @@
                         </select>
                     </form>
 
-                    <!-- Search -->
                     <div class="relative group w-full sm:w-48">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -245,8 +232,8 @@
                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                             @else
                                 <div
-                                    class="w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-gray-600">
-                                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-gray-600 bg-gray-200/50 dark:bg-gray-800">
+                                    <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                         </path>
