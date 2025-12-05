@@ -31,10 +31,8 @@ class MainMenuController extends Controller
 
         $profitYesterday = $revenueYesterday - $expenseYesterday;
 
-        // 3. Amerta Insight
         $insight = $this->generateInsight($profitYesterday);
 
-        // 4. Monthly Target
         $business = $user->business;
         $targetRevenue = $business->target_revenue ?? 0;
         $revenueThisMonth = CashJournal::where('business_id', $businessId)
@@ -43,14 +41,13 @@ class MainMenuController extends Controller
             ->sum('amount');
 
         $targetPercentage = $targetRevenue > 0 ? ($revenueThisMonth / $targetRevenue) * 100 : 0;
-        $targetPercentage = min($targetPercentage, 100); // Cap at 100% for bar width
+        $targetPercentage = min($targetPercentage, 100);
 
         $topProducts = Produk::where('business_id', $businessId)
         ->inRandomOrder()
         ->limit(3)
         ->get();
 
-        // 6. Streak (Daily Check-in)
         $streakDays = $this->calculateStreak();
 
         return view('main_menu', compact(
@@ -80,8 +77,6 @@ class MainMenuController extends Controller
     {
         $businessId = Auth::user()->business_id;
 
-        // We need to count consecutive days backwards from today/yesterday.
-        // Using DailySale as the check-in record
         $checkins = DailySale::where('business_id', $businessId)
             ->orderBy('date', 'desc')
             ->pluck('date')
@@ -98,7 +93,6 @@ class MainMenuController extends Controller
         $today = Carbon::today()->format('Y-m-d');
         $yesterday = Carbon::yesterday()->format('Y-m-d');
 
-        // Check if the latest checkin is today or yesterday to start the streak
         if ($checkins[0] !== $today && $checkins[0] !== $yesterday) {
             return 0;
         }
@@ -123,7 +117,6 @@ class MainMenuController extends Controller
     {
         $messages = [];
 
-        // Profit Insight
         if ($profit > 0) {
             $messages[] = "Kemarin Anda mencetak profit sebesar Rp " . number_format($profit, 0, ',', '.') . ". Pertahankan momentum ini!";
         } elseif ($profit < 0) {
@@ -132,7 +125,6 @@ class MainMenuController extends Controller
             $messages[] = "Belum ada aktivitas keuangan yang signifikan kemarin.";
         }
 
-        // General Motivation
         if ($profit >= 0) {
             $messages[] = "Semua sistem berjalan lancar. Fokus pada pengembangan bisnis hari ini!";
         }

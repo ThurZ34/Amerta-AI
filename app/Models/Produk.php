@@ -33,16 +33,13 @@ class produk extends Model
      */
     public function getTotalTerjualPerBulan($month, $year): int
     {
-        // 1. Buat tanggal lengkap berdasarkan Tahun dan Bulan yang dipilih
         $date = Carbon::createFromDate($year, $month, 1);
 
-        // 2. Tentukan range tanggal awal dan akhir bulan tersebut
         $startOfMonth = $date->copy()->startOfMonth();
         $endOfMonth = $date->copy()->endOfMonth();
 
         return $this->dailySaleItems()
             ->whereHas('dailySale', function ($query) use ($startOfMonth, $endOfMonth) {
-                // Filter berdasarkan range tanggal yang sudah spesifik tahunnya
                 $query->whereBetween('date', [$startOfMonth, $endOfMonth]);
             })
             ->sum('quantity');

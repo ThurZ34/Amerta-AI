@@ -3,7 +3,6 @@
 @section('header', 'Laporan Penjualan Harian')
 
 @section('content')
-    {{-- SETUP ALPINE JS UNTUK MODAL --}}
     <div class="p-4 sm:p-6 lg:p-8 h-full"
          x-data="{
             createModalOpen: false,
@@ -59,7 +58,6 @@
             ];
         @endphp
 
-        {{-- Loading Overlay saat Submit --}}
         <div x-show="isLoading" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm transition-opacity" style="display: none;" x-cloak>
             <div class="text-center">
                 <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-indigo-500 border-t-transparent mb-4"></div>
@@ -68,12 +66,10 @@
             </div>
         </div>
 
-        {{-- MAIN CONTENT (GRID KALENDER) --}}
         <div class="flex flex-col xl:flex-row gap-6 h-full">
 
             <div class="flex-1 order-2 xl:order-1 flex flex-col h-full">
 
-                {{-- Header Kalender & Navigasi Bulan (TETAP SAMA) --}}
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white">Kalender Penjualan</h2>
                     <div class="flex items-center bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-1">
@@ -91,7 +87,6 @@
                     </div>
                 </div>
 
-                {{-- Kalender Grid --}}
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex-1 flex flex-col">
                     <div class="grid grid-cols-7 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
                         @foreach (['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as $day)
@@ -119,12 +114,9 @@
                             <div class="min-h-[100px] bg-white dark:bg-gray-800 p-2 relative group flex flex-col transition-colors
                                 {{ !$isCurrentMonth ? 'bg-gray-50/50 dark:bg-gray-900/50' : 'hover:bg-gray-50 dark:hover:bg-gray-750' }}">
 
-                                {{-- LOGIKA TRIGGER MODAL --}}
                                 @if ($dailySale)
-                                    {{-- Kalau sudah ada data, klik untuk EDIT (bisa diarahkan ke show/edit, atau modal edit nanti) --}}
                                     <a href="{{ route('daily-checkin.show', $dailySale->id) }}" class="absolute inset-0 z-10"></a>
                                 @elseif ($isCurrentMonth && $currentDate <= now())
-                                    {{-- Kalau KOSONG & Bulan ini & Bukan masa depan -> BUKA MODAL --}}
                                     <button type="button"
                                             @click="openInputModal('{{ $dateStr }}', '{{ $dateReadable }}')"
                                             class="absolute inset-0 z-10 w-full h-full cursor-pointer focus:outline-none"></button>
@@ -163,7 +155,6 @@
                 </div>
             </div>
 
-            {{-- SIDEBAR RINGKASAN (TETAP SAMA) --}}
             <div class="w-full xl:w-80 shrink-0 order-1 xl:order-2 space-y-4">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                     Ringkasan {{ $startOfMonth->translatedFormat('F') }}
@@ -187,20 +178,15 @@
             </div>
         </div>
 
-        {{-- ========================================== --}}
-        {{-- MODAL INPUT PENJUALAN HARIAN --}}
-        {{-- ========================================== --}}
         <div x-show="createModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;" x-cloak>
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
 
-                {{-- Backdrop --}}
                 <div x-show="createModalOpen" x-transition.opacity
                      class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-sm"
                      @click="closeModal()"></div>
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
-                {{-- Modal Panel --}}
                 <div x-show="createModalOpen"
                      x-transition:enter="ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
@@ -210,13 +196,10 @@
                      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                      class="relative z-10 inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
 
-                    {{-- Form --}}
                     <form action="{{ route('daily-checkin.store') }}" method="POST" @submit="isLoading = true">
                         @csrf
-                        {{-- Hidden Date Input (Diisi oleh Alpine) --}}
                         <input type="hidden" name="date" x-model="targetDate">
 
-                        {{-- Modal Header --}}
                         <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800">
                             <div>
                                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Input Penjualan</h3>
@@ -229,14 +212,12 @@
                             </button>
                         </div>
 
-                        {{-- Modal Body (Product Grid) --}}
                         <div class="px-6 py-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 @forelse ($produks as $produk)
                                     <div x-data="{ count: 0 }"
                                          class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500 transition-all duration-300 p-3 flex gap-3 items-center">
 
-                                        {{-- Image --}}
                                         <div class="w-16 h-16 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden relative">
                                             @if ($produk->gambar)
                                                 <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}" class="w-full h-full object-cover">
@@ -247,7 +228,6 @@
                                             @endif
                                         </div>
 
-                                        {{-- Content & Stepper --}}
                                         <div class="flex-1 min-w-0 flex flex-col justify-between h-16">
                                             <div>
                                                 <h3 class="font-bold text-gray-900 dark:text-white text-sm leading-tight truncate" title="{{ $produk->nama_produk }}">
@@ -281,7 +261,6 @@
                             </div>
                         </div>
 
-                        {{-- Modal Footer --}}
                         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700">
                             <button type="button" @click="closeModal()" class="px-4 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                                 Batal

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-gray-200/50 dark:bg-gray-950 py-8 transition-colors duration-300" 
+    <div class="min-h-screen bg-gray-200/50 dark:bg-gray-950 py-8 transition-colors duration-300"
     x-data="{
         isEditing: false,
         categorySearch: '',
@@ -12,7 +12,7 @@
         imagePreview: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
         originalImage: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
         deleteImage: false,
-        
+
         // Modal Preview Image
         showImageModal: false,
         modalImageUrl: '',
@@ -95,7 +95,6 @@
     }">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            {{-- 1. HEADER SECTION & ACTIONS --}}
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Profil Bisnis</h1>
@@ -105,8 +104,8 @@
                 <div class="flex items-center gap-3">
                     <button @click="toggleEdit()" type="button"
                         class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm border"
-                        :class="isEditing 
-                            ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' 
+                        :class="isEditing
+                            ? 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                             : 'bg-indigo-600 text-white border-transparent hover:bg-indigo-700 hover:shadow-indigo-500/30'">
                         <svg x-show="!isEditing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                         <svg x-show="isEditing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -134,20 +133,16 @@
                 @method('PUT')
                 <input type="hidden" name="hapus_gambar" :value="deleteImage ? '1' : '0'">
 
-                {{-- 2. MAIN IDENTITY CARD --}}
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 p-6 mb-6 relative overflow-visible">
-                    {{-- Decorative Background --}}
                     <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50 dark:bg-indigo-900/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
                     <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6">
-                        {{-- Image Upload Section --}}
                         <div class="group relative shrink-0">
                             <input type="file" id="gambar-input" name="gambar" accept="image/*" class="hidden" @change="updatePreview($event)">
-                            
+
                             <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-4 border-white dark:border-gray-700 shadow-md bg-gray-100 dark:bg-gray-800 relative"
                                  :class="{ 'cursor-pointer ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800': isEditing }">
-                                
-                                {{-- Image Logic --}}
+
                                 <template x-if="imagePreview">
                                     <img :src="imagePreview" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                          @click="!isEditing && openImageModal(imagePreview)" :class="{'cursor-zoom-in': !isEditing}">
@@ -159,8 +154,7 @@
                                     </div>
                                 </template>
 
-                                {{-- Edit Overlay --}}
-                                <div x-show="isEditing" 
+                                <div x-show="isEditing"
                                      @click="document.getElementById('gambar-input').click()"
                                      class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-[1px]">
                                     <svg class="w-6 h-6 text-white mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /></svg>
@@ -168,14 +162,12 @@
                                 </div>
                             </div>
 
-                            {{-- Remove Button --}}
                             <button type="button" x-show="isEditing && imagePreview" @click="removeImage()"
                                 class="absolute -top-2 -right-2 bg-white dark:bg-gray-700 text-red-500 rounded-full p-1.5 shadow-md border border-gray-100 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-gray-600 transition-colors z-20">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
 
-                        {{-- Name & Category Inputs --}}
                         <div class="flex-1 w-full space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nama Bisnis</label>
@@ -214,7 +206,6 @@
                                             </div>
                                         </div>
 
-                                        {{-- Dropdown --}}
                                         <div x-show="showCategoryDropdown && (filteredCategories.length > 0 || showAddButton)"
                                             x-transition:enter="transition ease-out duration-100"
                                             x-transition:enter-start="opacity-0 scale-95"
@@ -241,20 +232,16 @@
                     </div>
                 </div>
 
-                {{-- 3. GRID DETAILS --}}
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    {{-- LEFT COL: General Info --}}
+
                     <div class="lg:col-span-2 space-y-6">
-                        {{-- Card: Tentang Bisnis --}}
                         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-full">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
                                 <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 Tentang Bisnis
                             </h3>
-                            
+
                             <div class="space-y-6">
-                                {{-- Tujuan --}}
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Tujuan Utama</label>
                                     <template x-if="!isEditing">
@@ -267,7 +254,6 @@
                                     </template>
                                 </div>
 
-                                {{-- Alamat --}}
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Alamat Lengkap</label>
                                     <template x-if="!isEditing">
@@ -284,13 +270,11 @@
                         </div>
                     </div>
 
-                    {{-- RIGHT COL: Stats & Meta --}}
                     <div class="lg:col-span-1 space-y-6">
-                        
-                        {{-- Invite Code Card --}}
+
                         <div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
-                            
+
                             <h4 class="text-sm font-semibold text-gray-950 dark:text-indigo-100 uppercase tracking-wide mb-4">Kode Tim</h4>
                             <div class="flex items-center gap-2" x-data="{ copied: false }">
                                 <code class="flex-1 bg-white/20 backdrop-blur-sm text-gray-900 dark:text-white border border-white/20 px-4 py-3 rounded-xl text-lg font-mono font-bold tracking-widest text-center shadow-inner">
@@ -305,11 +289,9 @@
                             <p class="text-xs text-gray-900 dark:text-indigo-200 mt-3 leading-relaxed">Bagikan kode ini kepada staff Anda untuk bergabung ke dalam workspace ini.</p>
                         </div>
 
-                        {{-- Details Card --}}
                         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
                             <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4">Detail Lainnya</h4>
                             <div class="space-y-4">
-                                {{-- Target Pasar --}}
                                 <div>
                                     <label class="text-xs text-gray-500 dark:text-gray-400">Target Pasar</label>
                                     <template x-if="!isEditing">
@@ -320,7 +302,6 @@
                                     </template>
                                 </div>
                                 <div class="border-t border-gray-100 dark:border-gray-700"></div>
-                                {{-- Jumlah Tim --}}
                                 <div>
                                     <label class="text-xs text-gray-500 dark:text-gray-400">Jumlah Tim</label>
                                     <template x-if="!isEditing">
@@ -331,7 +312,6 @@
                                     </template>
                                 </div>
                                 <div class="border-t border-gray-100 dark:border-gray-700"></div>
-                                {{-- Telepon --}}
                                 <div>
                                     <label class="text-xs text-gray-500 dark:text-gray-400">Telepon / WA</label>
                                     <template x-if="!isEditing">
@@ -347,7 +327,6 @@
                     </div>
                 </div>
 
-                {{-- SAVE BAR (Floating) --}}
                 <div x-show="isEditing" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-10" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-10" x-cloak
                     class="fixed bottom-6 right-6 z-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-2xl px-6 py-4 flex items-center gap-4 max-w-2xl">
                     <div class="flex-1">
@@ -363,7 +342,6 @@
             </form>
         </div>
 
-        {{-- IMAGE MODAL --}}
         <div x-show="showImageModal" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
             x-transition.opacity @click.self="showImageModal = false" @keydown.escape.window="showImageModal = false">
             <div class="relative max-w-5xl w-full flex flex-col items-center">

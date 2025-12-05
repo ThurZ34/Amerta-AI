@@ -23,45 +23,39 @@ class RiwayatController extends Controller
     public function index(Request $request)
     {
         $business = auth()->user()->business;
-        
-        // Get Filter Parameters (Default to Current Month/Year)
+
         $month = $request->input('month', now()->month);
         $year = $request->input('year', now()->year);
 
-        // 1. Get Manual Riwayat
         $riwayats = Riwayat::where('business_id', $business->id)
             ->whereMonth('tanggal_pembelian', $month)
             ->whereYear('tanggal_pembelian', $year)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // 2. Get Daily Sales (Automated Income)
         $dailySales = DailySale::where('business_id', $business->id)
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
             ->with('items.produk')
             ->get()
             ->map(function ($sale) {
-                // Calculate Gross Profit (Revenue - HPP)
                 $grossProfit = $sale->items->sum(function ($item) {
                     return ($item->price - $item->cost) * $item->quantity;
                 });
 
-                // Build detailed description
                 $itemDetails = $sale->items->map(function ($item) {
                     return "{$item->quantity}x {$item->produk->nama_produk}";
                 })->take(3)->join(', ');
-                
+
                 if ($sale->items->count() > 3) {
                     $itemDetails .= ', dll';
                 }
 
                 $description = "Profit dari penjualan: {$itemDetails}";
 
-                // Create a structure compatible with Riwayat model
                 return (object) [
-                    'id' => 'daily_sale_' . $sale->id, // Unique ID for frontend key
-                    'is_manual' => false, // Flag to disable edit/delete
+                    'id' => 'daily_sale_' . $sale->id,
+                    'is_manual' => false,
                     'nama_barang' => 'Profit Penjualan Harian',
                     'tanggal_pembelian' => $sale->date->format('Y-m-d'),
                     'total_harga' => $grossProfit,
@@ -73,10 +67,8 @@ class RiwayatController extends Controller
                 ];
             });
 
-        // 3. Merge and Sort
         $mergedRiwayats = $riwayats->concat($dailySales)->sortByDesc('tanggal_pembelian')->values();
 
-        // Get existing categories for suggestions
         $categories = Riwayat::where('business_id', $business->id)
             ->whereNotNull('kategori')
             ->where('jenis', 'pengeluaran'  )
@@ -96,7 +88,7 @@ class RiwayatController extends Controller
     public function scan(Request $request)
     {
         $request->validate([
-            'receipt_image' => 'required|image|max:5120', // Max 5MB
+            'receipt_image' => 'required|image|max:5120',
         ]);
 
         try {
@@ -107,8 +99,6 @@ class RiwayatController extends Controller
                 return back()->with('error', 'Gagal menganalisa struk. Pastikan gambar jelas.');
             }
 
-            // Return view with pre-filled data (using session or passing variable)
-            // We'll redirect back with session data to open the modal
             return redirect()->route('riwayat.index')
                 ->with('scan_result', $data)
                 ->with('success', 'Struk berhasil dianalisa! Silakan cek data sebelum disimpan.');
@@ -138,11 +128,9 @@ class RiwayatController extends Controller
 
         DB::beginTransaction();
         try {
-            // Determine COA based on jenis
             $coaName = $request->jenis === 'pendapatan' ? 'Pendapatan Lainnya' : 'Beban Operasional';
             $coa = Coa::where('name', $coaName)->first();
-            
-            // Fallback if specific COA not found, try generic types
+
             if (!$coa) {
                 $coaType = $request->jenis === 'pendapatan' ? 'INFLOW' : 'OUTFLOW';
                 $coa = Coa::where('type', $coaType)->first();
@@ -156,7 +144,7 @@ class RiwayatController extends Controller
                     'coa_id' => $coa->id,
                     'amount' => $request->total_harga,
                     'is_inflow' => $request->jenis === 'pendapatan',
-                    'payment_method' => 'Kas', // Default to Kas for now
+                    'payment_method' => 'Kas',
                     'description' => $request->nama_barang . ($request->keterangan ? ' - ' . $request->keterangan : ''),
                 ]);
             }
@@ -248,13 +236,6 @@ class RiwayatController extends Controller
             if ($riwayat->bukti_pembayaran) {
                 Storage::disk('public')->delete($riwayat->bukti_pembayaran);
             }
-
-            // CashJournal will be deleted automatically via cascade if defined in migration, 
-            // but since we added nullable foreign key on riwayats table pointing to cash_journals,
-            // we need to manually delete the cash_journal entry if we want to remove the financial record.
-            // Wait, the relation is Riwayat belongsTo CashJournal. 
-            // So Riwayat has cash_journal_id.
-            // If we delete Riwayat, the CashJournal entry remains unless we delete it explicitly.
             
             if ($riwayat->cash_journal_id) {
                 CashJournal::destroy($riwayat->cash_journal_id);

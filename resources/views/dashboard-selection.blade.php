@@ -6,15 +6,12 @@
     <div
         class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center relative overflow-hidden px-4 sm:px-6 lg:px-8">
 
-        {{-- 1. BACKGROUND DECORATION (Mengisi kekosongan) --}}
         <div class="absolute inset-0 w-full h-full">
-            {{-- Grid Pattern --}}
             <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
             <div class="absolute inset-0"
                 style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 32px 32px; opacity: 0.05;">
             </div>
 
-            {{-- Blurs --}}
             <div
                 class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-screen animate-blob">
             </div>
@@ -25,7 +22,6 @@
 
         <div class="w-full max-w-5xl relative z-10">
 
-            {{-- 2. HEADER SECTION --}}
             <div class="text-center mb-12">
 
                 <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
@@ -36,13 +32,10 @@
                 </p>
             </div>
 
-            {{-- 3. CARDS CONTAINER --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                {{-- CARD 1: BUAT BISNIS (OWNER) --}}
                 <div
                     class="group relative bg-white dark:bg-gray-800 rounded-[2rem] border border-gray-200 dark:border-gray-700 p-8 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                    {{-- Decor --}}
                     <div
                         class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-900/20 rounded-bl-[4rem] transition-colors group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40">
                     </div>
@@ -82,10 +75,8 @@
                     </div>
                 </div>
 
-                {{-- CARD 2: GABUNG TIM (STAFF) --}}
                 <div
                     class="group relative bg-white dark:bg-gray-800 rounded-[2rem] border border-gray-200 dark:border-gray-700 p-8 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                    {{-- Decor --}}
                     <div
                         class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 dark:bg-emerald-900/20 rounded-bl-[4rem] transition-colors group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40">
                     </div>

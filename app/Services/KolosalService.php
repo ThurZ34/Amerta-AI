@@ -17,13 +17,11 @@ class KolosalService
     {
         $this->apiKey = env('KOLOSAL_API_KEY');
         $this->baseUrl = env('KOLOSAL_BASE_URL', 'https://api.kolosal.ai/v1/chat/completions');
-        // Default ke Claude 3.5 Sonnet jika di env kosong, nanti bisa diganti 4.5 jika sudah rilis
         $this->model = env('KOLOSAL_MODEL', 'Claude Sonnet 4.5');
     }
 
     public function sendChat(string $message, Business $business, ?string $imagePath = null)
     {
-        // 1. CONTEXT INJECTION (Sama persis dengan GeminiService)
         $categoryName = $business->category ? $business->category->name : 'Tidak ada';
 
         $systemInstruction = "
@@ -49,21 +47,17 @@ class KolosalService
             Analisa apakah relevan (Struk, Produk, Laporan). Jika selfie/meme, tolak dengan sopan.
         ";
 
-        // 2. Siapkan Pesan User (Format OpenAI Compatible)
         $userContent = [];
 
-        // Masukkan Text
         $userContent[] = [
             'type' => 'text',
             'text' => $message
         ];
 
-        // Masukkan Gambar (Jika ada)
         if ($imagePath && Storage::disk('public')->exists($imagePath)) {
             $mimeType = Storage::disk('public')->mimeType($imagePath);
             $imageData = base64_encode(Storage::disk('public')->get($imagePath));
 
-            // Kolosal/OpenAI format butuh prefix data:image/...
             $base64Url = "data:{$mimeType};base64,{$imageData}";
 
             $userContent[] = [
@@ -74,7 +68,6 @@ class KolosalService
             ];
         }
 
-        // 3. Kirim Request ke Kolosal
         $response = Http::withToken($this->apiKey)
             ->post($this->baseUrl, [
                 'model' => $this->model,
@@ -83,10 +76,9 @@ class KolosalService
                     ['role' => 'user', 'content' => $userContent]
                 ],
                 'temperature' => 0.7,
-                'max_tokens' => 1500, // Claude biasanya butuh token limit eksplisit yang agak besar
+                'max_tokens' => 1500,
             ]);
 
-        // 4. Error Handling
         if ($response->failed()) {
             Log::error('Kolosal API Error', [
                 'status' => $response->status(),
@@ -95,7 +87,6 @@ class KolosalService
             return "Waduh, koneksi ke Amerta (Kolosal) sedang gangguan. Coba kirim ulang ya Bos.";
         }
 
-        // 5. Ambil respon
         return $response->json()['choices'][0]['message']['content'] ?? "Maaf, respon kosong.";
     }
 
@@ -132,9 +123,7 @@ class KolosalService
                         ]
                     ]
                 ],
-                // Fitur JSON mode (tergantung support Kolosal, biasanya aman pakai prompt saja)
-                // 'response_format' => ['type' => 'json_object'],
-                'temperature' => 0.1 // Rendah biar akurat baca angka
+                'temperature' => 0.1
             ]);
 
         if ($response->failed()) {
@@ -145,7 +134,6 @@ class KolosalService
         $text = $response->json()['choices'][0]['message']['content'] ?? null;
 
         if ($text) {
-            // Bersihkan markdown ```json ... ``` jika Claude menambahkannya
             $text = str_replace(['```json', '```'], '', $text);
             return json_decode(trim($text), true);
         }

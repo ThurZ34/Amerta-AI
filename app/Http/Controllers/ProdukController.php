@@ -31,7 +31,6 @@ class ProdukController extends Controller
         $prompt .= 'Berikan rekomendasi harga jual yang kompetitif namun menguntungkan. ';
         $prompt .= 'Berikan output HANYA dalam format JSON valid berikut tanpa markdown ```json: {"price": 15000, "reason": "Alasan singkat maksimal 2 kalimat"}';
 
-        // Get Business context
         $business = auth()->user()->business;
         if (! $business) {
             return response()->json(['error' => 'Bisnis tidak ditemukan. Silakan setup bisnis terlebih dahulu.'], 400);
@@ -40,16 +39,14 @@ class ProdukController extends Controller
         try {
             $response = $this->geminiService->sendChat($prompt, $business);
 
-            // Clean up response if it contains markdown code blocks
             $cleanResponse = str_replace(['```json', '```'], '', $response);
             $json = json_decode($cleanResponse, true);
 
             if (json_last_error() === JSON_ERROR_NONE) {
                 return response()->json($json);
             } else {
-                // Fallback if JSON parsing fails
                 return response()->json([
-                    'price' => $request->modal * 1.3, // Default 30% margin
+                    'price' => $request->modal * 1.3,
                     'reason' => 'AI sedang sibuk. Ini adalah estimasi margin standar 30%. ('.Str::limit($response, 50).')',
                     'is_fallback' => true,
                 ]);
@@ -61,13 +58,11 @@ class ProdukController extends Controller
 
     public function index(Request $request)
     {
-        // Get month from request or use current month
         $month = $request->input('month', now()->format('m'));
         $year = $request->input('year', now()->format('Y'));
 
         $produks = Produk::where('business_id', auth()->user()->business?->id)->latest()->get();
 
-        // Calculate total_terjual per bulan for each product
         $produks->each(function ($produk) use ($month, $year) {
             $produk->total_terjual_bulan_ini = $produk->getTotalTerjualPerBulan($month, $year);
         });
@@ -85,13 +80,11 @@ class ProdukController extends Controller
             'gambar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle file upload
         if ($request->hasFile('gambar')) {
             $gambarPath = $request->file('gambar')->store('produk-images', 'public');
             $validated['gambar'] = $gambarPath;
         }
 
-        // Set business_id (adjust based on your auth logic)
         $validated['business_id'] = auth()->user()->business?->id;
 
         Produk::create($validated);
@@ -108,12 +101,10 @@ class ProdukController extends Controller
             'modal' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
             'jenis_produk' => 'required|string|max:255',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Changed to nullable
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
         ]);
 
-        // Handle file upload if new image is provided
         if ($request->hasFile('gambar')) {
-            // Delete old image if exists
             if ($produk->gambar) {
                 Storage::disk('public')->delete($produk->gambar);
             }
@@ -131,7 +122,6 @@ class ProdukController extends Controller
     {
         $produk = Produk::where('business_id', auth()->user()->business?->id)->findOrFail($id);
 
-        // Delete image file if exists
         if ($produk->gambar) {
             Storage::disk('public')->delete($produk->gambar);
         }

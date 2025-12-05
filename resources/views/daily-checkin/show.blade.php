@@ -9,16 +9,6 @@
 
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    {{-- <nav class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
-                        <a href="{{ route('daily-checkin.index') }}"
-                            class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                            Kalender
-                        </a>
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                        <span class="text-gray-900 dark:text-white font-medium">Laporan Detail</span>
-                    </nav> --}}
                     <div class="flex items-center gap-3">
                         <a href="{{ route('daily-checkin.index') }}"
                             class="group p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"

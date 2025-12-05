@@ -14,11 +14,8 @@ class GeminiService
         $apiKey = config('services.gemini.key');
         $model = config('services.gemini.model');
 
-        // Get category name safely
         $categoryName = $business->category ? $business->category->name : 'Tidak ada';
 
-        // --- CONTEXT INJECTION (RAHASIA AI PINTAR) ---
-        // Kita rangkum data database jadi kalimat instruksi
         $systemInstruction = "
             PERAN: Kamu adalah 'Amerta', asisten konsultan bisnis profesional untuk UMKM.
             PROFIL BISNIS PENGGUNA:
@@ -49,17 +46,13 @@ class GeminiService
 
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
-        // Siapkan Payload (Isi Pesan)
         $userContentParts = [];
 
-        // 1. Masukkan Instruksi & Teks User
         $userContentParts[] = ['text' => $systemInstruction . "\n\nPERTANYAAN USER: " . $message];
 
-        // 2. Masukkan Gambar (Jika ada)
         if ($imagePath && Storage::disk('public')->exists($imagePath)) {
             $mimeType = Storage::disk('public')->mimeType($imagePath);
 
-            // Gemini hanya support tipe file tertentu untuk gambar
             $supportedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
 
             if (in_array($mimeType, $supportedMimes)) {
@@ -72,7 +65,6 @@ class GeminiService
                 ];
             } else {
                 Log::warning("Format gambar tidak didukung: {$mimeType}");
-                // Opsional: Tambahkan text info ke AI bahwa gambar gagal dimuat
                 $userContentParts[] = ['text' => "[SISTEM: User mencoba upload gambar tapi format $mimeType tidak didukung. Beritahu user untuk upload JPG/PNG]"];
             }
         }
@@ -85,7 +77,6 @@ class GeminiService
                 ]]
             ]);
 
-        // Error Handling
         if ($response->failed()) {
             Log::error('Gemini API Error', [
                 'status' => $response->status(),
@@ -149,7 +140,6 @@ class GeminiService
         $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
 
         if ($text) {
-            // Clean up potential markdown code blocks
             $text = str_replace('```json', '', $text);
             $text = str_replace('```', '', $text);
             return json_decode(trim($text), true);

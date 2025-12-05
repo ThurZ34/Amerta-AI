@@ -13,9 +13,8 @@ class ProfilController extends Controller
     public function bussiness_index()
     {
         $user = auth()->user();
-        // Get business owned by user OR business the user belongs to
         $business = $user->ownedBusiness ?? $user->business;
-        
+
         $categories = Category::orderBy('name')->get();
         return view('profil.index', compact('business', 'categories'));
     }

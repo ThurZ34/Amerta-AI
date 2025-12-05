@@ -69,10 +69,8 @@
 <body
     class="h-full antialiased text-gray-900 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
-    {{-- Fullscreen Container --}}
     <div class="relative h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden flex flex-col">
 
-        {{-- Background Decor (Orbs) --}}
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
             <div
                 class="absolute top-20 left-10 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-pulse">
@@ -82,12 +80,10 @@
             </div>
         </div>
 
-        {{-- Background Pattern Grid --}}
         <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none z-0"
             style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 24px 24px;">
         </div>
 
-        {{-- Back to Main Menu Button (Floating) --}}
         <a href="{{ route('main_menu') }}"
             class="absolute top-4 right-4 z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm font-medium group">
             <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none"
@@ -97,7 +93,6 @@
             Kembali ke Menu
         </a>
 
-        {{-- Livewire Component Wrapper --}}
         <div class="flex-1 h-full relative z-10">
             @livewire('dashboard-chat', ['mode' => 'full'])
         </div>

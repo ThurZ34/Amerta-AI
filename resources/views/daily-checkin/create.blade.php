@@ -5,7 +5,6 @@
 @section('content')
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24" x-data="{ isLoading: false }">
 
-        <!-- Loading Overlay -->
         <div x-show="isLoading"
             class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm transition-opacity"
             x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
@@ -22,7 +21,6 @@
 
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-            <!-- Header Section -->
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                 <div>
                     <a href="{{ route('daily-checkin.index') }}"
@@ -36,7 +34,6 @@
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Input Penjualan</h2>
                 </div>
 
-                <!-- Date Badge -->
                 <div
                     class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm rounded-xl px-4 py-2 flex items-center gap-3">
                     <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-lg text-indigo-600 dark:text-indigo-400">
@@ -58,13 +55,11 @@
                 @csrf
                 <input type="hidden" name="date" value="{{ $date }}">
 
-                <!-- Product Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-20">
                     @forelse ($produks as $produk)
                         <div x-data="{ count: 0 }"
                             class="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500 transition-all duration-300 p-3 flex gap-4 items-center">
 
-                            <!-- Image Thumbnail -->
                             <div
                                 class="w-20 h-20 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden relative">
                                 @if ($produk->gambar)
@@ -81,7 +76,6 @@
                                 @endif
                             </div>
 
-                            <!-- Content & Stepper -->
                             <div class="flex-1 min-w-0 flex flex-col justify-between h-20 py-0.5">
                                 <div>
                                     <h3 class="font-bold text-gray-900 dark:text-white leading-tight truncate"
@@ -93,7 +87,6 @@
                                     </p>
                                 </div>
 
-                                <!-- Stepper Input -->
                                 <div class="flex items-center justify-between mt-auto">
                                     <label
                                         class="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Terjual</label>
@@ -142,7 +135,6 @@
                     @endforelse
                 </div>
 
-                <!-- Floating Bottom Bar -->
                 @if ($produks->count() > 0)
                     <div
                         class="fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 z-40">
