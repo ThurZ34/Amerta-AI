@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-gray-50/50 dark:bg-gray-950 py-8 transition-colors duration-300" 
+    <div class="min-h-screen bg-gray-200/50 dark:bg-gray-950 py-8 transition-colors duration-300" 
     x-data="{
         isEditing: false,
         categorySearch: '',
