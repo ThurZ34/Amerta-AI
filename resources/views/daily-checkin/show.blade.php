@@ -379,4 +379,41 @@
         </div>
 
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const bgColor = isDarkMode ? '#1f2937' : '#ffffff';
+            const textColor = isDarkMode ? '#f3f4f6' : '#1f2937';
+
+            @if (session('success'))
+                Toast.fire({
+                    icon: 'success',
+                    title: "{{ session('success') }}",
+                    background: bgColor,
+                    color: textColor
+                });
+            @endif
+
+            @if (session('error'))
+                Toast.fire({
+                    icon: 'error',
+                    title: "{{ session('error') }}",
+                    background: bgColor,
+                    color: textColor
+                });
+            @endif
+        });
+    </script>
 @endsection

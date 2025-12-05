@@ -11,15 +11,12 @@
         selectedProduk: { id: null, nama_produk: '', modal: 0, harga_jual: 0, jenis_produk: '' },
         search: '',
 
-        // --- LOGIC IMAGE PREVIEW ---
         imagePreview: null,
 
-        // --- LOGIC AI SUGGESTION ---
         suggestingPrice: false,
         aiReason: '',
         aiError: '',
 
-        // Fungsi Reset Form
         resetForm() {
             this.selectedProduk = {
                 id: null,
@@ -37,7 +34,6 @@
             }
         },
 
-        // Fungsi Tanya AI
         async suggestPrice() {
             this.aiError = '';
             this.aiReason = '';
@@ -79,7 +75,6 @@
             }
         },
 
-        // Format currency for display (adds Rp. and thousand separators)
         formatCurrency(value) {
             if (!value) return '';
             const number = parseFloat(value);
@@ -87,37 +82,31 @@
             return 'Rp. ' + new Intl.NumberFormat('id-ID').format(number);
         },
 
-        // Parse currency input (removes Rp. and dots)
         parseCurrency(value) {
             if (!value) return '';
             return value.toString().replace(/[^0-9]/g, '');
         },
 
-        // Handle modal input
         updateModal(event) {
             const rawValue = this.parseCurrency(event.target.value);
             this.selectedProduk.modal = rawValue;
             event.target.value = this.formatCurrency(rawValue);
         },
 
-        // Handle harga jual input
         updateHargaJual(event) {
             const rawValue = this.parseCurrency(event.target.value);
             this.selectedProduk.harga_jual = rawValue;
             event.target.value = this.formatCurrency(rawValue);
         },
 
-        // Get formatted display value for modal
         get displayModal() {
             return this.formatCurrency(this.selectedProduk.modal);
         },
 
-        // Get formatted display value for harga jual
         get displayHargaJual() {
             return this.formatCurrency(this.selectedProduk.harga_jual);
         },
 
-        // Fungsi Handle File Upload
         fileChosen(event) {
             const file = event.target.files[0];
             if (file) {
@@ -162,21 +151,18 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                    <!-- Month Filter -->
                     <form method="GET" action="{{ route('produk.index') }}"
                         class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
 
-                        {{-- Dropdown Bulan --}}
                         <select name="month" onchange="this.form.submit()"
                             class="w-full sm:w-auto px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm text-gray-900 dark:text-gray-100">
                             @php
-                                // Ambil bulan dari request, atau default ke bulan ini
                                 $currentMonth = request('month', now()->format('m'));
                             @endphp
 
                             @foreach (range(1, 12) as $m)
                                 @php
-                                    $monthValue = sprintf('%02d', $m); // Format jadi 01, 02, dst.
+                                    $monthValue = sprintf('%02d', $m);
                                 @endphp
                                 <option value="{{ $monthValue }}" {{ $currentMonth == $monthValue ? 'selected' : '' }}>
                                     {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
@@ -184,11 +170,9 @@
                             @endforeach
                         </select>
 
-                        {{-- Dropdown Tahun --}}
                         <select name="year" onchange="this.form.submit()"
                             class="w-full sm:w-auto px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm text-gray-900 dark:text-gray-100">
                             @php
-                                // Ambil tahun dari request, atau default ke tahun ini
                                 $currentYear = request('year', now()->format('Y'));
                                 $startYear = 2020;
                                 $thisYear = now()->year;
@@ -224,25 +208,6 @@
                 </div>
             </div>
 
-            @if (session('success'))
-                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 transform -translate-y-2"
-                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                    x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="opacity-100 transform translate-y-0"
-                    x-transition:leave-end="opacity-0 transform -translate-y-2"
-                    class="mb-8 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 rounded-lg flex items-center gap-3 shadow-sm"
-                    role="alert">
-                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    <span class="font-medium text-sm">{{ session('success') }}</span>
-                </div>
-            @endif
-
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-20">
                 @forelse ($produks as $produk)
                     @php
@@ -253,7 +218,6 @@
                     <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group"
                         x-show="search === '' || '{{ strtolower($produk->nama_produk) }}'.includes(search.toLowerCase())">
 
-                        <!-- Product Image -->
                         <div class="aspect-[4/3] w-full bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
                             @if ($produk->gambar)
                                 <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}"
@@ -269,7 +233,6 @@
                                 </div>
                             @endif
 
-                            <!-- Category Badge -->
                             <div class="absolute top-2 left-2">
                                 <span
                                     class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-gray-700 dark:text-gray-300 shadow-sm">
@@ -277,7 +240,6 @@
                                 </span>
                             </div>
 
-                            <!-- Action Buttons (Show on Hover) -->
                             <div
                                 class="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <button @click='openEditModal(@json($produk))'
@@ -299,7 +261,6 @@
                             </div>
                         </div>
 
-                        <!-- Product Info -->
                         <div class="p-3">
                             <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1 line-clamp-1"
                                 title="{{ $produk->nama_produk }}">
@@ -315,7 +276,6 @@
                                 </span>
                             </div>
 
-                            <!-- Stats Grid -->
                             <div class="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
                                 <div>
                                     <p class="text-[9px] text-gray-500 dark:text-gray-400 uppercase font-medium mb-0.5">
@@ -406,7 +366,6 @@
                                 <div class="flex items-center justify-center w-full">
                                     <label
                                         class="relative flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all overflow-hidden group">
-
                                         <div x-show="!imagePreview"
                                             class="flex flex-col items-center justify-center pt-5 pb-6">
                                             <svg class="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor"
@@ -419,7 +378,6 @@
                                                 upload gambar</p>
                                             <p class="text-xs text-gray-400 mt-1">PNG, JPG up to 2MB</p>
                                         </div>
-
                                         <div x-show="imagePreview" class="absolute inset-0 w-full h-full"
                                             style="display: none;">
                                             <img :src="imagePreview" class="w-full h-full object-cover">
@@ -434,13 +392,11 @@
                                                 <span class="text-white text-sm font-medium">Ganti Gambar</span>
                                             </div>
                                         </div>
-
                                         <input type="file" id="fileInput" name="gambar" class="hidden"
                                             accept="image/*" @change="fileChosen">
                                     </label>
                                 </div>
                             </div>
-
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nama
                                     Produk</label>
@@ -448,7 +404,6 @@
                                     placeholder="Contoh: Kopi Susu Aren"
                                     class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-700 dark:text-white text-sm transition-shadow">
                             </div>
-
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">HPP
@@ -464,19 +419,6 @@
                                         Harga Jual per unit
                                         <button type="button" @click="suggestPrice()" :disabled="suggestingPrice"
                                             class="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-1 rounded-md hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors flex items-center gap-1 disabled:opacity-50">
-                                            <svg x-show="!suggestingPrice" class="w-3 h-3" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                            </svg>
-                                            <svg x-show="suggestingPrice" class="animate-spin w-3 h-3"
-                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10"
-                                                    stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                                </path>
-                                            </svg>
                                             <span x-text="suggestingPrice ? 'Menganalisa...' : 'Tanya AI'"></span>
                                         </button>
                                     </label>
@@ -490,9 +432,6 @@
                                         class="mt-1 text-xs text-red-600 dark:text-red-400 font-medium animate-pulse"></p>
                                 </div>
                             </div>
-
-
-
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Jenis
                                     Produk</label>
@@ -562,4 +501,54 @@
         </div>
 
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            function isDarkMode() {
+                return document.documentElement.classList.contains('dark');
+            }
+
+            function getThemeColors() {
+                return isDarkMode() ? {
+                    background: '#1f2937',
+                    color: '#f3f4f6'
+                } : {
+                    background: '#ffffff',
+                    color: '#1f2937'
+                };
+            }
+
+            @if (session('success'))
+                const colors = getThemeColors();
+                Toast.fire({
+                    icon: 'success',
+                    title: "{{ session('success') }}",
+                    background: colors.background,
+                    color: colors.color
+                });
+            @endif
+
+            @if (session('error'))
+                const colors = getThemeColors();
+                Toast.fire({
+                    icon: 'error',
+                    title: "{{ session('error') }}",
+                    background: colors.background,
+                    color: colors.color
+                });
+            @endif
+        });
+    </script>
 @endsection
