@@ -178,7 +178,6 @@
         <div x-show="createModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;" x-cloak>
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
 
-                {{-- Backdrop --}}
                 <div x-show="createModalOpen" x-transition.opacity
                      class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-sm"
                      @click="closeModal()"></div>

@@ -184,7 +184,6 @@
             @else
                 @foreach ($chats as $chat)
                     @if ($chat->role == 'user')
-                        {{-- USER CHAT --}}
                         <div class="flex items-end gap-3 justify-end fade-in-up">
                             <div class="bg-indigo-600 text-white p-4 rounded-2xl rounded-tr-none max-w-[85%] sm:max-w-[75%] text-sm shadow-md flex flex-col gap-2 relative group"
                                 x-data="{
@@ -205,7 +204,6 @@
                                         class="rounded-lg w-full max-w-[200px] h-auto object-cover border border-indigo-500 cursor-pointer hover:opacity-90 transition-opacity">
                                 @endif
 
-                                {{-- PERBAIKAN LOGIKA HEIGHT DISINI --}}
                                 <div x-ref="userContent"
                                     class="whitespace-pre-wrap overflow-hidden transition-[height] duration-500 ease-in-out"
                                     :style="isOverflowing ? ('height: ' + (expanded ? $refs.userContent.scrollHeight + 'px' :
@@ -236,7 +234,6 @@
                             </div>
                         </div>
                     @else
-                        {{-- AI CHAT --}}
                         <div class="flex items-start gap-4 max-w-[90%] sm:max-w-[85%] fade-in-up group">
                             <div
                                 class="w-8 h-8 rounded-full bg-indigo-600 shrink-0 flex items-center justify-center text-white text-xs font-bold shadow-md mt-1">
@@ -272,12 +269,10 @@
                                         <div x-html="renderedMessage"></div>
                                     </div>
 
-                                    {{-- Gradasi Overlay --}}
                                     <div x-show="!expanded && isOverflowing"
                                         class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white via-white/95 dark:from-gray-800 dark:via-gray-800/95 to-transparent pointer-events-none rounded-b-2xl transition-opacity duration-300 z-10">
                                     </div>
 
-                                    {{-- Tombol Expand/Collapse --}}
                                     <div x-show="isOverflowing"
                                         class="absolute bottom-0 inset-x-0 flex justify-center py-1 z-20 cursor-pointer"
                                         @click="expanded = !expanded">
@@ -297,7 +292,6 @@
                                     </div>
                                 </div>
 
-                                {{-- Fitur Copy --}}
                                 <div x-data="{
                                     copied: false,
                                     copyToClipboard() {

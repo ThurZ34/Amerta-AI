@@ -80,7 +80,6 @@
                             class="text-indigo-600 hover:text-indigo-800 text-xs font-bold">Ubah</button>
                     </div>
 
-                    {{-- Modal Update Target --}}
                     <div x-show="showModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
                         <div
                             class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">

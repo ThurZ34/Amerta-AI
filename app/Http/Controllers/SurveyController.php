@@ -24,6 +24,7 @@ class SurveyController extends Controller
         $validated = $request->validate([
             'nama_bisnis' => 'required|string',
             'status_bisnis' => 'required',
+            'masalah_utama' => 'nullable|string',
             'kategori_bisnis' => 'required',
             'kategori_manual' => 'nullable|string',
             'channel_penjualan' => 'required',
@@ -48,6 +49,7 @@ class SurveyController extends Controller
             'category_id' => $category->id,
             'nama_bisnis' => $validated['nama_bisnis'],
             'status_bisnis' => $validated['status_bisnis'],
+            'masalah_utama' => $validated['masalah_utama'] ?? null,
             'channel_penjualan' => $validated['channel_penjualan'],
             'target_pasar' => $validated['target_pasar'],
             'range_omset' => $validated['range_omset'],

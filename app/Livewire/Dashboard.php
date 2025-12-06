@@ -18,10 +18,8 @@ class Dashboard extends Component
 {
     use WithPagination;
 
-    // Filter Range (Default: Minggu ini)
     public $range = 'week';
 
-    // Reset pagination saat filter berubah agar data tidak error
     public function updatedRange()
     {
         $this->resetPage();
@@ -34,7 +32,6 @@ class Dashboard extends Component
 
     protected function getBusinessHealth($revenueThisMonth, $expenseThisMonth, $profitThisMonth, $cashBalance)
     {
-        // Check session cache (valid for 24 hours - AI advice once per day)
         $cacheKey = 'business_health_' . auth()->user()->business_id;
         if (Session::has($cacheKey)) {
             $cached = Session::get($cacheKey);
@@ -43,10 +40,8 @@ class Dashboard extends Component
             }
         }
 
-        // Calculate health score (0-100)
-        $score = 50; // Base score
+        $score = 50;
 
-        // 1. Profit margin analysis (+/- 20 points)
         if ($revenueThisMonth > 0) {
             $profitMargin = ($profitThisMonth / $revenueThisMonth) * 100;
             if ($profitMargin >= 20) {
@@ -56,11 +51,10 @@ class Dashboard extends Component
             } elseif ($profitMargin >= 0) {
                 $score += 0;
             } else {
-                $score -= 20; // Loss
+                $score -= 20;
             }
         }
 
-        // 2. Cash balance analysis (+/- 15 points)
         if ($cashBalance > 0) {
             $score += 15;
         } elseif ($cashBalance >= -500000) {
@@ -69,14 +63,12 @@ class Dashboard extends Component
             $score -= 15;
         }
 
-        // 3. Revenue existence (+/- 15 points)
         if ($revenueThisMonth > 0) {
             $score += 15;
         } else {
             $score -= 10;
         }
 
-        // Determine status
         if ($score >= 70) {
             $status = 'SEHAT';
             $statusColor = 'emerald';
@@ -91,7 +83,6 @@ class Dashboard extends Component
             $statusEmoji = '🚨';
         }
 
-        // Generate AI message based on status (once per day)
         try {
             $geminiService = app(GeminiService::class);
             $business = auth()->user()->business;
@@ -102,17 +93,20 @@ class Dashboard extends Component
             $prompt .= "- Profit: Rp " . number_format($profitThisMonth, 0, ',', '.') . "\n";
             $prompt .= "- Saldo kas: Rp " . number_format($cashBalance, 0, ',', '.') . "\n\n";
 
+            $prompt .= "PENTING: Format jawabanmu menggunakan HTML tag agar rapi di website:\n";
+            $prompt .= "- Gunakan tag <b>...</b> untuk menebalkan kata kunci (JANGAN pakai markdown **).\n";
+            $prompt .= "- Gunakan tag <br> untuk ganti baris/enter.\n";
+            $prompt .= "- Gunakan tag <ul> dan <li> untuk membuat list poin-poin saran.\n";
+            $prompt .= "- Gaya bahasa tetap santai.\n\n";
+
             if ($status === 'SEHAT') {
-                // Bisnis sehat - cukup kata semangat, penjualan naik turun itu normal
                 $prompt .= "Bisnis ini SEHAT dengan skor {$score}/100. Berikan 1-2 kalimat motivasi singkat. ";
                 $prompt .= "Ingatkan bahwa fluktuasi penjualan itu normal dan pertahankan konsistensi. Gunakan emoji dan bahasa santai.";
             } elseif ($status === 'WASPADA') {
-                // Perlu perhatian - beri saran perbaikan
                 $prompt .= "Bisnis ini perlu PERHATIAN dengan skor {$score}/100. ";
                 $prompt .= "Berikan 2 saran KONKRET dan SPESIFIK untuk memperbaiki kondisi. ";
                 $prompt .= "Fokus pada: (1) cara meningkatkan omset atau (2) cara mengurangi pengeluaran. Bahasa santai.";
             } else {
-                // Kritis - saran urgent
                 $prompt .= "Bisnis ini dalam kondisi KRITIS dengan skor {$score}/100. ";
                 $prompt .= "Berikan 2-3 langkah URGENT yang harus segera dilakukan untuk menyelamatkan bisnis. ";
                 $prompt .= "Prioritaskan: (1) menstabilkan cash flow (2) menghentikan kebocoran uang. Tegas tapi suportif.";
@@ -120,7 +114,6 @@ class Dashboard extends Component
 
             $message = $geminiService->sendChat($prompt, $business);
         } catch (\Exception $e) {
-            // Fallback messages based on status
             if ($status === 'SEHAT') {
                 $message = 'Bisnis kamu berjalan bagus! Fluktuasi penjualan itu normal, yang penting konsisten. Pertahankan! 🔥';
             } elseif ($status === 'WASPADA') {
@@ -139,7 +132,6 @@ class Dashboard extends Component
             'generated_at' => now()->toDateTimeString(),
         ];
 
-        // Cache result
         Session::put($cacheKey, $health);
 
         return $health;
@@ -152,7 +144,6 @@ class Dashboard extends Component
         $endOfMonth = $now->copy()->endOfMonth();
         $businessId = auth()->user()->business->id;
 
-        // --- 1. RINGKASAN KEUANGAN ---
         $totalInflow = CashJournal::inflows()->sum('amount');
         $totalOutflow = CashJournal::outflows()->sum('amount');
         $cashBalance = $totalInflow - $totalOutflow;
@@ -166,9 +157,9 @@ class Dashboard extends Component
             ->sum('amount');
 
         $expenseBahanBakuOnly = Riwayat::where('business_id', $businessId)
-            ->where('jenis', 'pengeluaran') // Pastikan hanya ambil pengeluaran
-            ->whereBetween('tanggal_pembelian', [$startOfMonth, $endOfMonth]) // Perhatikan nama kolom tanggal di riwayat
-            ->where('kategori', 'like', '%Bahan Baku%') // Filter string kategori
+            ->where('jenis', 'pengeluaran')
+            ->whereBetween('tanggal_pembelian', [$startOfMonth, $endOfMonth])
+            ->where('kategori', 'like', '%Bahan Baku%')
             ->sum('total_harga');
 
         $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth) {
@@ -191,7 +182,6 @@ class Dashboard extends Component
             $growthPercentage = 100;
         }
 
-        // --- 2. CHART TREN (FILTER LIVEWIRE) ---
         $chartLabels = [];
         $chartData = [];
 
@@ -200,7 +190,7 @@ class Dashboard extends Component
                 for ($i = 0; $i <= 23; $i++) {
                     $chartLabels[] = sprintf('%02d:00', $i);
                     $chartData[] = CashJournal::inflows()
-                        ->whereDate('transaction_date', \Carbon\Carbon::today())
+                        ->whereDate('transaction_date', Carbon::today())
                         ->whereTime('created_at', '>=', sprintf('%02d:00:00', $i))
                         ->whereTime('created_at', '<=', sprintf('%02d:59:59', $i))
                         ->sum('amount');
@@ -212,7 +202,6 @@ class Dashboard extends Component
                 for ($i = 1; $i <= $daysInMonth; $i++) {
                     $date = Carbon::createFromDate($now->year, $now->month, $i);
                     $chartLabels[] = (string) $i;
-                    // Jika tanggal belum lewat, isi 0 biar grafiknya ga turun tajam di masa depan
                     $chartData[] = CashJournal::inflows()
                         ->whereDate('transaction_date', $date)
                         ->sum('amount');
@@ -253,10 +242,7 @@ class Dashboard extends Component
                 break;
         }
 
-        // --- 3. CHART ALOKASI BIAYA ---
-        // --- 3. CHART ALOKASI BIAYA ---
-        // Menggunakan data dari Riwayat agar kategori sesuai input user
-        $expenseAllocationQuery = \App\Models\Riwayat::where('business_id', $businessId)
+        $expenseAllocationQuery = Riwayat::where('business_id', $businessId)
             ->where('jenis', 'pengeluaran')
             ->whereBetween('tanggal_pembelian', [$startOfMonth, $endOfMonth])
             ->select('kategori', DB::raw('sum(total_harga) as total'))
@@ -269,26 +255,22 @@ class Dashboard extends Component
             $expenseLabels = ['Belum Ada Pengeluaran'];
             $expenseData = [1];
         } else {
-            // Map null category to 'Lain-lain' or 'Tanpa Kategori'
             $expenseLabels = $expenseAllocationQuery->map(function ($item) {
                 return $item->kategori ?: 'Lain-lain';
             });
             $expenseData = $expenseAllocationQuery->pluck('total');
         }
 
-        // --- 4. TRANSAKSI (PAGINATION) ---
         $recentTransactions = CashJournal::with('coa')
             ->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(4);
 
-        // Pesan Semangat Amerta (Quotes) - AI Generated & Session Based
         $aiMessage = null;
         if (!Session::has('amerta_insight_dismissed')) {
             if (Session::has('amerta_insight_quote')) {
                 $aiMessage = Session::get('amerta_insight_quote');
             } else {
-                // Generate new quote via Gemini
                 try {
                     $business = Auth::user()->business;
                     if ($business) {
@@ -296,7 +278,6 @@ class Dashboard extends Component
                         $prompt = 'Berikan satu kalimat motivasi singkat, unik, dan semangat untuk pemilik bisnis ini. Jangan terlalu panjang, maksimal 15-20 kata. Gaya bahasa santai tapi profesional. jangan memakai emoji ataupun simbol';
                         $aiMessage = $gemini->sendChat($prompt, $business);
 
-                        // Clean up quotes if AI adds them
                         $aiMessage = trim($aiMessage, '"\'');
 
                         Session::put('amerta_insight_quote', $aiMessage);
@@ -310,10 +291,8 @@ class Dashboard extends Component
         }
 
 
-        // --- 5. BUSINESS HEALTH ---
         $businessHealth = $this->getBusinessHealth($revenueThisMonth, $expenseThisMonth, $profitThisMonth, $cashBalance);
 
-        // ✅ PERBAIKAN UTAMA: Menggunakan extends() dan section() agar sesuai layout blade biasa
         return view('livewire.dashboard', compact(
             'cashBalance',
             'revenueThisMonth',
@@ -328,7 +307,7 @@ class Dashboard extends Component
             'aiMessage',
             'businessHealth'
         ))
-            ->extends('layouts.app') // Pastikan ini sesuai nama file layout Anda (resources/views/layouts/app.blade.php)
-            ->section('content');    // Pastikan ini sesuai nama @yield('content') di layout Anda
+            ->extends('layouts.app') 
+            ->section('content');
     }
 }

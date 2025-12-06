@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Services\KolosalService; // <--- UBAH DI SINI (Ganti GeminiService jadi KolosalService)
+use App\Services\KolosalService;
 use Livewire\WithFileUploads;
 use App\Models\ChatHistory;
 use Illuminate\Support\Facades\Auth;
@@ -19,8 +19,8 @@ class DashboardChat extends Component
     public $isThinking = false;
     public $limit = 4;
     public $totalChats = 0;
-    public $mode = 'full'; // 'full' or 'quick'
-    public $ephemeralChats = []; // For quick mode
+    public $mode = 'full';
+    public $ephemeralChats = [];
     public $conversationId = null;
     public $conversations = [];
 
@@ -29,7 +29,6 @@ class DashboardChat extends Component
         $this->mode = $mode;
         if ($this->mode === 'full') {
             $this->loadConversations();
-            // Start new chat by default when entering page
             $this->conversationId = null;
             $this->totalChats = 0;
         }
@@ -48,7 +47,7 @@ class DashboardChat extends Component
         if ($conversation) {
             $this->conversationId = $conversation->id;
             $this->totalChats = $conversation->chats()->count();
-            $this->limit = max(4, $this->totalChats); // Load all or at least 4
+            $this->limit = max(4, $this->totalChats);
         }
     }
 
@@ -88,7 +87,7 @@ class DashboardChat extends Component
                     'title' => $title
                 ]);
                 $this->conversationId = $conversation->id;
-                $this->loadConversations(); // Refresh list
+                $this->loadConversations();
             }
 
             ChatHistory::create([
@@ -104,7 +103,7 @@ class DashboardChat extends Component
                 'id' => uniqid(),
                 'role' => 'user',
                 'message' => $messageText,
-                'image_path' => null, // Quick mode doesn't support image upload
+                'image_path' => null,
                 'created_at' => now(),
             ];
         }
@@ -117,7 +116,7 @@ class DashboardChat extends Component
     }
 
     #[On('process-ai-reply')]
-    public function generateAiReply(KolosalService $aiService) // <--- UBAH DI SINI (Inject KolosalService)
+    public function generateAiReply(KolosalService $aiService)
     {
         $business = Auth::user()->business;
         $userMessage = '';
@@ -133,7 +132,6 @@ class DashboardChat extends Component
             $userMessage = $lastUserChat ? $lastUserChat->message : '';
             $imagePath = $lastUserChat ? $lastUserChat->image_path : null;
         } else {
-            // Get last user message from ephemeral chats
             $lastChat = end($this->ephemeralChats);
             if ($lastChat && $lastChat['role'] === 'user') {
                 $userMessage = $lastChat['message'];
@@ -141,11 +139,8 @@ class DashboardChat extends Component
         }
 
         try {
-            // Panggil service Kolosal
             $aiReply = $aiService->sendChat($userMessage, $business, $imagePath);
         } catch (\Exception $e) {
-            // Log error asli untuk debugging developer jika perlu
-            // Log::error($e->getMessage());
             $aiReply = "Maaf Bos, koneksi ke Amerta terputus. Coba lagi ya.";
         }
 

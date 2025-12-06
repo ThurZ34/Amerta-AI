@@ -1,16 +1,13 @@
 <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col transition-transform duration-300 transform md:relative md:translate-x-0 shrink-0">
 
-    {{-- 1. BRAND LOGO --}}
     <div class="h-20 flex items-center px-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
         <a href="{{ route('main_menu') }}" class="flex items-center gap-3 w-full group">
-            {{-- Icon Container --}}
             <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform duration-300">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
             </div>
-            {{-- Text Container (Fixed Contrast) --}}
             <div class="flex flex-col">
                 <span class="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-none">
                     Amerta<span class="text-indigo-600 dark:text-indigo-400">.AI</span>
@@ -73,18 +70,7 @@
             <span>Riwayat Keuangan</span>
         </a>
 
-        <a href="{{ route('riwayat.kasir') }}"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group
-            {{ request()->routeIs('riwayat.kasir')
-                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-600 dark:text-white'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white' }}">
-            <svg class="w-5 h-5 {{ request()->routeIs('riwayat.kasir') ? 'text-indigo-700 dark:text-white' : 'text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 dark:group-hover:text-white' }} transition-colors"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z" />
-            </svg>
-            <span>Kasir</span>
-        </a>
-    
+
     </div>
 
     <div class="p-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900">

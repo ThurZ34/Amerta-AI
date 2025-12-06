@@ -36,7 +36,6 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 
-    {{-- BARU: SweetAlert2 CDN --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -67,7 +66,6 @@
 <body class="h-full antialiased text-gray-900 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
     x-data="{ sidebarOpen: false }">
 
-    {{-- 1. LAYOUT UTAMA (Sidebar & Content) --}}
     <div class="h-screen flex flex-col md:flex-row overflow-hidden relative z-0">
 
         <div x-show="sidebarOpen" @click="sidebarOpen = false" x-cloak
@@ -80,6 +78,7 @@
         @unless (request()->routeIs('main_menu') || request()->routeIs('amerta') || request()->routeIs('dashboard-selection') || request()->routeIs('dashboard-selection.join'))
             @include('layouts.partials.sidebar')
         @endunless
+
 
         <div class="flex-1 flex flex-col min-w-0 h-full">
             @unless (request()->routeIs('dashboard-selection') || request()->routeIs('dashboard-selection.join'))
@@ -96,7 +95,6 @@
     @unless (request()->routeIs('dashboard-selection') ||
             request()->routeIs('dashboard-selection.join') ||
             request()->routeIs('main_menu'))
-        {{-- 2. WIDGET CHAT --}}
         <div x-data="{
             chatOpen: false,
             isFullscreen: false,
@@ -157,8 +155,6 @@
                 </button>
             </div>
 
-            {{-- MODAL UTAMA --}}
-            {{-- Added: 'transition-all duration-200 ease-out' untuk efek smooth drag --}}
             <div x-ref="chatModal" x-show="chatOpen" x-cloak x-transition:enter="transition-all ease-out duration-300"
                 x-transition:enter="transition-all ease-[cubic-bezier(0.19,1,0.22,1)] duration-500"
                 x-transition:enter-start="opacity-0 translate-y-10 scale-95"

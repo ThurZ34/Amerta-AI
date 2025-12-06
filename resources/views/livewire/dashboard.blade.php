@@ -4,12 +4,9 @@
 
     <div class="min-h-screen bg-gray-200/50 dark:bg-gray-900 transition-colors duration-300 font-sans pb-24">
 
-        {{-- Main Container --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
 
-            {{-- 1. HEADER SECTION & AI INSIGHT --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-                {{-- Greeting --}}
                 <div class="lg:col-span-2 flex flex-col justify-center">
                     <div class="flex items-center gap-2 mb-2">
                         <span
@@ -27,12 +24,10 @@
                     </p>
                 </div>
 
-                {{-- AI Insight Card --}}
                 @if ($aiMessage)
                     <div x-data="{ show: true }" x-show="show" x-transition
                         class="relative bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl shadow-indigo-100/50 dark:shadow-none border border-indigo-50 dark:border-indigo-500/20 overflow-hidden group">
 
-                        {{-- Close Button --}}
                         <button wire:click="dismissInsight" @click="show = false"
                             class="absolute top-4 right-4 text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-300 transition z-20">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,7 +58,6 @@
                             </div>
                         </div>
 
-                        {{-- Background Decor --}}
                         <div
                             class="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none">
                         </div>
@@ -71,9 +65,7 @@
                 @endif
             </div>
 
-            {{-- 2. STATS GRID (4 Cards) --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {{-- Saldo --}}
                 <div
                     class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition duration-300 group">
                     <div class="flex items-center gap-3 mb-4">
@@ -96,7 +88,7 @@
                             </button>
                             <div x-show="open" x-transition
                                 class="absolute left-0 bottom-full mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-lg z-10">
-                                Total Pemasukan - Total Pengeluaran (Uang Tunai saat ini)
+                                Uang fisik anda saat ini
                             </div>
                         </div>
                     </div>
@@ -104,7 +96,6 @@
                         {{ number_format($cashBalance, 0, ',', '.') }}</h3>
                 </div>
 
-                {{-- Omset --}}
                 <div
                     class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition duration-300 group">
                     <div class="flex items-center justify-between mb-4">
@@ -140,7 +131,6 @@
                         {{ number_format($revenueThisMonth, 0, ',', '.') }}</h3>
                 </div>
 
-                {{-- Pengeluaran --}}
                 <div
                     class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition duration-300 group">
                     <div class="flex items-center gap-3 mb-4">
@@ -162,7 +152,7 @@
                             </button>
                             <div x-show="open" x-transition
                                 class="absolute left-0 bottom-full mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-lg z-10">
-                                Total Biaya Operasional + Belanja Bahan Baku bulan ini
+                                Saldo Kas - Biaya Operasional (Kecuali bahan baku karena sudah masuk HPP)
                             </div>
                         </div>
                     </div>
@@ -170,7 +160,6 @@
                         {{ number_format($expenseThisMonth, 0, ',', '.') }}</h3>
                 </div>
 
-                {{-- Profit --}}
                 <div
                     class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition duration-300 group">
                     <div class="flex items-center gap-3 mb-4">
@@ -204,7 +193,6 @@
                 </div>
             </div>
 
-            {{-- 3. TREN PENJUALAN (Full Width) --}}
             <div
                 class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
@@ -247,7 +235,6 @@
                 </div>
             </div>
 
-            {{-- 4. ALOKASI BIAYA + KESEHATAN BISNIS (2 Columns, Horizontal Cards) --}}
             @php
                 $colorMap = [
                     'emerald' => [
@@ -276,11 +263,9 @@
                 $score = $businessHealth['score'] ?? 0;
             @endphp
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {{-- Alokasi Biaya (Horizontal) --}}
                 <div
                     class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
                     <div class="flex flex-col sm:flex-row items-center gap-6">
-                        {{-- Chart --}}
                         <div class="relative w-32 h-32 shrink-0"
                             wire:key="expense-chart-wrapper-{{ $range }}">
                             <div wire:ignore class="h-full w-full"
@@ -296,7 +281,6 @@
                                 <canvas></canvas>
                             </div>
                         </div>
-                        {{-- Info --}}
                         <div class="flex-1 text-center sm:text-left">
                             <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Alokasi Biaya</h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Distribusi pengeluaranmu bulan ini
@@ -310,11 +294,9 @@
                     </div>
                 </div>
 
-                {{-- Kesehatan Bisnis (Horizontal) --}}
                 <div x-data="{ showModal: false }" @click="showModal = true"
                     class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:shadow-lg transition">
                     <div class="flex flex-col sm:flex-row items-center gap-6">
-                        {{-- Gauge --}}
                         <div class="relative w-24 h-24 shrink-0">
                             <svg class="w-full h-full transform -rotate-90" viewBox="0 0 96 96">
                                 <circle cx="48" cy="48" r="40" fill="none" stroke="currentColor"
@@ -330,7 +312,6 @@
                                 <span class="text-[8px] uppercase font-bold text-gray-400">Skor</span>
                             </div>
                         </div>
-                        {{-- Info --}}
                         <div class="flex-1 text-center sm:text-left">
                             <div class="flex items-center justify-center sm:justify-start gap-2 mb-1">
                                 <h4 class="text-lg font-bold text-gray-900 dark:text-white">Kesehatan Bisnis</h4>
@@ -343,23 +324,18 @@
                         </div>
                     </div>
 
-                    {{-- Modal --}}
                     <div x-show="showModal" x-cloak class="fixed inset-0 z-50"
                         x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0"
                         x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-150"
                         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-                        {{-- Fixed Backdrop --}}
                         <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showModal = false"></div>
-                        {{-- Scrollable Content Wrapper --}}
                         <div class="fixed inset-0 overflow-y-auto">
                             <div class="min-h-full flex items-center justify-center p-4">
-                                {{-- Modal Content - SCROLLABLE & RESPONSIVE --}}
                                 <div class="relative bg-white dark:bg-gray-800 rounded-3xl p-5 sm:p-8 w-full max-w-2xl shadow-2xl my-8"
                                     x-transition:enter="ease-out duration-200"
                                     x-transition:enter-start="opacity-0 scale-95"
                                     x-transition:enter-end="opacity-100 scale-100" @click.stop>
 
-                                    {{-- Close Button --}}
                                     <button @click="showModal = false"
                                         class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor"
@@ -369,9 +345,7 @@
                                         </svg>
                                     </button>
 
-                                    {{-- 2-Column Layout: Gauge Left, Message Right --}}
                                     <div class="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-                                        {{-- LEFT: Gauge + Status --}}
                                         <div class="text-center shrink-0">
                                             <div class="relative w-28 h-28 mx-auto mb-3">
                                                 <svg class="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
@@ -399,7 +373,6 @@
                                             </span>
                                         </div>
 
-                                        {{-- RIGHT: Title + AI Message --}}
                                         <div class="flex-1 min-w-0">
                                             <h3
                                                 class="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center sm:text-left">
@@ -420,10 +393,10 @@
                                                         <p
                                                             class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1">
                                                             Saran Amerta AI</p>
-                                                        <p
-                                                            class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                                                            {{ $businessHealth['message'] ?? 'Terus pantau perkembangan bisnis Anda!' }}
-                                                        </p>
+                                                        <div
+                                                            class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed space-y-2">
+                                                            {!! $businessHealth['message'] ?? 'Terus pantau perkembangan bisnis Anda!' !!}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -441,7 +414,6 @@
                 </div>
             </div>
 
-            {{-- 4. RECENT TRANSACTIONS --}}
             <div
                 class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                 <div
