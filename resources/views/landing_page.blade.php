@@ -23,35 +23,101 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth"
-    x-data="{
-        darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
-        toggleTheme() {
-            this.darkMode = !this.darkMode;
-            localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
-            document.documentElement.classList.toggle('dark', this.darkMode);
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth" x-data="{
+    darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+    toggleTheme() {
+        this.darkMode = !this.darkMode;
+        localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+        if (this.darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
-    }" :class="{ 'dark': darkMode }">
+    }
+}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Amerta') }}</title>
 
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
+                '(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .fade-in-section, .fade-in-left, .fade-in-right { opacity: 0; transition: all 0.8s ease-out; will-change: opacity, transform; }
-        .fade-in-section { transform: translateY(30px); }
-        .fade-in-left { transform: translateX(-50px); }
-        .fade-in-right { transform: translateX(50px); }
-        .is-visible { opacity: 1 !important; transform: none !important; }
-        @keyframes blob { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } }
-        .animate-blob { animation: blob 7s infinite; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .fade-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .fade-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .is-visible {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+
+        /* Parallax Blob Animation */
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
     </style>
     <script>if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');</script>
 </head>
@@ -68,14 +134,16 @@
                     <span class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-lg">A</span> Amerta
                 </a>
 
-                <div class="hidden md:flex space-x-8 items-center">
-                    @foreach($navLinks as $link)
-                        <a href="{{ $link['url'] }}" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium text-sm transition-colors">{{ __($link['label']) }}</a>
-                    @endforeach
-
-                    <div class="relative">
-                        <button @click="langOpen = !langOpen" @click.away="langOpen = false" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" /></svg>
+                    <!-- Language Switcher -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" type="button"
+                            class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
+                            <span class="sr-only">Switch Language</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                            </svg>
                         </button>
                         <div x-show="langOpen" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50" style="display: none;">
                             @foreach(['en' => 'English', 'id' => 'Bahasa Indonesia'] as $code => $name)
@@ -90,13 +158,56 @@
                     </button>
 
                     @auth
-                        <div class="relative ml-3">
-                            <button @click="profileOpen = !profileOpen" @click.away="profileOpen = false" class="flex text-sm rounded-full focus:ring-2 focus:ring-indigo-500">
-                                <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&color=7F9CF5&background=EBF4FF" alt="">
-                            </button>
-                            <div x-show="profileOpen" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5" style="display: none;">
-                                <a href="{{ url('/main_menu') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100">{{ __('Main Menu') }}</a>
-                                <form method="POST" action="{{ route('logout') }}"><button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100">{{ __('Sign out') }}</button> @csrf</form>
+                        <!-- Profile Dropdown -->
+                        <div class="relative ml-3" x-data="{ open: false }">
+                            <div>
+                                <button @click="open = !open" @click.away="open = false" type="button"
+                                    class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                    <span class="sr-only">Open user menu</span>
+                                    <img class="h-8 w-8 rounded-full"
+                                        src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&color=7F9CF5&background=EBF4FF"
+                                        alt="{{ Auth::user()->name }}">
+                                </button>
+                            </div>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button"
+                                tabindex="-1" style="display: none;">
+                                @if (Auth::user()->business_id)
+                                    {{-- JIKA SUDAH PUNYA BISNIS: TAMPILKAN MAIN MENU --}}
+                                    <a href="{{ url('/main_menu') }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        role="menuitem" tabindex="-1" id="user-menu-item-0">
+                                        {{ __('Main Menu') }}
+                                    </a>
+                                @else
+                                    {{-- JIKA BELUM PUNYA BISNIS: TAMPILKAN SETUP BISNIS (DENGAN HIGHLIGHT) --}}
+                                    <a href="{{ route('dashboard-selection') }}"
+                                        class="block px-4 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 font-semibold transition-colors flex items-center justify-between"
+                                        role="menuitem" tabindex="-1" id="user-menu-item-0">
+                                        {{ __('Setup Bisnis') }}
+
+                                        {{-- Indikator Visual Bahwa Ini Penting --}}
+                                        <span class="flex h-2 w-2 relative">
+                                            <span
+                                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                        </span>
+                                    </a>
+                                @endif
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        role="menuitem" tabindex="-1"
+                                        id="user-menu-item-2">{{ __('Sign out') }}</button>
+                                </form>
                             </div>
                         </div>
                     @else
@@ -106,8 +217,53 @@
                 </div>
 
                 <div class="md:hidden flex items-center gap-4">
-                     <button @click="toggleTheme()" class="p-2 text-gray-500"><svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg><svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></button>
-                     <button @click="mobileOpen = !mobileOpen" class="text-gray-600 dark:text-gray-300"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+                    <!-- Mobile Language Switcher -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" type="button"
+                            class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
+                            <span class="sr-only">Switch Language</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                            </svg>
+                        </button>
+                        <div x-show="open"
+                            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                            role="menu" aria-orientation="vertical" tabindex="-1" style="display: none;">
+                            <a href="{{ route('lang.switch', 'en') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == 'en' ? 'bg-gray-100 dark:bg-gray-700 font-bold' : '' }}"
+                                role="menuitem">English</a>
+                            <a href="{{ route('lang.switch', 'id') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == 'id' ? 'bg-gray-100 dark:bg-gray-700 font-bold' : '' }}"
+                                role="menuitem">Bahasa Indonesia</a>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Theme Toggle -->
+                    <button @click="toggleTheme()"
+                        class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
+                        <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24" style="display: none;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <button
+                        class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -126,9 +282,18 @@
                 <a href="{{ route('register') }}" class="px-8 py-4 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 shadow-xl flex items-center justify-center gap-2">{{ __('Start Free Trial') }} <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></a>
                 <a href="#about" class="px-8 py-4 bg-white dark:bg-gray-800 text-slate-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-full font-semibold hover:bg-gray-50 flex items-center justify-center gap-2">{{ __('Learn More') }}</a>
             </div>
-            <div class="mt-16 relative mx-auto max-w-5xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-800 aspect-video flex items-center justify-center group fade-in-section">
-                <img src="{{ asset('images/dashboard.png') }}" class="max-h-full max-w-full object-contain dark:hidden" alt="Light Dash" />
-                <img src="{{ asset('images/dashboard_dark.png') }}" class="max-h-full max-w-full object-contain hidden dark:block" alt="Dark Dash" />
+
+            <!-- Hero Image -->
+            <div
+                class="mt-16 relative mx-auto max-w-5xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-800 aspect-video flex items-center justify-center group fade-in-section">
+                <div class="absolute inset-0 bg-gradient-to-t from-gray-900/10 to-transparent pointer-events-none">
+                </div>
+                <!-- Light mode image -->
+                <img src="{{ asset('images/dashboard.png') }}" alt="Dashboard Preview Light"
+                    class="max-h-full max-w-full object-contain transition-transform duration-300 dark:hidden" />
+                <!-- Dark mode image -->
+                <img src="{{ asset('images/dashboard_dark.png') }}" alt="Dashboard Preview Dark"
+                    class="max-h-full max-w-full object-contain transition-transform duration-300 hidden dark:block" />
             </div>
         </div>
         <div class="absolute top-0 left-1/2 w-full -translate-x-1/2 h-full z-0 pointer-events-none">
@@ -160,10 +325,17 @@
     </div>
 
     <div id="problem-solution" class="py-24 bg-gray-50 dark:bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 space-y-12">
-            <div class="text-center fade-in-section">
-                <h2 class="text-base text-indigo-600 font-semibold uppercase">{{ __('Why Choose Us') }}</h2>
-                <p class="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{{ __('Solving real-world challenges') }}</p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in-section">
+                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">
+                    {{ __('Why Choose Us') }}</h2>
+                <p
+                    class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                    {{ __('Solving real-world challenges') }}
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-slate-600 dark:text-gray-400 mx-auto">
+                    {{ __('We understand the hurdles you face. Here is how Amerta bridges the gap between problems and success.') }}
+                </p>
             </div>
             @foreach([
                 ['p_icon' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', 'p_text' => 'Managing multiple disconnected tools leads to data silos and lost productivity.', 's_icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 's_text' => 'Amerta provides a unified platform. Centralize your data and streamline workflows.'],
@@ -189,27 +361,128 @@
                 <h2 class="text-base text-indigo-600 font-semibold uppercase">{{ __('Features') }}</h2>
                 <p class="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{{ __('Everything you need') }}</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach($features as $f)
-                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section">
-                    <div class="w-14 h-14 bg-{{ $f['color'] }}-100 dark:bg-{{ $f['color'] }}-900/30 rounded-2xl flex items-center justify-center mb-6 text-{{ $f['color'] }}-600 group-hover:bg-{{ $f['color'] }}-600 group-hover:text-white transition-colors">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $f['icon'] }}"></path></svg>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+                <!-- Feature 1 -->
+                <div
+                    class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section">
+                    <div
+                        class="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center mb-6 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __($f['title']) }}</h3>
-                    <p class="text-slate-600 dark:text-gray-400">{{ __($f['desc']) }}</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Lightning Fast') }}</h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
+                        {{ __('Optimized for speed and performance, ensuring your users have the best experience possible without any lag.') }}
+                    </p>
                 </div>
-                @endforeach
+
+                <!-- Feature 2 -->
+                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
+                    style="transition-delay: 100ms;">
+                    <div
+                        class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center mb-6 text-purple-600 dark:text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Secure by Design') }}
+                    </h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
+                        {{ __('Built with security in mind from the ground up. Your data is protected with enterprise-grade encryption.') }}
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
+                    style="transition-delay: 200ms;">
+                    <div
+                        class="w-14 h-14 bg-pink-100 dark:bg-pink-900/30 rounded-2xl flex items-center justify-center mb-6 text-pink-600 dark:text-pink-400 group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Easy to Use') }}</h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
+                        {{ __('Intuitive interface that requires no training. Get up and running in minutes, not days.') }}
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div
+                    class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section">
+                    <div
+                        class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-6 text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Analytics') }}</h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
+                        {{ __('Gain deep insights into your performance with our advanced analytics dashboard.') }}
+                    </p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
+                    style="transition-delay: 100ms;">
+                    <div
+                        class="w-14 h-14 bg-orange-100 dark:bg-orange-900/30 rounded-2xl flex items-center justify-center mb-6 text-orange-600 dark:text-orange-400 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Team Collaboration') }}
+                    </h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
+                        {{ __('Built for teams. Share, comment, and collaborate in real-time to get work done faster.') }}
+                    </p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:-translate-y-1 fade-in-section"
+                    style="transition-delay: 200ms;">
+                    <div
+                        class="w-14 h-14 bg-teal-100 dark:bg-teal-900/30 rounded-2xl flex items-center justify-center mb-6 text-teal-600 dark:text-teal-400 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('24/7 Support') }}</h3>
+                    <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
+                        {{ __('Our dedicated support team is always available to help you resolve any issues quickly.') }}
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="pricing" class="py-24 bg-gray-50 dark:bg-gray-950">
-        <div class="max-w-7xl mx-auto px-4">
+    <!-- 5. Pricing Section -->
+    <div id="pricing" class="py-24 bg-gray-50 dark:bg-gray-950 text-slate-900 dark:text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16 fade-in-section">
-                <h2 class="text-base text-indigo-600 font-semibold uppercase">{{ __('Pricing') }}</h2>
-                <p class="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{{ __('Simple pricing') }}</p>
+                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">
+                    {{ __('Pricing') }}</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold text-slate-900 dark:text-white sm:text-4xl">
+                    {{ __('Simple, transparent pricing') }}
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-slate-600 dark:text-gray-400 mx-auto">
+                    {{ __('Choose the plan that fits your needs. No hidden fees.') }}
+                </p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($plans as $plan)
                 <div class="{{ $plan['popular'] ? 'bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-500 transform md:-translate-y-4 shadow-2xl z-10' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' }} rounded-2xl p-8 relative fade-in-section">
                     @if($plan['popular']) <div class="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase">Popular</div> @endif
@@ -231,15 +504,86 @@
         </div>
     </div>
 
-    <div class="bg-indigo-600 py-20 text-center relative overflow-hidden fade-in-section">
-        <h2 class="text-3xl font-extrabold text-white mb-6 relative z-10">{{ __('Ready to transform?') }}</h2>
-        <a href="{{ route('register') }}" class="inline-block bg-white text-indigo-600 px-8 py-4 rounded-full font-bold shadow-xl relative z-10">{{ __('Create Free Account') }}</a>
-    </div>
-
-    <footer class="bg-gray-900 text-white py-12 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-            <span class="text-2xl font-bold flex items-center gap-2 mb-4 md:mb-0"><span class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">A</span> Amerta</span>
-            <p class="text-gray-400 text-sm">&copy; {{ date('Y') }} Amerta. All rights reserved.</p>
+    <!-- Footer -->
+    <footer class="bg-gray-900 dark:bg-black text-white py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div class="col-span-1 md:col-span-1">
+                    <span class="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">A</span>
+                        Amerta
+                    </span>
+                    <p class="mt-4 text-gray-400 text-sm">
+                        Making the world a better place through constructing elegant hierarchies.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Product') }}
+                    </h3>
+                    <ul class="space-y-3">
+                        <li><a href="#features"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Features') }}</a>
+                        </li>
+                        <li><a href="#pricing"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Pricing') }}</a>
+                        </li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Integrations') }}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Company') }}
+                    </h3>
+                    <ul class="space-y-3">
+                        <li><a href="#about"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('About') }}</a></li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Blog') }}</a></li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Careers') }}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Legal') }}
+                    </h3>
+                    <ul class="space-y-3">
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Privacy') }}</a>
+                        </li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Terms') }}</a></li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Security') }}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">
+                    &copy; {{ date('Y') }} Amerta. All rights reserved.
+                </p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <span class="sr-only">Twitter</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                            </path>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <span class="sr-only">GitHub</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd"
+                                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -249,7 +593,7 @@
                 entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); } });
             }, { threshold: 0.1 });
             document.querySelectorAll('.fade-in-section, .fade-in-left, .fade-in-right').forEach(s => observer.observe(s));
-            
+
             // Parallax Blobs
             window.addEventListener('scroll', () => {
                 const s = window.pageYOffset;
