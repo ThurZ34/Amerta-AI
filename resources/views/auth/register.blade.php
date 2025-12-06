@@ -48,13 +48,13 @@
         </div>
 
         <button type="submit"
-            class="w-full bg-black dark:bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-indigo-700 transition duration-300 shadow-lg dark:shadow-indigo-900/20">
+            class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-indigo-700 transition duration-300 shadow-lg dark:shadow-indigo-900/20">
             Daftar
         </button>
     </form>
 
     <div class="text-center text-sm text-gray-600 dark:text-gray-400">
         Sudah punya akun?
-        <a href="{{ route('login') }}" class="font-semibold text-black dark:text-indigo-400 hover:underline">Masuk disini</a>
+        <a href="{{ route('login') }}" class="font-semibold text-indigo-400 hover:underline">Masuk disini</a>
     </div>
 @endsection
