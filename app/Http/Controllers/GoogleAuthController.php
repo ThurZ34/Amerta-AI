@@ -45,7 +45,7 @@ class GoogleAuthController extends Controller
             }
 
             if ($user->business_id) {
-                return redirect()->intended('dashboard');
+                return redirect()->intended('analisis.dashboard');
             } else {
                 return redirect('dashboard-selection');
             }

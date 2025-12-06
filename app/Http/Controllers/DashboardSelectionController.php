@@ -12,6 +12,20 @@ class DashboardSelectionController extends Controller
 {
     public function index()
     {
+        $rejectedRequest = BusinessJoinRequest::where('user_id', Auth::id())
+            ->where('status', 'rejected')
+            ->with('business')
+            ->first();
+
+        if ($rejectedRequest) {
+            $businessName = $rejectedRequest->business->nama_bisnis;
+
+            $rejectedRequest->delete();
+
+            return redirect()->route('dashboard-selection')
+                ->with('rejection_alert', "Maaf, permintaan Anda ditolak oleh Owner dari bisnis: $businessName.");
+        }
+
         // Cek apakah user punya request yang masih pending
         $pendingRequest = BusinessJoinRequest::where('user_id', Auth::id())
             ->where('status', 'pending')
