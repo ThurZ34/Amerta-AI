@@ -1,14 +1,15 @@
 <?php
 
 use App\Http\Controllers\DailyCheckinController;
+use App\Http\Controllers\DashboardSelectionController;
+use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\MainMenuController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\SurveyController;
-use App\Http\Controllers\GoogleAuthController;
-use App\Http\Controllers\DashboardSelectionController;
-use App\Http\Controllers\MainMenuController;
-use App\Http\Controllers\ProfilController;
 use App\Livewire\Dashboard;
+use App\Livewire\MarketingTools;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,6 +20,7 @@ Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'id'])) {
         session(['locale' => $locale]);
     }
+
     return redirect()->back();
 })->name('lang.switch');
 
@@ -51,7 +53,9 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('daily-checkin', DailyCheckinController::class)->except(['destroy']);
 
-        Route::get('/amerta', fn() => view('amerta'))->name('amerta');
+        Route::get('/amerta', fn () => view('amerta'))->name('amerta');
+
+        Route::get('/marketing-tools', MarketingTools::class)->name('marketing-tools');
 
         Route::controller(MainMenuController::class)->prefix('main_menu')->group(function () {
             Route::get('/', 'index')->name('main_menu');
@@ -62,5 +66,6 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/produk/suggest-price', [ProdukController::class, 'suggestPrice'])->name('produk.suggest-price');
         Route::resource('produk', ProdukController::class);
+
     });
 });
