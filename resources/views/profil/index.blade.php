@@ -443,83 +443,155 @@
                     @endif
 
                     {{-- Card Daftar Anggota --}}
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                        <div
-                            class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 flex justify-between items-center">
-                            <h4 class="font-bold text-gray-900 dark:text-white">Anggota Tim</h4>
-                            <span
-                                class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-xs font-bold px-2 py-1 rounded-md">{{ $business->users->count() }}
-                                Orang</span>
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                        <!-- Header -->
+                        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-gray-900 dark:text-white">Anggota Tim</h4>
+                                @php
+                                    $totalMembers = ($owner ? 1 : 0) + ($staffMembers ? $staffMembers->total() : 0);
+                                @endphp
+                                <span class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-xs font-bold px-2 py-1 rounded-md">
+                                    {{ $totalMembers }} Orang
+                                </span>
+                            </div>
                         </div>
 
+                        <!-- Members List -->
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
-                            {{-- SECTION OWNER --}}
-                            @php
-                                $owner = $business->users->first(); // Asumsi user pertama atau yg create bisnis adalah owner. Sesuaikan logic jika ada kolom role.
-                                // Jika punya kolom 'role' di user/pivot, ganti logic ini.
-                                // Misal: $owner = $business->users->where('role', 'owner')->first();
-                            @endphp
-
+                            <!-- Owner Section -->
                             @if ($owner)
                                 <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                                    <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-2 ml-1">
-                                        Owner</p>
+                                    <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-2 ml-1">Owner</p>
                                     <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold text-sm border-2 border-white dark:border-gray-800 shadow-sm">
+                                        <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold text-sm border-2 border-white dark:border-gray-800 shadow-sm">
                                             {{ substr($owner->name, 0, 2) }}
                                         </div>
-                                        <div>
-                                            <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $owner->name }}
-                                            </p>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $owner->name }}</p>
                                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ $owner->email }}</p>
                                         </div>
-                                        <div class="ml-auto">
-                                            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                        </div>
+                                        <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
                                     </div>
                                 </div>
                             @endif
 
-                            {{-- SECTION STAFF --}}
-                            @php
-                                $staffs = $business->users->where('id', '!=', optional($owner)->id);
-                            @endphp
-
-                            @if ($staffs->count() > 0)
+                            <!-- Staff Section -->
+                            @if ($staffMembers && $staffMembers->count() > 0)
                                 <div class="p-4">
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Staff
-                                        ({{ $staffs->count() }})</p>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">
+                                        Staf ({{ $staffMembers->total() }})
+                                    </p>
                                     <div class="space-y-3">
-                                        @foreach ($staffs as $staff)
-                                            <div
-                                                class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                                                <div
-                                                    class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 font-bold text-xs">
+                                        @foreach ($staffMembers as $staff)
+                                            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                                                <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 font-bold text-xs">
                                                     {{ substr($staff->name, 0, 2) }}
                                                 </div>
-                                                <div class="overflow-hidden">
-                                                    <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                                        {{ $staff->name }}</p>
-                                                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                                        {{ $staff->email }}</p>
+                                                <div class="flex-1 overflow-hidden">
+                                                    <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $staff->name }}</p>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $staff->email }}</p>
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
                                 </div>
-                            @else
+                            @elseif ($owner && (!$staffMembers || $staffMembers->count() == 0))
+                                <div class="p-4">
+                                    <p class="text-sm text-gray-400 italic text-center">Belum ada anggota tim yang bergabung.</p>
+                                </div>
+                            @elseif (!$owner)
                                 <div class="p-8 text-center">
-                                    <p class="text-sm text-gray-400 italic">Belum ada staff yang bergabung.</p>
+                                    <p class="text-sm text-gray-400 italic">Belum ada anggota tim.</p>
                                 </div>
                             @endif
                         </div>
-                    </div>
 
+                        <!-- Pagination Footer -->
+                        @if ($staffMembers && $staffMembers->hasPages())
+                            <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                                <div class="flex items-center justify-between">
+                                    <!-- Per Page Selector -->
+                                    @if ($staffMembers->total() > 5)
+                                        <form method="GET" action="{{ route('profil_bisnis') }}" class="flex items-center">
+                                            <div class="relative">
+                                                <select name="per_page" onchange="this.form.submit()"
+                                                    class="h-8 px-3 pr-8 rounded-md border border-gray-300 dark:border-gray-600
+                                                        bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-gray-100
+                                                        appearance-none -webkit-appearance-none -moz-appearance-none
+                                                        leading-6 py-0 focus:outline-none focus:ring-2 focus:ring-indigo-500/20
+                                                        transition-colors">
+                                                    <option value="5"  {{ request('per_page', 5) == 5  ? 'selected' : '' }}>5</option>
+                                                    <option value="10" {{ request('per_page', 5) == 10 ? 'selected' : '' }}>10</option>
+                                                    <option value="20" {{ request('per_page', 5) == 20 ? 'selected' : '' }}>20</option>
+                                                </select>
+
+                                                <!-- SVG arrow, vertically centered -->
+                                                <span class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2">
+                                                    <!-- small triangle SVG sized to match pagination -->
+                                                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </form>
+                                    @endif
+
+                                    <!-- Pagination Controls -->
+                                    <div class="flex gap-1">
+                                        <!-- Previous Button -->
+                                        @if ($staffMembers->onFirstPage())
+                                            <span class="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed">‹</span>
+                                        @else
+                                            <a href="{{ $staffMembers->previousPageUrl() }}" 
+                                            class="px-3 py-1 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">‹</a>
+                                        @endif
+                                        
+                                        <!-- Page Numbers (Sliding Window) -->
+                                        @php
+                                            $currentPage = $staffMembers->currentPage();
+                                            $lastPage = $staffMembers->lastPage();
+                                            
+                                            if ($lastPage <= 3) {
+                                                $startPage = 1;
+                                                $endPage = $lastPage;
+                                            } else {
+                                                if ($currentPage <= 2) {
+                                                    $startPage = 1;
+                                                    $endPage = 3;
+                                                } elseif ($currentPage >= $lastPage - 1) {
+                                                    $startPage = $lastPage - 2;
+                                                    $endPage = $lastPage;
+                                                } else {
+                                                    $startPage = $currentPage - 1;
+                                                    $endPage = $currentPage + 1;
+                                                }
+                                            }
+                                        @endphp
+                                        
+                                        @for ($page = $startPage; $page <= $endPage; $page++)
+                                            @if ($page == $currentPage)
+                                                <span class="px-3 py-1 rounded-md bg-indigo-600 text-white font-bold">{{ $page }}</span>
+                                            @else
+                                                <a href="{{ $staffMembers->url($page) }}" 
+                                                class="px-3 py-1 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">{{ $page }}</a>
+                                            @endif
+                                        @endfor
+                                        
+                                        <!-- Next Button -->
+                                        @if ($staffMembers->hasMorePages())
+                                            <a href="{{ $staffMembers->nextPageUrl() }}" 
+                                            class="px-3 py-1 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">›</a>
+                                        @else
+                                            <span class="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed">›</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

@@ -48,11 +48,21 @@ class TorMonitorSeeder extends Seeder
         }
 
         $user->business_id = $business->id;
+        $user->role = 'owner';
         $user->save();
 
+        User::factory()
+            ->count(20)
+            ->create([
+                'business_id' => $business->id,
+                'role' => 'staf',
+                'password' => Hash::make('123123123'),
+            ]);
+
         $this->command->info('User "tor monitor ketua" and business "Tor Monitor Ketua coffee" created successfully.');
+        $this->command->info('20 team members created for the business.');
         $this->command->info('Email: tormonitor@amerta.ai');
-        $this->command->info('Password: 123123123');
+        $this->command->info('Password: 123123123 (for all users)');
         $this->command->info('Invite Code: ' . $business->invite_code);
     }
 }
