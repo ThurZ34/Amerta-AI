@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/categories', 'storeCategory')->name('categories.store');
     });
 
+    Route::get('/riwayat/kasir', [RiwayatController::class, 'kasir'])->name('riwayat.kasir');
     Route::post('/riwayat/scan', [RiwayatController::class, 'scan'])->name('riwayat.scan');
     Route::resource('riwayat', RiwayatController::class)->only(['index', 'store', 'update', 'destroy']);
 
