@@ -1,4 +1,4 @@
-@extends('auth.layout')
+@extends('auth.layout2')
 
 @section('title', 'Daftar Akun')
 
