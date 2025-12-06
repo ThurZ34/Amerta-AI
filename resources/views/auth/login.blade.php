@@ -1,4 +1,4 @@
-@extends('auth.layout2')
+@extends('auth.layout')
 
 @section('title', 'Login')
 
@@ -57,7 +57,7 @@
                 @if (Route::has('password.request'))
                     <a href="{{ route('password.request') }}"
                         class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">
-                        Forgot Password ?
+                        Lupa Password ?
                     </a>
                 @endif
         </div>

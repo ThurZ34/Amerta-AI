@@ -1,4 +1,4 @@
-@extends('auth.layout2')
+@extends('auth.layout')
 
 @section('title', 'Daftar Akun')
 
@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="text-left mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create an Account</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Buat Akun</h1>
         <p class="text-gray-500 dark:text-gray-400 text-sm">
             Mulai perjalanan anda bersama kami.
         </p>
