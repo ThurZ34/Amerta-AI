@@ -9,7 +9,6 @@ use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\SurveyController;
 use App\Livewire\Dashboard;
-use App\Livewire\MarketingTools;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -55,8 +54,6 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('daily-checkin', DailyCheckinController::class)->except(['destroy']);
 
         Route::get('/amerta', fn () => view('amerta'))->name('amerta');
-
-        Route::get('/marketing-tools', MarketingTools::class)->name('marketing-tools');
 
         Route::controller(MainMenuController::class)->prefix('main_menu')->group(function () {
             Route::get('/', 'index')->name('main_menu');
