@@ -125,149 +125,191 @@
 <body class="antialiased bg-gray-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100 transition-colors duration-300">
 
     <nav class="fixed w-full z-50 transition-all duration-300 backdrop-blur-md border-b border-gray-200 dark:border-gray-800"
-         x-data="{ scrolled: false, mobileOpen: false, langOpen: false, profileOpen: false }"
-         :class="scrolled ? 'bg-white/90 dark:bg-gray-900/90 shadow-sm' : 'bg-white/80 dark:bg-gray-900/80'"
-         @scroll.window="scrolled = (window.pageYOffset > 20)">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <a href="#" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-lg">A</span> Amerta
+     x-data="{ scrolled: false, mobileOpen: false, langOpen: false, profileOpen: false }"
+     :class="scrolled ? 'bg-white/90 dark:bg-gray-900/90 shadow-sm' : 'bg-white/80 dark:bg-gray-900/80'"
+     @scroll.window="scrolled = (window.pageYOffset > 20)">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <!-- Logo -->
+            <div class="flex-shrink-0 flex items-center">
+                <a href="#" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">A</span>
+                    Amerta
                 </a>
+            </div>
 
-                    <!-- Language Switcher -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" @click.away="open = false" type="button"
-                            class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
-                            <span class="sr-only">Switch Language</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
-                            </svg>
-                        </button>
-                        <div x-show="langOpen" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50" style="display: none;">
-                            @foreach(['en' => 'English', 'id' => 'Bahasa Indonesia'] as $code => $name)
-                                <a href="{{ route('lang.switch', $code) }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == $code ? 'font-bold bg-gray-50 dark:bg-gray-700' : '' }}">{{ $name }}</a>
-                            @endforeach
-                        </div>
-                    </div>
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#about"
+                    class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('About') }}</a>
+                <a href="#problem-solution"
+                    class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Solutions') }}</a>
+                <a href="#features"
+                    class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Features') }}</a>
+                <a href="#pricing"
+                    class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Pricing') }}</a>
 
-                    <button @click="toggleTheme()" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                    </button>
-
-                    @auth
-                        <!-- Profile Dropdown -->
-                        <div class="relative ml-3" x-data="{ open: false }">
-                            <div>
-                                <button @click="open = !open" @click.away="open = false" type="button"
-                                    class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    id="user-menu-button" aria-expanded="false" aria-haspopup="true">
-                                    <span class="sr-only">Open user menu</span>
-                                    <img class="h-8 w-8 rounded-full"
-                                        src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&color=7F9CF5&background=EBF4FF"
-                                        alt="{{ Auth::user()->name }}">
-                                </button>
-                            </div>
-                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="transform opacity-0 scale-95"
-                                x-transition:enter-end="transform opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="transform opacity-100 scale-100"
-                                x-transition:leave-end="transform opacity-0 scale-95"
-                                class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button"
-                                tabindex="-1" style="display: none;">
-                                @if (Auth::user()->business_id)
-                                    {{-- JIKA SUDAH PUNYA BISNIS: TAMPILKAN MAIN MENU --}}
-                                    <a href="{{ url('/main_menu') }}"
-                                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                                        role="menuitem" tabindex="-1" id="user-menu-item-0">
-                                        {{ __('Main Menu') }}
-                                    </a>
-                                @else
-                                    {{-- JIKA BELUM PUNYA BISNIS: TAMPILKAN SETUP BISNIS (DENGAN HIGHLIGHT) --}}
-                                    <a href="{{ route('dashboard-selection') }}"
-                                        class="block px-4 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 font-semibold transition-colors flex items-center justify-between"
-                                        role="menuitem" tabindex="-1" id="user-menu-item-0">
-                                        {{ __('Setup Bisnis') }}
-
-                                        {{-- Indikator Visual Bahwa Ini Penting --}}
-                                        <span class="flex h-2 w-2 relative">
-                                            <span
-                                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                                        </span>
-                                    </a>
-                                @endif
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit"
-                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                        role="menuitem" tabindex="-1"
-                                        id="user-menu-item-2">{{ __('Sign out') }}</button>
-                                </form>
-                            </div>
-                        </div>
-                    @else
-                        <a href="{{ route('login') }}" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 font-medium text-sm">{{ __('Log in') }}</a>
-                        <a href="{{ route('register') }}" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 text-sm">{{ __('Get Started') }}</a>
-                    @endauth
-                </div>
-
-                <div class="md:hidden flex items-center gap-4">
-                    <!-- Mobile Language Switcher -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" @click.away="open = false" type="button"
-                            class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
-                            <span class="sr-only">Switch Language</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
-                            </svg>
-                        </button>
-                        <div x-show="open"
-                            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
-                            role="menu" aria-orientation="vertical" tabindex="-1" style="display: none;">
-                            <a href="{{ route('lang.switch', 'en') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == 'en' ? 'bg-gray-100 dark:bg-gray-700 font-bold' : '' }}"
-                                role="menuitem">English</a>
-                            <a href="{{ route('lang.switch', 'id') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == 'id' ? 'bg-gray-100 dark:bg-gray-700 font-bold' : '' }}"
-                                role="menuitem">Bahasa Indonesia</a>
-                        </div>
-                    </div>
-
-                    <!-- Mobile Theme Toggle -->
-                    <button @click="toggleTheme()"
+                <!-- Language Switcher -->
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" @click.away="open = false" type="button"
                         class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
-                        <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
-                            </path>
-                        </svg>
-                        <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" style="display: none;">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
-                            </path>
+                        <span class="sr-only">Switch Language</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
                         </svg>
                     </button>
-
-                    <button
-                        class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+                    <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="transform opacity-0 scale-95"
+                        x-transition:enter-end="transform opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="transform opacity-100 scale-100"
+                        x-transition:leave-end="transform opacity-0 scale-95"
+                        class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                        role="menu" aria-orientation="vertical" tabindex="-1" style="display: none;">
+                        @foreach(['en' => 'English', 'id' => 'Bahasa Indonesia'] as $code => $name)
+                            <a href="{{ route('lang.switch', $code) }}" 
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == $code ? 'font-bold bg-gray-50 dark:bg-gray-700' : '' }}"
+                                role="menuitem">{{ $name }}</a>
+                        @endforeach
+                    </div>
                 </div>
+
+                <!-- Theme Toggle Button -->
+                <button @click="toggleTheme()"
+                    class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
+                    <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+
+                @auth
+                    <!-- Profile Dropdown -->
+                    <div class="relative ml-3" x-data="{ open: false }">
+                        <div>
+                            <button @click="open = !open" @click.away="open = false" type="button"
+                                class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                <span class="sr-only">Open user menu</span>
+                                <img class="h-8 w-8 rounded-full"
+                                    src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&color=7F9CF5&background=EBF4FF"
+                                    alt="{{ Auth::user()->name }}">
+                            </button>
+                        </div>
+                        <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                            role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button"
+                            tabindex="-1" style="display: none;">
+                            @if (Auth::user()->business_id)
+                                {{-- JIKA SUDAH PUNYA BISNIS: TAMPILKAN MAIN MENU --}}
+                                <a href="{{ url('/main_menu') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    role="menuitem" tabindex="-1" id="user-menu-item-0">
+                                    {{ __('Main Menu') }}
+                                </a>
+                            @else
+                                {{-- JIKA BELUM PUNYA BISNIS: TAMPILKAN SETUP BISNIS (DENGAN HIGHLIGHT) --}}
+                                <a href="{{ route('dashboard-selection') }}"
+                                    class="block px-4 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 font-semibold transition-colors flex items-center justify-between"
+                                    role="menuitem" tabindex="-1" id="user-menu-item-0">
+                                    {{ __('Setup Bisnis') }}
+
+                                    {{-- Indikator Visual Bahwa Ini Penting --}}
+                                    <span class="flex h-2 w-2 relative">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                    </span>
+                                </a>
+                            @endif
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    role="menuitem" tabindex="-1"
+                                    id="user-menu-item-2">{{ __('Sign out') }}</button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}"
+                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Log in') }}</a>
+                    <a href="{{ route('register') }}"
+                        class="bg-indigo-600 text-white px-5 py-2 rounded-full font-medium hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 text-sm">{{ __('Get Started') }}</a>
+                @endauth
+            </div>
+
+            <!-- Mobile Menu Button and Controls -->
+            <div class="md:hidden flex items-center gap-4">
+                <!-- Mobile Language Switcher -->
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" @click.away="open = false" type="button"
+                        class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
+                        <span class="sr-only">Switch Language</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                        </svg>
+                    </button>
+                    <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="transform opacity-0 scale-95"
+                        x-transition:enter-end="transform opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="transform opacity-100 scale-100"
+                        x-transition:leave-end="transform opacity-0 scale-95"
+                        class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                        role="menu" aria-orientation="vertical" tabindex="-1" style="display: none;">
+                        <a href="{{ route('lang.switch', 'en') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == 'en' ? 'bg-gray-100 dark:bg-gray-700 font-bold' : '' }}"
+                            role="menuitem">English</a>
+                        <a href="{{ route('lang.switch', 'id') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 {{ app()->getLocale() == 'id' ? 'bg-gray-100 dark:bg-gray-700 font-bold' : '' }}"
+                            role="menuitem">Bahasa Indonesia</a>
+                    </div>
+                </div>
+
+                <!-- Mobile Theme Toggle -->
+                <button @click="toggleTheme()"
+                    class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
+                    <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24" style="display: none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+
+                <!-- Mobile Menu Toggle -->
+                <button @click="mobileOpen = !mobileOpen"
+                    class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
         </div>
-        </nav>
+    </div>
+</nav>
 
     <div class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 relative z-10 text-center fade-in-section">
