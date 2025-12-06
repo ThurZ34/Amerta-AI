@@ -1,8 +1,48 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50" x-data="themeManager"
+    :class="{ 'dark': darkMode }">
 
-@section('header', 'Menu Utama')
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-@section('content')
+    <title>Menu Utama - {{ config('app.name', 'Amerta AI') }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {{-- Alpine is handled by app.js usually, but we include logic here --}}
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
+                '(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
+<body
+    class="h-full antialiased text-gray-900 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+
     <div class="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
 
         {{-- Hero Section --}}
@@ -10,11 +50,14 @@
             <div class="absolute inset-0">
                 <img class="w-full h-full object-cover opacity-20 dark:opacity-10 mix-blend-overlay"
                     src="{{ asset('images/main_menu_bg.jpg') }}" alt="Background Pattern">
-                <div class="absolute inset-0 bg-gradient-to-b from-indigo-600/90 to-indigo-900/95 mix-blend-multiply"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-indigo-600/90 to-indigo-900/95 mix-blend-multiply">
+                </div>
             </div>
 
-            <div class="relative max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="text-center md:text-left">
+            <div
+                class="relative max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                {{-- Left Side: Greeting & Stats --}}
+                <div class="text-center md:text-left flex-1">
                     <h1 class="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl mb-2">
                         Halo, {{ Auth::user()->name }}! 👋
                     </h1>
@@ -23,21 +66,74 @@
                     </p>
 
                     {{-- Profit Badge --}}
-                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-lg">
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-lg">
                         <span class="text-indigo-200 text-sm font-medium">Profit Kemarin:</span>
                         <span class="text-white font-bold tracking-wide">
                             Rp {{ number_format($profitYesterday, 0, ',', '.') }}
                         </span>
                         @if ($profitYesterday > 0)
-                            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                             </svg>
                         @elseif($profitYesterday < 0)
                             <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
                             </svg>
                         @endif
                     </div>
+                </div>
+
+                {{-- Right Side: Profile & Tools --}}
+                <div class="flex items-center gap-4">
+                    {{-- User Profile Card --}}
+                    <a href="{{ route('profile.edit') }}"
+                        class="group flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md px-4 py-3 rounded-2xl transition-all duration-300">
+                        <div
+                            class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg overflow-hidden border border-white/30">
+                            @if (Auth::user()->business && Auth::user()->business->logo)
+                                <img src="{{ asset('storage/' . Auth::user()->business->logo) }}" alt="Logo"
+                                    class="w-full h-full object-cover">
+                            @else
+                                {{ substr(Auth::user()->name, 0, 1) }}
+                            @endif
+                        </div>
+                        <div class="text-left hidden sm:block">
+                            <p class="text-sm font-bold text-white group-hover:text-indigo-100 transition-colors">
+                                {{ Auth::user()->name }}</p>
+                            <p class="text-xs text-indigo-200">{{ Auth::user()->role ?? 'Owner' }}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-indigo-200 group-hover:text-white transition-colors ml-1"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </a>
+
+                    {{-- Theme Toggle --}}
+                    <button @click="toggleTheme()"
+                        class="p-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md text-white transition-all duration-300 group"
+                        aria-label="Toggle Dark Mode">
+                        {{-- Sun Icon (Show in Dark Mode) --}}
+                        <svg x-show="darkMode" x-cloak
+                            class="w-6 h-6 text-yellow-300 group-hover:rotate-12 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        {{-- Moon Icon (Show in Light Mode) --}}
+                        <svg x-show="!darkMode"
+                            class="w-6 h-6 text-indigo-100 group-hover:-rotate-12 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                            </path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -51,17 +147,22 @@
                 <div x-data="{ showModal: false }"
                     class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
                     <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <svg class="w-16 h-16 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        <svg class="w-16 h-16 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                         </svg>
                     </div>
 
                     <div class="relative z-10">
-                        <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Target Bulan Ini</h3>
+                        <h3
+                            class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                            Target Bulan Ini</h3>
                     </div>
 
                     <div class="flex items-end gap-2 mb-3">
-                        <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($targetPercentage, 0) }}%</span>
+                        <span
+                            class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($targetPercentage, 0) }}%</span>
                         <span class="text-sm text-gray-500 dark:text-gray-400 mb-1">tercapai</span>
                     </div>
 
@@ -74,40 +175,53 @@
                     </p>
 
                     <div class="flex items-center justify-between mt-1 relative z-10">
-                        <p class="text-xs text-gray-400">Target: Rp {{ number_format($targetRevenue, 0, ',', '.') }}</p>
-                        <button @click="showModal = true" class="text-indigo-600 hover:text-indigo-800 dark:hover:text-indigo-300 text-xs font-bold transition-colors">
+                        <p class="text-xs text-gray-400">Target: Rp {{ number_format($targetRevenue, 0, ',', '.') }}
+                        </p>
+                        <button @click="showModal = true"
+                            class="text-indigo-600 hover:text-indigo-800 dark:hover:text-indigo-300 text-xs font-bold transition-colors">
                             Ubah
                         </button>
                     </div>
 
                     {{-- Modal Update Target --}}
-                    <div x-show="showModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                            <div x-show="showModal" @click="showModal = false" class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true"></div>
-                            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                            <div x-show="showModal" class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div x-show="showModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto"
+                        aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                        <div
+                            class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                            <div x-show="showModal" @click="showModal = false"
+                                class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true">
+                            </div>
+                            <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+                                aria-hidden="true">&#8203;</span>
+                            <div x-show="showModal"
+                                class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                                 <form action="{{ route('main_menu.update-target') }}" method="POST">
                                     @csrf
                                     <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                         <div class="sm:flex sm:items-start">
                                             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+                                                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white"
+                                                    id="modal-title">
                                                     Ubah Target Bulanan
                                                 </h3>
                                                 <div class="mt-2">
                                                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                                                         Tentukan target omset yang ingin Anda capai bulan ini.
                                                     </p>
-                                                    <input type="number" name="target_revenue" value="{{ $targetRevenue }}"
+                                                    <input type="number" name="target_revenue"
+                                                        value="{{ $targetRevenue }}"
                                                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
                                                         placeholder="Masukkan nominal target (Rp)">
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
-                                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:w-auto sm:text-sm">Simpan</button>
-                                        <button type="button" @click="showModal = false" class="w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none sm:w-auto sm:text-sm">Batal</button>
+                                    <div
+                                        class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                                        <button type="submit"
+                                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:w-auto sm:text-sm">Simpan</button>
+                                        <button type="button" @click="showModal = false"
+                                            class="w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none sm:w-auto sm:text-sm">Batal</button>
                                     </div>
                                 </form>
                             </div>
@@ -116,18 +230,26 @@
                 </div>
 
                 {{-- Card 2: Produk Jagoan --}}
-                <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
                     <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <svg class="w-16 h-16 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        <svg class="w-16 h-16 text-amber-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z">
+                            </path>
                         </svg>
                     </div>
-                    <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Produk Jagoan</h3>
+                    <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                        Produk Jagoan</h3>
                     @forelse ($topProducts as $product)
                         <div class="mb-3 last:mb-0 relative z-10">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate" title="{{ $product->nama_produk }}">{{ $product->nama_produk }}</h4>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-white truncate"
+                                title="{{ $product->nama_produk }}">{{ $product->nama_produk }}</h4>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full dark:bg-amber-900 dark:text-amber-200">Favorit Pelanggan</span>
+                                <span
+                                    class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full dark:bg-amber-900 dark:text-amber-200">Favorit
+                                    Pelanggan</span>
                             </div>
                         </div>
                     @empty
@@ -136,13 +258,18 @@
                 </div>
 
                 {{-- Card 3: Streak Laporan --}}
-                <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
                     <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <svg class="w-16 h-16 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+                        <svg class="w-16 h-16 text-rose-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z">
+                            </path>
                         </svg>
                     </div>
-                    <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Disiplin Laporan 🔥</h3>
+                    <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                        Disiplin Laporan 🔥</h3>
                     <div class="flex items-baseline gap-2 relative z-10">
                         <span class="text-3xl font-black text-rose-600 dark:text-rose-400">{{ $streakDays }}</span>
                         <span class="text-gray-600 dark:text-gray-300 font-medium">Hari Beruntun</span>
@@ -165,19 +292,28 @@
                     <a href="{{ route('operasional.analisis-penjualan.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         {{-- Background Gradient & Blob --}}
-                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-600/0 to-teal-600/0 dark:from-emerald-900/20 dark:to-teal-900/20 transition-opacity"></div>
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 dark:bg-emerald-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500"></div>
-                        
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-emerald-600/0 to-teal-600/0 dark:from-emerald-900/20 dark:to-teal-900/20 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 dark:bg-emerald-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
+                        </div>
+
                         {{-- Content --}}
                         <div class="relative flex items-start gap-4 z-10">
-                            <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-emerald-50 dark:border-emerald-500/20 group-hover:rotate-12 transition-transform">
-                                <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                            <div
+                                class="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-emerald-50 dark:border-emerald-500/20 group-hover:rotate-12 transition-transform">
+                                <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+                                    </path>
                                 </svg>
                             </div>
                             <div>
                                 <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Laporan Harian</h4>
-                                <p class="text-sm text-gray-500 dark:text-emerald-100/70">Pantau dan kelola transaksi harian bisnis Anda.</p>
+                                <p class="text-sm text-gray-500 dark:text-emerald-100/70">Pantau dan kelola transaksi
+                                    harian bisnis Anda.</p>
                             </div>
                         </div>
                     </a>
@@ -185,18 +321,27 @@
                     {{-- Menu Item: Catat Pengeluaran --}}
                     <a href="{{ route('operasional.riwayat-keuangan.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-rose-600/0 to-red-600/0 dark:from-rose-900/20 dark:to-red-900/20 transition-opacity"></div>
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-rose-50 dark:bg-rose-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500"></div>
-                        
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-rose-600/0 to-red-600/0 dark:from-rose-900/20 dark:to-red-900/20 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-rose-50 dark:bg-rose-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
+                        </div>
+
                         <div class="relative flex items-start gap-4 z-10">
-                            <div class="w-12 h-12 bg-rose-100 dark:bg-rose-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-rose-50 dark:border-rose-500/20 group-hover:rotate-12 transition-transform">
-                                <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            <div
+                                class="w-12 h-12 bg-rose-100 dark:bg-rose-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-rose-50 dark:border-rose-500/20 group-hover:rotate-12 transition-transform">
+                                <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
+                                    </path>
                                 </svg>
                             </div>
                             <div>
                                 <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Catat Pengeluaran</h4>
-                                <p class="text-sm text-gray-500 dark:text-rose-100/70">Rekap pengeluaran operasional dengan mudah.</p>
+                                <p class="text-sm text-gray-500 dark:text-rose-100/70">Rekap pengeluaran operasional
+                                    dengan mudah.</p>
                             </div>
                         </div>
                     </a>
@@ -212,18 +357,26 @@
                     {{-- Menu Item: Produk --}}
                     <a href="{{ route('manajemen.produk.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-purple-600/0 to-fuchsia-600/0 dark:from-purple-900/20 dark:to-fuchsia-900/20 transition-opacity"></div>
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-50 dark:bg-purple-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500"></div>
-                        
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-purple-600/0 to-fuchsia-600/0 dark:from-purple-900/20 dark:to-fuchsia-900/20 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-purple-50 dark:bg-purple-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
+                        </div>
+
                         <div class="relative flex items-start gap-4 z-10">
-                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-purple-50 dark:border-purple-500/20 group-hover:rotate-12 transition-transform">
-                                <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            <div
+                                class="w-12 h-12 bg-purple-100 dark:bg-purple-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-purple-50 dark:border-purple-500/20 group-hover:rotate-12 transition-transform">
+                                <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                                 </svg>
                             </div>
                             <div>
                                 <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Manajemen Produk</h4>
-                                <p class="text-sm text-gray-500 dark:text-purple-100/70">Atur katalog produk, harga, dan stok barang.</p>
+                                <p class="text-sm text-gray-500 dark:text-purple-100/70">Atur katalog produk, harga,
+                                    dan stok barang.</p>
                             </div>
                         </div>
                     </a>
@@ -231,18 +384,27 @@
                     {{-- Menu Item: Profil Bisnis --}}
                     <a href="{{ route('manajemen.profil-bisnis.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-orange-600/0 to-amber-600/0 dark:from-orange-900/20 dark:to-amber-900/20 transition-opacity"></div>
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 dark:bg-orange-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500"></div>
-                        
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-orange-600/0 to-amber-600/0 dark:from-orange-900/20 dark:to-amber-900/20 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-orange-50 dark:bg-orange-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
+                        </div>
+
                         <div class="relative flex items-start gap-4 z-10">
-                            <div class="w-12 h-12 bg-orange-100 dark:bg-orange-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-orange-50 dark:border-orange-500/20 group-hover:rotate-12 transition-transform">
-                                <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            <div
+                                class="w-12 h-12 bg-orange-100 dark:bg-orange-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-orange-50 dark:border-orange-500/20 group-hover:rotate-12 transition-transform">
+                                <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                    </path>
                                 </svg>
                             </div>
                             <div>
                                 <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Profil Bisnis</h4>
-                                <p class="text-sm text-gray-500 dark:text-orange-100/70">Kelola informasi bisnis dan pengaturan dasar.</p>
+                                <p class="text-sm text-gray-500 dark:text-orange-100/70">Kelola informasi bisnis dan
+                                    pengaturan dasar.</p>
                             </div>
                         </div>
                     </a>
@@ -258,18 +420,27 @@
                     {{-- Menu Item: Dashboard --}}
                     <a href="{{ route('analisis.dashboard') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-blue-600/0 to-cyan-600/0 dark:from-blue-900/20 dark:to-cyan-900/20 transition-opacity"></div>
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500"></div>
-                        
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-blue-600/0 to-cyan-600/0 dark:from-blue-900/20 dark:to-cyan-900/20 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
+                        </div>
+
                         <div class="relative flex items-start gap-4 z-10">
-                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-blue-50 dark:border-blue-500/20 group-hover:rotate-12 transition-transform">
-                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            <div
+                                class="w-12 h-12 bg-blue-100 dark:bg-blue-500/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-blue-50 dark:border-blue-500/20 group-hover:rotate-12 transition-transform">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                    </path>
                                 </svg>
                             </div>
                             <div>
                                 <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Dashboard Utama</h4>
-                                <p class="text-sm text-gray-500 dark:text-blue-100/70">Ringkasan performa bisnis dan grafik analisis.</p>
+                                <p class="text-sm text-gray-500 dark:text-blue-100/70">Ringkasan performa bisnis dan
+                                    grafik analisis.</p>
                             </div>
                         </div>
                     </a>
@@ -277,18 +448,27 @@
                     {{-- Menu Item: Amerta AI (Reference Card) --}}
                     <a href="{{ route('amerta') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/0 to-purple-600/0 dark:from-indigo-900/40 dark:to-purple-900/40 transition-opacity"></div>
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500"></div>
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-indigo-600/0 to-purple-600/0 dark:from-indigo-900/40 dark:to-purple-900/40 transition-opacity">
+                        </div>
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
+                        </div>
 
                         <div class="relative flex items-start gap-4 z-10">
-                            <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-500/30 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-indigo-50 dark:border-indigo-500/20 group-hover:rotate-12 transition-transform">
-                                <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            <div
+                                class="w-12 h-12 bg-indigo-100 dark:bg-indigo-500/30 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-indigo-50 dark:border-indigo-500/20 group-hover:rotate-12 transition-transform">
+                                <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-300" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Amerta AI Assistant</h4>
-                                <p class="text-sm text-gray-500 dark:text-indigo-200">Konsultasi cerdas untuk strategi bisnis Anda.</p>
+                                <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Amerta AI Assistant
+                                </h4>
+                                <p class="text-sm text-gray-500 dark:text-indigo-200">Konsultasi cerdas untuk strategi
+                                    bisnis Anda.</p>
                             </div>
                         </div>
                     </a>
@@ -297,4 +477,26 @@
             </div>
         </main>
     </div>
-@endsection
+
+    {{-- Script for Alpine Theme Logic handled at top, init is automatic with defer/module or included script --}}
+    <script>
+        document.addEventListener('alpine:init', () => {
+            // Theme Logic
+            Alpine.data('themeManager', () => ({
+                darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) &&
+                    window.matchMedia('(prefers-color-scheme: dark)').matches),
+                toggleTheme() {
+                    this.darkMode = !this.darkMode;
+                    localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+                    if (this.darkMode) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                }
+            }));
+        });
+    </script>
+</body>
+
+</html>
