@@ -496,6 +496,31 @@
                 }
             }));
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if welcome message has already been shown this session
+            if (!sessionStorage.getItem('welcomeShown')) {
+                const userName = "{{ Auth::user()->name }}";
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                const bgColor = isDarkMode ? '#1f2937' : '#ffffff';
+                const textColor = isDarkMode ? '#f9fafb' : '#111827';
+
+                Swal.fire({
+                    title: 'Selamat Datang!',
+                    text: `Halo ${userName}, selamat datang kembali!`,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    background: bgColor,
+                    color: textColor,
+                    position: 'center',
+                    toast: false // Set to true if you want a toast instead
+                });
+
+                // Mark as shown
+                sessionStorage.setItem('welcomeShown', 'true');
+            }
+        });
     </script>
 </body>
 
