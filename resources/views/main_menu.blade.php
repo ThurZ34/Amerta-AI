@@ -6,9 +6,9 @@
     <div class="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
 
         {{-- Hero Section --}}
-        <div class="relative bg-indigo-600 pb-32 overflow-hidden">
+        <div class="relative bg-indigo-600 pb-32">
             <div class="absolute inset-0">
-                <img class="w-full h-full object-cover opacity-20 dark:opacity-10 mix-blend-overlay"
+                <img class="w-full h-auto object-cover opacity-20 dark:opacity-10 mix-blend-overlay"
                     src="{{ asset('images/main_menu_bg.jpg') }}" alt="Background Pattern">
                 <div class="absolute inset-0 bg-gradient-to-b from-indigo-600/90 to-indigo-900/95 mix-blend-multiply"></div>
             </div>
