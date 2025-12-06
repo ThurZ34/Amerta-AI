@@ -7,10 +7,10 @@ Jika menemukan kesalahan, buat **Issue** baru dengan menyertakan:
 *   **Judul Jelas:** (Contoh: *Gagal login via Google*).
 *   **Langkah Reproduksi:** Urutan kejadian hingga error muncul.
 *   **Bukti:** Screenshot atau pesan error.
-*   **Environment:** OS, Browser, dan versi PHP/Node.
+*   **Environment:** Versi PHP/Node.
 
 ## 2. Pengajuan Fitur (Feature Request)
-1.  Cek daftar **Issues**, pastikan ide belum pernah diajukan.
+1.  Cek daftar **Issues**, pastikan isu belum pernah diajukan.
 2.  Buat Issue baru dengan label `enhancement`.
 3.  Jelaskan masalah dan solusi yang ditawarkan.
 
@@ -19,7 +19,7 @@ Jika menemukan kesalahan, buat **Issue** baru dengan menyertakan:
 ### A. Fork & Clone
 Fork repositori ini, lalu clone ke lokal Anda:
 ```bash
-git clone [https://github.com/USERNAME_ANDA/Amerta-AI.git](https://github.com/USERNAME_ANDA/Amerta-AI.git)
+git clone https://github.com/USERNAME_ANDA/Amerta-AI.git
 cd Amerta-AI
 ```
 
