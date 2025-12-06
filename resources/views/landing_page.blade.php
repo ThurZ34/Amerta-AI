@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth"
-    x-data="{
-        darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
-        toggleTheme() {
-            this.darkMode = !this.darkMode;
-            localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
-            if (this.darkMode) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth" x-data="{
+    darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+    toggleTheme() {
+        this.darkMode = !this.darkMode;
+        localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+        if (this.darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
-    }">
+    }
+}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,7 +20,8 @@
     <title>{{ config('app.name', 'Amerta') }}</title>
 
     <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
+                '(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
@@ -36,17 +37,66 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .fade-in-section { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; will-change: opacity, transform; }
-        .fade-in-left { opacity: 0; transform: translateX(-50px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; will-change: opacity, transform; }
-        .fade-in-right { opacity: 0; transform: translateX(50px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; will-change: opacity, transform; }
-        .is-visible { opacity: 1 !important; transform: none !important; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .fade-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .fade-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .is-visible {
+            opacity: 1 !important;
+            transform: none !important;
+        }
 
         /* Parallax Blob Animation */
-        @keyframes blob { 0% { transform: translate(0px, 0px) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } 100% { transform: translate(0px, 0px) scale(1); } }
-        .animate-blob { animation: blob 7s infinite; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
     </style>
 </head>
 
@@ -82,8 +132,10 @@
                         <button @click="open = !open" @click.away="open = false" type="button"
                             class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
                             <span class="sr-only">Switch Language</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
                             </svg>
                         </button>
                         <div x-show="open" x-transition:enter="transition ease-out duration-100"
@@ -142,16 +194,36 @@
                                 x-transition:leave-start="transform opacity-100 scale-100"
                                 x-transition:leave-end="transform opacity-0 scale-95"
                                 class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1"
-                                style="display: none;">
-                                <a href="{{ url('/main_menu') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                    role="menuitem" tabindex="-1" id="user-menu-item-0">{{ __('Main Menu') }}</a>
+                                role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button"
+                                tabindex="-1" style="display: none;">
+                                @if (Auth::user()->business_id)
+                                    {{-- JIKA SUDAH PUNYA BISNIS: TAMPILKAN MAIN MENU --}}
+                                    <a href="{{ url('/main_menu') }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        role="menuitem" tabindex="-1" id="user-menu-item-0">
+                                        {{ __('Main Menu') }}
+                                    </a>
+                                @else
+                                    {{-- JIKA BELUM PUNYA BISNIS: TAMPILKAN SETUP BISNIS (DENGAN HIGHLIGHT) --}}
+                                    <a href="{{ route('dashboard-selection') }}"
+                                        class="block px-4 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 font-semibold transition-colors flex items-center justify-between"
+                                        role="menuitem" tabindex="-1" id="user-menu-item-0">
+                                        {{ __('Setup Bisnis') }}
+
+                                        {{-- Indikator Visual Bahwa Ini Penting --}}
+                                        <span class="flex h-2 w-2 relative">
+                                            <span
+                                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                        </span>
+                                    </a>
+                                @endif
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
                                         class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                        role="menuitem" tabindex="-1" id="user-menu-item-2">{{ __('Sign out') }}</button>
+                                        role="menuitem" tabindex="-1"
+                                        id="user-menu-item-2">{{ __('Sign out') }}</button>
                                 </form>
                             </div>
                         </div>
@@ -169,8 +241,10 @@
                         <button @click="open = !open" @click.away="open = false" type="button"
                             class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
                             <span class="sr-only">Switch Language</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
                             </svg>
                         </button>
                         <div x-show="open"
@@ -194,8 +268,8 @@
                                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
                             </path>
                         </svg>
-                        <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            style="display: none;">
+                        <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24" style="display: none;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
                             </path>
@@ -251,15 +325,15 @@
             </div>
 
             <!-- Hero Image -->
-            <div class="mt-16 relative mx-auto max-w-5xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-800 aspect-video flex items-center justify-center group fade-in-section">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-900/10 to-transparent pointer-events-none"></div>
+            <div
+                class="mt-16 relative mx-auto max-w-5xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-800 aspect-video flex items-center justify-center group fade-in-section">
+                <div class="absolute inset-0 bg-gradient-to-t from-gray-900/10 to-transparent pointer-events-none">
+                </div>
                 <!-- Light mode image -->
-                <img src="{{ asset('images/dashboard.png') }}"
-                    alt="Dashboard Preview Light"
+                <img src="{{ asset('images/dashboard.png') }}" alt="Dashboard Preview Light"
                     class="max-h-full max-w-full object-contain transition-transform duration-300 dark:hidden" />
                 <!-- Dark mode image -->
-                <img src="{{ asset('images/dashboard_dark.png') }}"
-                    alt="Dashboard Preview Dark"
+                <img src="{{ asset('images/dashboard_dark.png') }}" alt="Dashboard Preview Dark"
                     class="max-h-full max-w-full object-contain transition-transform duration-300 hidden dark:block" />
             </div>
         </div>
@@ -326,7 +400,8 @@
     <div id="problem-solution" class="py-24 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16 fade-in-section">
-                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">{{ __('Why Choose Us') }}</h2>
+                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">
+                    {{ __('Why Choose Us') }}</h2>
                 <p
                     class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
                     {{ __('Solving real-world challenges') }}
@@ -457,7 +532,8 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Secure by Design') }}</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Secure by Design') }}
+                    </h3>
                     <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
                         {{ __('Built with security in mind from the ground up. Your data is protected with enterprise-grade encryption.') }}
                     </p>
@@ -507,7 +583,8 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Team Collaboration') }}</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ __('Team Collaboration') }}
+                    </h3>
                     <p class="text-slate-600 dark:text-gray-400 leading-relaxed">
                         {{ __('Built for teams. Share, comment, and collaborate in real-time to get work done faster.') }}
                     </p>
@@ -537,7 +614,8 @@
     <div id="pricing" class="py-24 bg-gray-50 dark:bg-gray-950 text-slate-900 dark:text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16 fade-in-section">
-                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">{{ __('Pricing') }}</h2>
+                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">
+                    {{ __('Pricing') }}</h2>
                 <p class="mt-2 text-3xl leading-8 font-extrabold text-slate-900 dark:text-white sm:text-4xl">
                     {{ __('Simple, transparent pricing') }}
                 </p>
@@ -551,31 +629,32 @@
                 <div
                     class="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 transition-colors relative fade-in-left">
                     <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ __('Starter') }}</h3>
-                    <p class="text-slate-600 dark:text-gray-400 mb-6">{{ __('Perfect for individuals and small projects.') }}</p>
+                    <p class="text-slate-600 dark:text-gray-400 mb-6">
+                        {{ __('Perfect for individuals and small projects.') }}</p>
                     <div class="flex items-baseline mb-8">
                         <span class="text-4xl font-extrabold text-slate-900 dark:text-white">Rp. 1.000.000</span>
                         <span class="text-slate-500 dark:text-gray-400 ml-2">{{ __('/month') }}</span>
                     </div>
                     <ul class="space-y-4 mb-8 text-slate-600 dark:text-gray-300">
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             {{ __('5 Projects') }}
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             {{ __('Basic Analytics') }}
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
@@ -593,39 +672,40 @@
                         class="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase tracking-wider">
                         Popular</div>
                     <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ __('Professional') }}</h3>
-                    <p class="text-indigo-600 dark:text-indigo-200 mb-6">{{ __('For growing teams and businesses.') }}</p>
+                    <p class="text-indigo-600 dark:text-indigo-200 mb-6">{{ __('For growing teams and businesses.') }}
+                    </p>
                     <div class="flex items-baseline mb-8">
                         <span class="text-4xl font-extrabold text-slate-900 dark:text-white">Rp.2.000.000</span>
                         <span class="text-indigo-600 dark:text-indigo-200 ml-2">{{ __('/month') }}</span>
                     </div>
                     <ul class="space-y-4 mb-8 text-indigo-700 dark:text-indigo-100">
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             {{ __('Unlimited Projects') }}
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             {{ __('Advanced Analytics') }}
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             {{ __('Priority Support') }}
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-300 mr-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
@@ -640,30 +720,32 @@
                 <div
                     class="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 transition-colors relative fade-in-right">
                     <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ __('Enterprise') }}</h3>
-                    <p class="text-slate-600 dark:text-gray-400 mb-6">{{ __('Custom solutions for large organizations.') }}</p>
+                    <p class="text-slate-600 dark:text-gray-400 mb-6">
+                        {{ __('Custom solutions for large organizations.') }}</p>
                     <div class="flex items-baseline mb-8">
-                        <span class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ __('Custom') }}</span>
+                        <span
+                            class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ __('Custom') }}</span>
                     </div>
                     <ul class="space-y-4 mb-8 text-slate-600 dark:text-gray-300">
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             {{ __('Dedicated Infrastructure') }}
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             {{ __('Custom Integrations') }}
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
@@ -709,32 +791,44 @@
                     </p>
                 </div>
                 <div>
-                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Product') }}</h3>
+                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Product') }}
+                    </h3>
                     <ul class="space-y-3">
-                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">{{ __('Features') }}</a>
+                        <li><a href="#features"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Features') }}</a>
                         </li>
-                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">{{ __('Pricing') }}</a>
+                        <li><a href="#pricing"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Pricing') }}</a>
                         </li>
                         <li><a href="#"
-                                class="text-gray-400 hover:text-white transition-colors">{{ __('Integrations') }}</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Company') }}</h3>
-                    <ul class="space-y-3">
-                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">{{ __('About') }}</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ __('Blog') }}</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ __('Careers') }}</a>
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Integrations') }}</a>
                         </li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Legal') }}</h3>
+                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Company') }}
+                    </h3>
                     <ul class="space-y-3">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ __('Privacy') }}</a>
+                        <li><a href="#about"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('About') }}</a></li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Blog') }}</a></li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Careers') }}</a>
                         </li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ __('Terms') }}</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ __('Security') }}</a>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">{{ __('Legal') }}
+                    </h3>
+                    <ul class="space-y-3">
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Privacy') }}</a>
+                        </li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Terms') }}</a></li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition-colors">{{ __('Security') }}</a>
                         </li>
                     </ul>
                 </div>
