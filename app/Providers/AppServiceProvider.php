@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\URL; // <--- JANGAN LUPA TAMBAH INI
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,8 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if($this->app->environment('production') || str_contains(request()->url(), 'ngrok-free.app')) {
-        URL::forceScheme('https');
-    }
+        // Tambahkan kode ini:
+        if($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
