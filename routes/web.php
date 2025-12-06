@@ -11,6 +11,7 @@ use App\Http\Controllers\SurveyController;
 use App\Livewire\Dashboard;
 use App\Livewire\MarketingTools;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BusinessRequestController;
 
 Route::get('/', function () {
     return view('landing_page');
@@ -36,6 +37,7 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(DashboardSelectionController::class)->prefix('dashboard-selection')->group(function () {
         Route::get('/', 'index')->name('dashboard-selection');
         Route::post('/join', 'join')->name('dashboard-selection.join');
+        Route::post('/dashboard-selection/cancel/{id}', 'cancelRequest')->name('dashboard-selection.cancel-request');
     });
 
     Route::controller(ProfilController::class)->group(function () {
@@ -54,7 +56,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('daily-checkin', DailyCheckinController::class)->except(['destroy']);
 
-        Route::get('/amerta', fn () => view('amerta'))->name('amerta');
+        Route::get('/amerta', fn() => view('amerta'))->name('amerta');
 
         Route::get('/marketing-tools', MarketingTools::class)->name('marketing-tools');
 
@@ -68,5 +70,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/produk/suggest-price', [ProdukController::class, 'suggestPrice'])->name('produk.suggest-price');
         Route::resource('produk', ProdukController::class);
 
+        Route::post('/business-request/{id}', [BusinessRequestController::class, 'action'])
+            ->name('business.request.action');
     });
 });
