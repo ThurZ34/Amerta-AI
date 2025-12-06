@@ -89,9 +89,8 @@
 
                 {{-- Right Side: Profile & Tools --}}
                 <div class="flex items-center gap-4">
-                    {{-- User Profile Card --}}
-                    {{-- User Profile Card (Updated) --}}
-                    <div class="flex items-center gap-3 bg-white/10 border border-white/20 backdrop-blur-md px-4 py-2 rounded-2xl transition-all duration-300">
+                    <div
+                        class="flex items-center gap-3 bg-white/10 border border-white/20 backdrop-blur-md px-4 py-2 rounded-2xl transition-all duration-300">
                         {{-- Avatar (Klik untuk ke Edit Profile) --}}
                         <a href="{{ route('profile.edit') }}"
                             class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg overflow-hidden border border-white/30 hover:ring-2 hover:ring-indigo-400 transition-all">
@@ -106,26 +105,28 @@
                         {{-- Text & Logout Button --}}
                         <div class="text-left hidden sm:block">
                             {{-- Nama User --}}
-                            <a href="{{ route('profile.edit') }}" 
-                               class="text-sm font-bold text-white hover:text-indigo-200 transition-colors block leading-tight">
+                            <a href="{{ route('profile.edit') }}"
+                                class="text-sm font-bold text-white hover:text-indigo-200 transition-colors block leading-tight">
                                 {{ Auth::user()->name }}
                             </a>
-                            
+
                             {{-- Role & Logout --}}
                             <div class="flex items-center gap-2 mt-0.5">
                                 <p class="text-[10px] text-indigo-200 uppercase tracking-wider">
                                     {{ Auth::user()->role ?? 'Owner' }}
                                 </p>
                                 <span class="text-indigo-200/40 text-[10px]">|</span>
-                                
+
                                 {{-- Tombol Logout --}}
                                 <form method="POST" action="{{ route('logout') }}" class="inline">
                                     @csrf
-                                    <button type="submit" 
+                                    <button type="submit" onclick="confirmLogout(event)"
                                         class="text-[10px] font-bold text-rose-300 hover:text-rose-100 transition-colors cursor-pointer flex items-center gap-1">
                                         Keluar
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                            </path>
                                         </svg>
                                     </button>
                                 </form>
@@ -518,8 +519,12 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if welcome message has already been shown this session
-            if (!sessionStorage.getItem('welcomeShown')) {
+            // Use Laravel Session ID to track the welcome message state uniquely for each login session
+            const sessionId = "{{ session()->getId() }}";
+            const storageKey = 'welcome_shown_' + sessionId;
+
+            // Check if welcome message has already been shown for THIS session
+            if (!localStorage.getItem(storageKey)) {
                 const userName = "{{ Auth::user()->name }}";
                 const isDarkMode = document.documentElement.classList.contains('dark');
                 const bgColor = isDarkMode ? '#1f2937' : '#ffffff';
@@ -534,14 +539,43 @@
                     background: bgColor,
                     color: textColor,
                     position: 'center',
-                    toast: false // Set to true if you want a toast instead
+                    toast: false
                 });
 
-                // Mark as shown
-                sessionStorage.setItem('welcomeShown', 'true');
+                // Mark as shown for this session
+                localStorage.setItem(storageKey, 'true');
+
+                // Optional cleanup: Remove old keys from other sessions to keep localStorage clean (simple check)
+                // This is a basic cleanup strategy
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith('welcome_shown_') && key !== storageKey) {
+                        localStorage.removeItem(key);
+                    }
+                }
             }
         });
+
+        function confirmLogout(event) {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda akan keluar dari sesi ini.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Keluar!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
     </script>
 </body>
 
 </html>
+```
