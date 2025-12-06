@@ -10,13 +10,27 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfilController extends Controller
 {
-    public function bussiness_index()
+    public function bussiness_index(Request $request)
     {
         $user = auth()->user();
         $business = $user->ownedBusiness ?? $user->business;
 
         $categories = Category::orderBy('name')->get();
-        return view('profil.index', compact('business', 'categories'));
+        
+        // Get owner separately (always shown on top, not paginated)
+        $owner = $business ? User::where('business_id', $business->id)
+            ->where('id', $business->user_id)
+            ->first() : null;
+        
+        // Pagination for staff members only (excluding owner)
+        $perPage = $request->get('per_page', 5); // Default 5
+        $staffMembers = $business ? User::where('business_id', $business->id)
+            ->where('id', '!=', $business->user_id)
+            ->orderBy('name')
+            ->paginate($perPage)
+            ->appends(['per_page' => $perPage]) : null;
+        
+        return view('profil.index', compact('business', 'categories', 'owner', 'staffMembers'));
     }
 
     public function update(Request $request)
