@@ -5,9 +5,9 @@
 @section('image_url', asset('images/banner_login.png'))
 @section('content')
 
-    <div class="text-left mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Buat Akun</h1>
-        <p class="text-gray-500 dark:text-gray-400 text-sm">
+    <div class="text-left  mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white ">Buat Akun</h1>
+        <p class="text-gray-500 dark:text-gray-400 text-sm ">
             Mulai perjalanan anda bersama kami.
         </p>
     </div>
@@ -24,14 +24,20 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Nama Lengkap
             </label>
-            <input
-                autocomplete="off"
-                type="text"
-                name="name"
-                value="{{ old('name') }}"
-                required
-                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-indigo-500 focus:border-transparent outline-none transition bg-white dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                placeholder="Masukkan Nama Anda">
+
+            <div
+                class="flex items-center gap-3 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 bg-white dark:bg-gray-800">
+                <img src="{{ asset('images/profil.png') }}" class="w-5 h-5 opacity-80" alt="profil">
+                <input
+                    autocomplete="off"
+                    type="text"
+                    name="name"
+                    value="{{ old('name') }}"
+                    required
+                    class="flex-1 outline-none bg-transparent dark:text-white placeholder-gray-400"
+                    placeholder="Masukkan Nama Anda">
+            </div>
+
             @error('name')
                 <span class="text-red-500 text-sm">{{ $message }}</span>
             @enderror

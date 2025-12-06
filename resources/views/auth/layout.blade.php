@@ -62,7 +62,7 @@
 
 <body class="bg-white dark:bg-gray-950 transition-colors duration-300">
 
-    <div class="flex min-h-screen">
+    <div class="flex h-screen overflow-hidden">
 
         {{-- =====================================================
             LEFT SIDE (FORM LOGIN / REGISTER)
@@ -92,18 +92,43 @@
                 @yield('content')
             </div>
         </div>
+        
+
 
 
 
         {{-- =====================================================
-            RIGHT SIDE (SATU FOTO PENUH)
-            Gambar diambil dari: @yield('image_url')
+            RIGHT SIDE (SATU FOTO PENUH + TEKS RATA KANAN)
         ====================================================== --}}
-        <div class="hidden md:block w-1/2 relative">
-            <img src="@yield('image_url')"
-                 alt="Auth Banner"
-                 class="w-full h-full object-cover">
-        </div>
+{{-- =====================================================
+    RIGHT SIDE (SATU FOTO + TEKS RATA KANAN)
+====================================================== --}}
+<div class="hidden md:block w-1/2 relative h-full overflow-hidden">
+
+    {{-- GAMBAR --}}
+    <img src="@yield('image_url')"
+         alt="Auth Banner"
+         class="w-full h-full object-cover object-center ">
+
+    {{-- TEKS DI ATAS GAMBAR (RATA KANAN) --}}
+    <div class="absolute top-24 right-12 z-20 max-w-lg text-right">
+
+        <h2 class="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg leading-tight whitespace-nowrap">
+            Selamat Datang di <span class="text-cyan-300">AMERTA</span>
+        </h2>
+
+        <p class="text-white/90 mt-2 text-lg drop-shadow">
+            Asisten digital all-in-one untuk semua jenis UMKM.
+        </p>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
 
     </div>
 </body>
