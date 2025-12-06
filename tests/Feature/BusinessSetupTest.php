@@ -16,7 +16,7 @@ class BusinessSetupTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get(route('dashboard'));
+        $response = $this->actingAs($user)->get(route('analisis.dashboard'));
 
         $response->assertRedirect(route('setup-bisnis'));
     }
@@ -25,7 +25,7 @@ class BusinessSetupTest extends TestCase
     {
         $user = User::factory()->create();
         $category = Category::create(['name' => 'Tech']);
-        
+
         Business::create([
             'user_id' => $user->id,
             'nama_bisnis' => 'Test Business',
@@ -38,7 +38,7 @@ class BusinessSetupTest extends TestCase
             'tujuan_utama' => 'Scale Up',
         ]);
 
-        $response = $this->actingAs($user)->get(route('dashboard'));
+        $response = $this->actingAs($user)->get(route('analisis.dashboard'));
 
         $response->assertStatus(200);
     }
@@ -60,7 +60,7 @@ class BusinessSetupTest extends TestCase
                 'masalah_utama' => 'Modal',
             ]);
 
-        $response->assertRedirect(route('dashboard'));
+        $response->assertRedirect(route('analisis.dashboard'));
 
         // Check that category was created
         $this->assertDatabaseHas('categories', [

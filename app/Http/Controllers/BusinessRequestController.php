@@ -28,7 +28,7 @@ class BusinessRequestController extends Controller
 
         if ($request->action === 'reject') {
             // Hapus request
-            $joinRequest->delete();
+            $joinRequest->update(['status' => 'rejected']);
             return back()->with('success', 'Permintaan bergabung ditolak.');
         }
 
