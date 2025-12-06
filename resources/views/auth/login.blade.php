@@ -32,7 +32,7 @@
         {{-- EMAIL --}}
         <div>
             <div class="flex items-center gap-3 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 bg-white dark:bg-gray-800">
-                <img src="{{ asset('images/email.jpg')}}" class="w-6 h-6 opacity-70">
+                <img src="{{ asset('images/email.png')}}" class="w-6 h-6 opacity-70">
                 <input autocomplete="off" type="email" name="email" required autofocus
                     class="flex-1 outline-none bg-transparent dark:text-white placeholder-gray-400"
                     placeholder="Email">
@@ -55,7 +55,7 @@
             </div>
 
             <div class="flex items-center gap-3 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 bg-white dark:bg-gray-800">
-                <img src="{{ asset('images/password.jpg')}}" class="w-6 h-6 opacity-70">
+                <img src="{{ asset('images/password.png')}}" class="w-6 h-6 opacity-70">
                 <input type="password" name="password" required
                     class="flex-1 outline-none bg-transparent dark:text-white placeholder-gray-400"
                     placeholder="Password">
