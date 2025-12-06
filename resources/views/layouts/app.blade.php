@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50"
-    x-data="{
-        darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
-        toggleTheme() {
-            this.darkMode = !this.darkMode;
-            localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
-            if (this.darkMode) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50" x-data="{
+    darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+    toggleTheme() {
+        this.darkMode = !this.darkMode;
+        localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+        if (this.darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
-    }" :class="{ 'dark': darkMode }">
+    }
+}"
+    :class="{ 'dark': darkMode }">
 
 <head>
     <meta charset="utf-8">
@@ -21,7 +21,8 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
+                '(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
@@ -43,27 +44,51 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
                 }
             }
         }
-        marked.use({ breaks: true, gfm: true });
+        marked.use({
+            breaks: true,
+            gfm: true
+        });
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        [x-cloak] { display: none !important; }
-        .chat-scroll::-webkit-scrollbar { width: 5px; }
-        .chat-scroll::-webkit-scrollbar-track { background: transparent; }
-        .chat-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
-        .dark .chat-scroll::-webkit-scrollbar-thumb { background-color: #4f46e5; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
+
+        .chat-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .chat-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .dark .chat-scroll::-webkit-scrollbar-thumb {
+            background-color: #4f46e5;
+        }
     </style>
 </head>
 
-<body class="h-full antialiased text-gray-900 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
+<body
+    class="h-full antialiased text-gray-900 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
     x-data="{ sidebarOpen: false }">
 
     <div class="h-screen flex flex-col md:flex-row overflow-hidden relative z-0">
@@ -75,7 +100,11 @@
             class="fixed inset-0 bg-gray-900/80 z-40 md:hidden">
         </div>
 
-        @unless (request()->routeIs('main_menu') || request()->routeIs('amerta') || request()->routeIs('dashboard-selection') || request()->routeIs('dashboard-selection.join'))
+        @unless (request()->routeIs('main_menu') ||
+                request()->routeIs('amerta') ||
+                request()->routeIs('dashboard-selection') ||
+                request()->routeIs('dashboard-selection.join') ||
+                request()->routeIs('marketing-tools'))
             @include('layouts.partials.sidebar')
         @endunless
 
@@ -102,7 +131,7 @@
             pos: { x: 0, y: 0 },
             start: { x: 0, y: 0 },
             limits: { minX: 0, maxX: 0, minY: 0, maxY: 0 },
-
+        
             startDrag(e) {
                 if (this.isFullscreen) return;
                 this.isDragging = true;
@@ -113,7 +142,7 @@
                 const rect = this.$refs.chatModal.getBoundingClientRect();
                 const baseRight = 24;
                 const baseBottom = 96;
-
+        
                 this.limits = {
                     maxX: baseRight,
                     minX: -(winW - rect.width - baseRight),
@@ -262,4 +291,5 @@
 
     @livewireScripts
 </body>
+
 </html>
