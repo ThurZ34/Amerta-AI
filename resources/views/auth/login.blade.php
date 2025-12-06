@@ -209,7 +209,6 @@
         document.getElementById('forgotModal').classList.remove('hidden');
         document.getElementById('forgotModal').classList.add('flex');
 
-        // pastikan mulai dari step email
         document.getElementById('stepEmail').classList.remove('hidden');
         document.getElementById('stepOTP').classList.add('hidden');
         document.getElementById('stepReset').classList.add('hidden');
@@ -220,11 +219,39 @@
         document.getElementById('forgotModal').classList.remove('flex');
     }
 
-    function sendOTP() {
-        // TODO: Kirim request ke backend untuk kirim OTP ke email
-        // Sementara langsung lanjut ke step OTP
-        document.getElementById('stepEmail').classList.add('hidden');
-        document.getElementById('stepOTP').classList.remove('hidden');
+    async function sendOTP() {
+        const email = document.getElementById('resetEmail').value;
+
+        if (!email) {
+            alert('Email tidak boleh kosong.');
+            return;
+        }
+
+        try {
+            const res = await fetch("{{ route('forgot.send-otp') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                alert(data.message || 'Gagal mengirim OTP.');
+                return;
+            }
+
+            alert(data.message);
+            document.getElementById('stepEmail').classList.add('hidden');
+            document.getElementById('stepOTP').classList.remove('hidden');
+
+        } catch (e) {
+            console.error(e);
+            alert('Terjadi kesalahan. Coba lagi nanti.');
+        }
     }
 
     function backToEmail() {
@@ -232,37 +259,93 @@
         document.getElementById('stepEmail').classList.remove('hidden');
     }
 
-    // Auto move next for OTP input
     function moveToNext(field, index) {
         if (field.value.length === 1 && index < 6) {
             document.getElementById("otp" + (index + 1)).focus();
         }
     }
 
-    function verifyOTP() {
-        // TODO: Verifikasi OTP ke backend
-        // Kalau valid, lanjut ke step reset password
-        document.getElementById('stepOTP').classList.add('hidden');
-        document.getElementById('stepReset').classList.remove('hidden');
+    async function verifyOTP() {
+        const email = document.getElementById('resetEmail').value;
+        let otp = '';
+        for (let i = 1; i <= 6; i++) {
+            otp += document.getElementById('otp' + i).value;
+        }
+
+        if (otp.length !== 6) {
+            alert('Kode OTP harus 6 digit.');
+            return;
+        }
+
+        try {
+            const res = await fetch("{{ route('forgot.verify-otp') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ email, otp }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                alert(data.message || 'OTP tidak valid.');
+                return;
+            }
+
+            alert(data.message);
+            document.getElementById('stepOTP').classList.add('hidden');
+            document.getElementById('stepReset').classList.remove('hidden');
+
+            // simpan otp di hidden input untuk reset
+            window.__lastOtp = otp;
+
+        } catch (e) {
+            console.error(e);
+            alert('Terjadi kesalahan. Coba lagi.');
+        }
     }
 
-    function saveNewPassword() {
-        const pass = document.getElementById('newPassword').value;
-        const confirm = document.getElementById('confirmPassword').value;
+    async function saveNewPassword() {
+        const email = document.getElementById('resetEmail').value;
+        const otp = window.__lastOtp;
+        const password = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
-        if (!pass || pass.length < 8) {
+        if (!password || password.length < 8) {
             alert('Password minimal 8 karakter.');
             return;
         }
 
-        if (pass !== confirm) {
+        if (password !== confirmPassword) {
             alert('Konfirmasi password tidak sama.');
             return;
         }
 
-        // TODO: Kirim password baru + OTP/email ke backend untuk update password
-        alert('Password berhasil diubah (simulasi). Nanti dihubungkan ke backend.');
+        try {
+            const res = await fetch("{{ route('forgot.reset-by-otp') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ email, otp, password, password_confirmation: confirmPassword }),
+            });
 
-        closeForgotModal();
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                alert(data.message || 'Gagal mengubah password.');
+                return;
+            }
+
+            alert(data.message);
+            closeForgotModal();
+
+        } catch (e) {
+            console.error(e);
+            alert('Terjadi kesalahan. Coba lagi.');
+        }
     }
 </script>
