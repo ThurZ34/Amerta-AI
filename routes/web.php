@@ -98,6 +98,7 @@ Route::middleware(['auth'])->group(function () {
                 ->name('business-request.action');
 
             // Katalog Produk
+            Route::post('/produk/analyze', [ProdukController::class, 'analyze'])->name('produk.analyze');
             Route::post('/produk/suggest-price', [ProdukController::class, 'suggestPrice'])->name('produk.suggest-price');
             Route::resource('produk', ProdukController::class);
         });

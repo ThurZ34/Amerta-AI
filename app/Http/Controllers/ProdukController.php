@@ -76,6 +76,8 @@ class ProdukController extends Controller
             'nama_produk' => 'required|string|max:255',
             'modal' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
+            'harga_coret' => 'nullable|numeric|min:0',
+            'promo_end_date' => 'nullable|date',
             'jenis_produk' => 'required|string|max:255',
             'gambar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -100,6 +102,8 @@ class ProdukController extends Controller
             'nama_produk' => 'required|string|max:255',
             'modal' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
+            'harga_coret' => 'nullable|numeric|min:0',
+            'promo_end_date' => 'nullable|date',
             'jenis_produk' => 'required|string|max:255',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
         ]);
@@ -129,5 +133,28 @@ class ProdukController extends Controller
         $produk->delete();
 
         return redirect()->route('produk.index')->with('success', 'Produk deleted successfully.');
+    }
+    public function analyze(Request $request)
+    {
+        $business = auth()->user()->business;
+        if (!$business) {
+            return response()->json(['error' => 'Bisnis tidak ditemukan'], 400);
+        }
+
+        $month = now()->format('m');
+        $year = now()->format('Y');
+
+        $products = Produk::where('business_id', $business->id)->get();
+        
+        $products->each(function ($produk) use ($month, $year) {
+            $produk->total_terjual_bulan_ini = $produk->getTotalTerjualPerBulan($month, $year);
+        });
+
+        try {
+            $analysis = $this->geminiService->analyzeProductPromotions($business, $products);
+            return response()->json($analysis);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
