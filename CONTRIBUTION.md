@@ -33,17 +33,16 @@ git checkout -b feature/tambah-login
 ```
 
 ### 3. Setup Environment
-Pastikan Anda sudah menjalankan instalasi sesuai `README.md`.
+Pastikan Anda sudah menjalankan instalasi sesuai <a href="INSTALLATION.md">Instalasi</a>  `INSTALLATION.md`.
 
 ### 4. Coding Standards
 *   **PHP/Laravel**: Ikuti standar **PSR-12**.
 *   **Frontend**: Pastikan kode rapi dan tidak ada *console log* yang tertinggal.
-*   **Commit Message**: Gunakan Bahasa Inggris/Indonesia yang jelas.
+*   **Commit Message**: Gunakan Bahasa yang jelas.
     *   `fix: memperbaiki tombol login yang tidak responsif`
     *   `benerin tombol`
 
 ### 5. Push & Pull Request
-Setelah selesai, push branch Anda:
 ```bash
 git push origin feature/nama-fitur
 ```
