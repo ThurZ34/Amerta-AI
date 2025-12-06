@@ -44,6 +44,16 @@
 
         {{-- PASSWORD --}}
         <div>
+
+
+            <div class="flex items-center gap-3 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 bg-white dark:bg-gray-800">
+                <img src="{{ asset('images/password.png')}}" class="w-6 h-6 opacity-70">
+                <input type="password" name="password" required
+                    class="flex-1 outline-none bg-transparent dark:text-white placeholder-gray-400"
+                    placeholder="Password">
+            </div>
+        </div>
+
             <div class="flex justify-between items-center mb-1">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
                 @if (Route::has('password.request'))
@@ -52,14 +62,6 @@
                         Forgot Password ?
                     </a>
                 @endif
-            </div>
-
-            <div class="flex items-center gap-3 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 bg-white dark:bg-gray-800">
-                <img src="{{ asset('images/password.png')}}" class="w-6 h-6 opacity-70">
-                <input type="password" name="password" required
-                    class="flex-1 outline-none bg-transparent dark:text-white placeholder-gray-400"
-                    placeholder="Password">
-            </div>
         </div>
 
         {{-- TOMBOL LOGIN BESAR --}}
