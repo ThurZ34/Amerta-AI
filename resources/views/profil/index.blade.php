@@ -32,7 +32,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
-                            <svg x-show="isEditing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg x-show="isEditing" class="w-4 h-4" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -169,7 +170,8 @@
                                                 <div x-show="showCategoryDropdown && (filteredCategories.length > 0 || showAddButton)"
                                                     x-transition
                                                     class="absolute z-[100] w-full mt-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl max-h-56 overflow-y-auto custom-scrollbar">
-                                                    <template x-for="category in filteredCategories" :key="category">
+                                                    <template x-for="category in filteredCategories"
+                                                        :key="category">
                                                         <button type="button" @click="selectCategory(category)"
                                                             class="w-full text-left px-4 py-2.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-sm text-gray-700 dark:text-gray-200 transition-colors"
                                                             x-text="category"></button>
@@ -343,10 +345,19 @@
                     @endphp
 
                     @if ($pendingRequests->count() > 0 && $isOwner)
-                        <div
-                            class="bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/30 shadow-sm overflow-hidden mb-6">
-                            <div
-                                class="px-6 py-4 border-b border-amber-100 dark:border-amber-800/30 flex justify-between items-center">
+                        <div class="mb-8" x-data="{
+                            activeSlide: 0,
+                            total: {{ $pendingRequests->count() }},
+                            next() {
+                                if (this.activeSlide < this.total - 1) this.activeSlide++;
+                            },
+                            prev() {
+                                if (this.activeSlide > 0) this.activeSlide--;
+                            }
+                        }">
+
+                            {{-- Header Section --}}
+                            <div class="flex justify-between items-center mb-4 px-1">
                                 <h4 class="font-bold text-amber-800 dark:text-amber-200 flex items-center gap-2">
                                     <span class="relative flex h-3 w-3">
                                         <span
@@ -355,46 +366,139 @@
                                     </span>
                                     Menunggu Persetujuan
                                 </h4>
+                                {{-- Counter (Misal: 1/3) --}}
+                                <span
+                                    class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-md"
+                                    x-show="total > 1" x-text="(activeSlide + 1) + ' / ' + total"></span>
                             </div>
 
-                            <div class="divide-y divide-amber-100 dark:divide-amber-800/30">
-                                @foreach ($pendingRequests as $req)
-                                    <div class="p-4">
-                                        <div class="flex items-center gap-3 mb-3">
-                                            <div
-                                                class="w-8 h-8 rounded-full bg-amber-200 dark:bg-amber-800 flex items-center justify-center text-amber-800 dark:text-amber-200 font-bold text-xs">
-                                                {{ substr($req->user->name, 0, 2) }}
+                            {{-- CAROUSEL CONTAINER --}}
+                            <div class="relative group">
+
+                                {{-- 1. Main Slider Window --}}
+                                <div
+                                    class="overflow-hidden rounded-2xl border border-amber-100 dark:border-amber-800/30 shadow-sm bg-white dark:bg-gray-800">
+                                    {{-- Track Slider (Bergerak Horizontal) --}}
+                                    <div class="flex transition-transform duration-500 ease-in-out"
+                                        :style="'transform: translateX(-' + (activeSlide * 100) + '%)'">
+
+                                        @foreach ($pendingRequests as $req)
+                                            {{-- SINGLE SLIDE ITEM --}}
+                                            <div class="w-full shrink-0 p-6 relative overflow-hidden">
+                                                {{-- Background Decor --}}
+                                                <div
+                                                    class="absolute top-0 right-0 w-24 h-24 bg-amber-50 dark:bg-amber-900/10 rounded-bl-full -mr-6 -mt-6 pointer-events-none">
+                                                </div>
+
+                                                <div class="relative z-10">
+                                                    <div
+                                                        class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left mb-6">
+                                                        <div
+                                                            class="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-xl border-4 border-white dark:border-gray-700 shadow-sm">
+                                                            {{ substr($req->user->name, 0, 2) }}
+                                                        </div>
+                                                        <div class="flex-1 min-w-0">
+                                                            <h3
+                                                                class="text-lg font-bold text-gray-900 dark:text-white truncate">
+                                                                {{ $req->user->name }}
+                                                            </h3>
+                                                            <p
+                                                                class="text-sm text-gray-500 dark:text-gray-400 mb-2 truncate">
+                                                                {{ $req->user->email }}
+                                                            </p>
+                                                            <div
+                                                                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                <span>Request:
+                                                                    {{ $req->created_at->diffForHumans() }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Action Buttons --}}
+                                                    <div class="flex gap-3">
+                                                        <form
+                                                            action="{{ route('manajemen.business-request.action', $req->id) }}"
+                                                            method="POST" class="flex-1">
+                                                            @csrf
+                                                            <input type="hidden" name="action" value="approve">
+                                                            <button type="submit"
+                                                                class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2" d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                                Terima
+                                                            </button>
+                                                        </form>
+                                                        <form
+                                                            action="{{ route('manajemen.business-request.action', $req->id) }}"
+                                                            method="POST" class="flex-1">
+                                                            @csrf
+                                                            <input type="hidden" name="action" value="reject">
+                                                            <button type="submit"
+                                                                class="w-full py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-colors active:scale-95">
+                                                                Tolak
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p class="text-sm font-bold text-gray-900 dark:text-white">
-                                                    {{ $req->user->name }}</p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                    {{ $req->user->email }}</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex gap-2">
-                                            <form action="{{ route('manajemen.business-request.action', $req->id) }}"
-                                                method="POST" class="flex-1">
-                                                @csrf
-                                                <input type="hidden" name="action" value="approve">
-                                                <button type="submit"
-                                                    class="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors">
-                                                    Terima
-                                                </button>
-                                            </form>
-                                            <form action="{{ route('manajemen.business-request.action', $req->id) }}"
-                                                method="POST" class="flex-1">
-                                                @csrf
-                                                <input type="hidden" name="action" value="reject">
-                                                <button type="submit"
-                                                    class="w-full py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 text-xs font-bold rounded-lg transition-colors">
-                                                    Tolak
-                                                </button>
-                                            </form>
-                                        </div>
+                                        @endforeach
                                     </div>
-                                @endforeach
+                                </div>
+
+                                {{-- 2. Navigation Arrows (Hanya muncul jika total > 1) --}}
+                                <template x-if="total > 1">
+                                    <div>
+                                        {{-- Tombol Kiri --}}
+                                        <button @click="prev()" x-show="activeSlide > 0"
+                                            x-transition:enter="transition ease-out duration-200"
+                                            x-transition:enter-start="opacity-0 -translate-x-2"
+                                            x-transition:enter-end="opacity-100 translate-x-0"
+                                            class="absolute top-1/2 -left-4 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-100 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 transition-all">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+
+                                        {{-- Tombol Kanan --}}
+                                        <button @click="next()" x-show="activeSlide < total - 1"
+                                            x-transition:enter="transition ease-out duration-200"
+                                            x-transition:enter-start="opacity-0 translate-x-2"
+                                            x-transition:enter-end="opacity-100 translate-x-0"
+                                            class="absolute top-1/2 -right-4 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-100 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 transition-all">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </template>
                             </div>
+
+                            {{-- 3. Indicators / Breadcrumbs (Dots) --}}
+                            <template x-if="total > 1">
+                                <div class="flex justify-center gap-2 mt-4">
+                                    {{-- Loop sebanyak total request --}}
+                                    <template x-for="idx in total">
+                                        <button @click="activeSlide = idx - 1"
+                                            class="h-2 rounded-full transition-all duration-300"
+                                            :class="activeSlide === (idx - 1) ? 'w-8 bg-indigo-600 dark:bg-indigo-400' :
+                                                'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'">
+                                        </button>
+                                    </template>
+                                </div>
+                            </template>
                         </div>
                     @endif
 
