@@ -91,7 +91,7 @@ class ProdukController extends Controller
 
         Produk::create($validated);
 
-        return redirect()->route('produk.index')->with('success', 'Produk created successfully.');
+        return redirect()->route('manajemen.produk.index')->with('success', 'Produk created successfully.');
     }
 
     public function update(Request $request, $id)
@@ -119,7 +119,7 @@ class ProdukController extends Controller
 
         $produk->update($validated);
 
-        return redirect()->route('produk.index')->with('success', 'Produk updated successfully.');
+        return redirect()->route('manajemen.produk.index')->with('success', 'Produk updated successfully.');
     }
 
     public function destroy($id)
@@ -132,7 +132,7 @@ class ProdukController extends Controller
 
         $produk->delete();
 
-        return redirect()->route('produk.index')->with('success', 'Produk deleted successfully.');
+        return redirect()->route('manajemen.produk.index')->with('success', 'Produk deleted successfully.');
     }
     public function analyze(Request $request)
     {

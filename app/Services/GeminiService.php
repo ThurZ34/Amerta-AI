@@ -100,7 +100,8 @@ class GeminiService
         foreach ($products as $p) {
             $sales = $p->total_terjual_bulan_ini ?? 0;
             $margin = $p->harga_jual - $p->modal;
-            $productsData .= "- ID: {$p->id} | Nama: {$p->nama_produk} | Harga: {$p->harga_jual} | Modal: {$p->modal} | Terjual Bulan Ini: {$sales}\n";
+            $ageDays = $p->created_at ? round(now()->diffInDays($p->created_at)) : 30; // Default to 30 if null
+            $productsData .= "- ID: {$p->id} | Nama: {$p->nama_produk} | Harga: {$p->harga_jual} | Modal: {$p->modal} | Terjual Bulan Ini: {$sales} | Umur: {$ageDays} hari\n";
         }
 
         $prompt = "
@@ -115,9 +116,14 @@ class GeminiService
             TUGAS:
             Analisis data penjualan. Identifikasi produk yang butuh diskon/promosi.
             
+            PANDUAN STRATEGI:
+            1. Jika 'Umur' < 7 hari dan sales 0: JANGAN anggap stok mati. Ini produk baru. Diskon hanya jika 'Intro Price' strategis (maks 10-15%).
+            2. Jika 'Umur' > 30 hari dan sales 0: Ini 'Dead Stock'. Diskon agresif (20-50%) untuk cuci gudang.
+            3. Jika Sales tinggi & Margin tebal: Tawarkan 'Bundling' atau 'Volume Discount'.
+            
             OUTPUT JSON (HANYA JSON):
             Kembalikan object JSON dimana KEY adalah ID Produk, dan VALUE adalah object rekomendasi.
-            Hanya sertakan produk yang MEMANG butuh tindakan.
+            Hanya sertakan produk yang MEMANG butuh tindakan strategis.
             
             Key 'duration_days' adalah rekomendasi durasi promo dalam hari (misal 3, 7, 30).
             
@@ -127,13 +133,13 @@ class GeminiService
                     \"type\": \"Cuci Gudang\", 
                     \"discount_percent\": 20, 
                     \"duration_days\": 7,
-                    \"reason\": \"Stok mati, diskon agresif seminggu.\" 
+                    \"reason\": \"Barang lama (60 hari) tidak laku, perlu likuidasi stok.\" 
                 },
                 \"15\": { 
-                    \"type\": \"Flash Sale\", 
+                    \"type\": \"Promo Bundling\", 
                     \"discount_percent\": 10, 
-                    \"duration_days\": 3,
-                    \"reason\": \"Margin tinggi, boost sales weekend.\" 
+                    \"duration_days\": 14,
+                    \"reason\": \"Produk laku keras dengan margin tebal, dorong pembelian jumlah banyak.\" 
                 }
             }
         ";

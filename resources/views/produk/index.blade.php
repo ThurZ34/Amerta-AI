@@ -173,6 +173,15 @@
                                             d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                     </svg>
                                 </button>
+                                <!-- Manual Promo Button -->
+                                <button @click="openPromoModal({{ $produk }})"
+                                    class="p-1.5 bg-white/90 dark:bg-gray-900/90 rounded hover:text-orange-600 dark:hover:text-orange-400"
+                                    title="Atur Promo">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                    </svg>
+                                </button>
                                 <button @click="openModal('delete', {{ $produk }})"
                                     class="p-1.5 bg-white/90 dark:bg-gray-900/90 rounded hover:text-red-600 dark:hover:text-red-400">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,7 +320,15 @@
 
                             <!-- Promo Settings (Visible if Active) -->
                             <div x-show="form.harga_coret > 0"
-                                class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg border border-indigo-100 dark:border-indigo-500/30 mb-4 transition-all">
+                                class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg border border-indigo-100 dark:border-indigo-500/30 mb-4 transition-all relative">
+                                <button type="button" @click="removePromo()"
+                                    class="absolute top-2 right-2 text-xs text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Hapus Promo
+                                </button>
                                 <h4
                                     class="text-sm font-bold text-indigo-900 dark:text-indigo-300 mb-2 flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,7 +433,7 @@
                         </div>
                     </div>
                     <div class="mt-6 flex flex-row-reverse gap-3">
-                        <form :action="'/produk/' + form.id" method="POST">
+                        <form :action="'/manajemen/produk/' + form.id" method="POST">
                             @csrf @method('DELETE')
                             <button type="submit"
                                 class="px-4 py-2 bg-red-600 text-sm font-medium text-white rounded-lg hover:bg-red-700">Ya,
@@ -457,6 +474,28 @@
                     } else {
                         this.resetForm();
                     }
+                },
+
+                openPromoModal(data) {
+                    this.openModal('edit', data);
+
+                    // If no active promo, initialize manual promo mode
+                    if (!this.form.harga_coret || this.form.harga_coret == 0) {
+                        this.form.harga_coret = this.form.harga_jual;
+                        this.form.harga_jual = Math.round(this.form.harga_jual * 0.9); // Default 10% off
+
+                        // Set default duration 7 days
+                        const date = new Date();
+                        date.setDate(date.getDate() + 7);
+                        this.form.promo_end_date = date.toISOString().split('T')[0];
+                    }
+                },
+
+                removePromo() {
+                    // Restore original price
+                    this.form.harga_jual = this.form.harga_coret;
+                    this.form.harga_coret = 0;
+                    this.form.promo_end_date = null;
                 },
 
                 closeModal() {
