@@ -90,28 +90,48 @@
                 {{-- Right Side: Profile & Tools --}}
                 <div class="flex items-center gap-4">
                     {{-- User Profile Card --}}
-                    <a href="{{ route('profile.edit') }}"
-                        class="group flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md px-4 py-3 rounded-2xl transition-all duration-300">
-                        <div
-                            class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg overflow-hidden border border-white/30">
+                    {{-- User Profile Card (Updated) --}}
+                    <div class="flex items-center gap-3 bg-white/10 border border-white/20 backdrop-blur-md px-4 py-2 rounded-2xl transition-all duration-300">
+                        {{-- Avatar (Klik untuk ke Edit Profile) --}}
+                        <a href="{{ route('profile.edit') }}"
+                            class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg overflow-hidden border border-white/30 hover:ring-2 hover:ring-indigo-400 transition-all">
                             @if (Auth::user()->business && Auth::user()->business->logo)
                                 <img src="{{ asset('storage/' . Auth::user()->business->logo) }}" alt="Logo"
                                     class="w-full h-full object-cover">
                             @else
                                 {{ substr(Auth::user()->name, 0, 1) }}
                             @endif
-                        </div>
+                        </a>
+
+                        {{-- Text & Logout Button --}}
                         <div class="text-left hidden sm:block">
-                            <p class="text-sm font-bold text-white group-hover:text-indigo-100 transition-colors">
-                                {{ Auth::user()->name }}</p>
-                            <p class="text-xs text-indigo-200">{{ Auth::user()->role ?? 'Owner' }}</p>
+                            {{-- Nama User --}}
+                            <a href="{{ route('profile.edit') }}" 
+                               class="text-sm font-bold text-white hover:text-indigo-200 transition-colors block leading-tight">
+                                {{ Auth::user()->name }}
+                            </a>
+                            
+                            {{-- Role & Logout --}}
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <p class="text-[10px] text-indigo-200 uppercase tracking-wider">
+                                    {{ Auth::user()->role ?? 'Owner' }}
+                                </p>
+                                <span class="text-indigo-200/40 text-[10px]">|</span>
+                                
+                                {{-- Tombol Logout --}}
+                                <form method="POST" action="{{ route('logout') }}" class="inline">
+                                    @csrf
+                                    <button type="submit" 
+                                        class="text-[10px] font-bold text-rose-300 hover:text-rose-100 transition-colors cursor-pointer flex items-center gap-1">
+                                        Keluar
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <svg class="w-5 h-5 text-indigo-200 group-hover:text-white transition-colors ml-1"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </a>
+                    </div>
 
                     {{-- Theme Toggle --}}
                     <button @click="toggleTheme()"
