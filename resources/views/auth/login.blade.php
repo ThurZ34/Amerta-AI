@@ -2,9 +2,7 @@
 
 @section('title', 'Login')
 
-@section('image_url',
-    'https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')
-
+@section('image_url', asset('images/banner_login.png'))
 @section('content')
 
     <div class="text-left mb-6">

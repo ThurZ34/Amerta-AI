@@ -2,8 +2,7 @@
 
 @section('title', 'Daftar Akun')
 
-@section('image_url', 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')
-
+@section('image_url', asset('images/banner_login.png'))
 @section('content')
 
     <div class="text-left mb-6">
