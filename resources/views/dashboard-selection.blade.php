@@ -204,7 +204,6 @@
         </div>
     </div>
 
-    {{-- SCRIPT SWEETALERT (TETAP SAMA) --}}
     @if (session('success_request'))
         <script>
             Swal.fire({
@@ -213,6 +212,20 @@
                 text: '{{ session('success_request') }}',
                 confirmButtonColor: '#10b981',
                 confirmButtonText: 'Oke, saya tunggu',
+                background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#fff',
+                color: document.documentElement.classList.contains('dark') ? '#fff' : '#000',
+            });
+        </script>
+    @endif
+
+    @if(session('rejection_alert'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Permintaan Ditolak',
+                text: '{{ session("rejection_alert") }}',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Tutup',
                 background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#fff',
                 color: document.documentElement.classList.contains('dark') ? '#fff' : '#000',
             });
