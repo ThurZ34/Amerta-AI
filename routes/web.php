@@ -62,6 +62,12 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/update-target', 'updateTarget')->name('main_menu.update-target');
         });
 
+        Route::controller(\App\Http\Controllers\UserProfileController::class)->group(function () {
+            Route::get('/profile', 'edit')->name('profile.edit');
+            Route::put('/profile', 'update')->name('profile.update');
+        });
+
+
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
         Route::post('/produk/suggest-price', [ProdukController::class, 'suggestPrice'])->name('produk.suggest-price');
