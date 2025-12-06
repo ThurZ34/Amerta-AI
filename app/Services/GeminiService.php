@@ -89,6 +89,82 @@ class GeminiService
 
         return $data['candidates'][0]['content']['parts'][0]['text'] ?? "Maaf, saya tidak bisa membaca respon AI.";
     }
+    public function analyzeProductPromotions($business, $products)
+    {
+        $apiKey = config('services.gemini.key');
+        $model = config('services.gemini.model');
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+
+        // Format product data for prompt
+        $productsData = "";
+        foreach ($products as $p) {
+            $sales = $p->total_terjual_bulan_ini ?? 0;
+            $margin = $p->harga_jual - $p->modal;
+            $ageDays = $p->created_at ? round(now()->diffInDays($p->created_at)) : 30; // Default to 30 if null
+            $productsData .= "- ID: {$p->id} | Nama: {$p->nama_produk} | Harga: {$p->harga_jual} | Modal: {$p->modal} | Terjual Bulan Ini: {$sales} | Umur: {$ageDays} hari\n";
+        }
+
+        $prompt = "
+            PERAN: Kamu adalah Konsultan Bisnis & Pricing Expert.
+            
+            KONTEKS BISNIS:
+            Nama: {$business->nama_bisnis}
+            
+            DATA PRODUK:
+            {$productsData}
+
+            TUGAS:
+            Analisis data penjualan. Identifikasi produk yang butuh diskon/promosi.
+            
+            PANDUAN STRATEGI:
+            1. Jika 'Umur' < 7 hari dan sales 0: JANGAN anggap stok mati. Ini produk baru. Diskon hanya jika 'Intro Price' strategis (maks 10-15%).
+            2. Jika 'Umur' > 30 hari dan sales 0: Ini 'Dead Stock'. Diskon agresif (20-50%) untuk cuci gudang.
+            3. Jika Sales tinggi & Margin tebal: Tawarkan 'Bundling' atau 'Volume Discount'.
+            
+            OUTPUT JSON (HANYA JSON):
+            Kembalikan object JSON dimana KEY adalah ID Produk, dan VALUE adalah object rekomendasi.
+            Hanya sertakan produk yang MEMANG butuh tindakan strategis.
+            
+            Key 'duration_days' adalah rekomendasi durasi promo dalam hari (misal 3, 7, 30).
+            
+            Contoh Format:
+            {
+                \"12\": { 
+                    \"type\": \"Cuci Gudang\", 
+                    \"discount_percent\": 20, 
+                    \"duration_days\": 7,
+                    \"reason\": \"Barang lama (60 hari) tidak laku, perlu likuidasi stok.\" 
+                },
+                \"15\": { 
+                    \"type\": \"Promo Bundling\", 
+                    \"discount_percent\": 10, 
+                    \"duration_days\": 14,
+                    \"reason\": \"Produk laku keras dengan margin tebal, dorong pembelian jumlah banyak.\" 
+                }
+            }
+        ";
+
+        $response = Http::withHeaders(['Content-Type' => 'application/json'])
+            ->post($url, [
+                'contents' => [[
+                    'parts' => [['text' => $prompt]]
+                ]]
+            ]);
+
+        if ($response->failed()) {
+            return [];
+        }
+
+        $data = $response->json();
+        $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+
+        if ($text) {
+            $text = str_replace(['```json', '```'], '', $text);
+            return json_decode(trim($text), true) ?? [];
+        }
+
+        return [];
+    }
     public function analyzeReceipt(string $imagePath)
     {
         $apiKey = config('services.gemini.key');

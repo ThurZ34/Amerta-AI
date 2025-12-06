@@ -11,6 +11,7 @@ use App\Services\GeminiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Models\DailySaleItem;
 
 class RiwayatController extends Controller
 {
@@ -169,6 +170,40 @@ class RiwayatController extends Controller
                 'kategori' => $request->kategori,
                 'cash_journal_id' => $cashJournal ? $cashJournal->id : null,
             ]);
+
+            // AUTOMATED DAILY CHECKIN LOGIC
+            // Jika ada items dari kasir, masukkan ke DailySale & DailySaleItem
+            if ($request->has('items') && $request->jenis === 'pendapatan') {
+                $items = json_decode($request->items, true);
+
+                if (is_array($items) && count($items) > 0) {
+                    // Cari atau Buat Daily Sale untuk hari ini
+                    $dailySale = DailySale::firstOrCreate(
+                        [
+                            'business_id' => $business->id,
+                            'date' => $request->tanggal_pembelian,
+                        ],
+                        [
+                            'ai_analysis' => 'Menunggu analisis...',
+                        ]
+                    );
+
+                    foreach ($items as $item) {
+                        $produk = Produk::find($item['id']);
+                        if ($produk) {
+                             DailySaleItem::create([
+                                'daily_sale_id' => $dailySale->id,
+                                'produk_id' => $produk->id,
+                                'quantity' => $item['qty'],
+                                'price' => $item['harga_jual'],
+                                'cost' => $produk->modal ?? 0, // Ambil modal dari items/produk
+                            ]);
+                        }
+                    }
+                     
+                    // Opsi: Trigger ulang AI Analysis jika diperlukan, atau biarkan update manual/nanti
+                }
+            }
 
             DB::commit();
             return redirect()->route('riwayat.index')->with('success', 'Data berhasil ditambahkan.');

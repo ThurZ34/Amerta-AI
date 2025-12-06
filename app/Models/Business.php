@@ -48,4 +48,9 @@ class Business extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function joinRequests()
+    {
+        return $this->hasMany(BusinessJoinRequest::class);
+    }
 }

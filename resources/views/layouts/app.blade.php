@@ -95,7 +95,7 @@
         @endunless
 
         <div class="flex-1 flex flex-col min-w-0 h-full">
-            @unless (request()->routeIs(['dashboard-selection', 'dashboard-selection.join']))
+            @unless (request()->routeIs(['dashboard-selection', 'dashboard-selection.join', 'main_menu']))
                 @include('layouts.partials.header')
             @endunless
 
@@ -106,7 +106,7 @@
         </div>
     </div>
 
-    @unless (request()->routeIs(['dashboard-selection', 'dashboard-selection.join', 'main_menu']))
+    @unless (request()->routeIs(['dashboard-selection', 'dashboard-selection.join', 'main_menu', 'profil_bisnis']))
         <div x-data="chatWidget" @mousemove.window="doDrag($event)" @mouseup.window="stopDrag()"
             class="relative z-[9999]">
 

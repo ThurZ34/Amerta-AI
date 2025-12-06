@@ -14,7 +14,7 @@
 
         <div class="max-w-4xl mx-auto space-y-8">
 
-            <form id="scanForm" action="{{ route('riwayat.scan') }}" method="POST" enctype="multipart/form-data" class="hidden">
+            <form id="scanForm" action="{{ route('operasional.riwayat-keuangan.scan') }}" method="POST" enctype="multipart/form-data" class="hidden">
                 @csrf
                 <input type="file" id="scanInput" name="receipt_image" accept="image/*" @change="submitScan()">
             </form>
@@ -56,7 +56,7 @@
             </div>
 
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <form action="{{ route('riwayat.index') }}" method="GET" class="flex gap-2 w-full sm:w-auto">
+                <form action="{{ route('operasional.riwayat-keuangan.index') }}" method="GET" class="flex gap-2 w-full sm:w-auto">
                     <select name="month" onchange="this.form.submit()"
                         class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500">
                         @foreach (range(1, 12) as $m)
@@ -165,7 +165,7 @@
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                         </button>
 
-                                        <form :id="'delete-form-' + riwayat.id" :action="`{{ route('riwayat.index') }}/${riwayat.id}`" method="POST" class="inline">
+                                        <form :id="'delete-form-' + riwayat.id" :action="`{{ route('operasional.riwayat-keuangan.index') }}/${riwayat.id}`" method="POST" class="inline">
                                             @csrf @method('DELETE')
                                             <button type="button" @click="confirmDelete(riwayat.id)" class="text-xs text-gray-400 hover:text-red-500 transition-colors" title="Hapus">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -212,7 +212,7 @@
                      x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="ease-in duration-200"
                      x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 translate-y-4 scale-95">
 
-                    <form :action="isEditing ? `{{ route('riwayat.index') }}/${editId}` : '{{ route('riwayat.store') }}'" method="POST" enctype="multipart/form-data">
+                    <form :action="isEditing ? `{{ route('operasional.riwayat-keuangan.index') }}/${editId}` : '{{ route('operasional.riwayat-keuangan.store') }}'" method="POST" enctype="multipart/form-data">
                         @csrf
                         <template x-if="isEditing"><input type="hidden" name="_method" value="PUT"></template>
                         <input type="hidden" name="jenis" x-model="formData.jenis">

@@ -59,6 +59,7 @@ class SurveyController extends Controller
 
         $user = Auth::user();
         $user->business_id = $business->id;
+        $user->role = 'owner';
         $user->save();
 
         session()->flash('first_time_entry', true);

@@ -10,50 +10,81 @@
                 </svg>
             </button>
         @endunless
-        
+
         <div class="flex flex-col">
             <!-- Page Title -->
             <h1 class="text-xl font-semibold text-gray-800 dark:text-white">
                 @yield('header', 'Dashboard')
             </h1>
-            
+
             <!-- Dynamic Breadcrumbs -->
             <nav class="flex items-center space-x-1.5 text-xs mt-1">
-                <a href="{{ route('main_menu') }}" 
-                   class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                <a href="{{ route('main_menu') }}"
+                    class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                     Main Menu
                 </a>
-                
+
                 @php
-                    $routeName = request()->route()->getName();
+                    $route = request()->route()->getName();
                     $breadcrumbs = [];
-                    
-                    // Define breadcrumb mappings
-                    if (!in_array($routeName, ['main_menu', 'amerta'])) {
-                        $breadcrumbs[] = ['name' => 'Dashboard', 'route' => 'dashboard'];
-                        
-                        // Add specific page breadcrumb if not on dashboard
-                        if ($routeName !== 'dashboard') {
-                            // Current page is not clickable
-                            $breadcrumbs[] = ['name' => '', 'route' => null, 'current' => true];
+
+                    // Determine the breadcrumb category based on route prefix
+                    if (Str::startsWith($route, 'analisis.')) {
+                        // Analisis & Bantuan
+                        $breadcrumbs[] = ['name' => 'Analisis & Bantuan', 'route' => null];
+                        if ($route === 'analisis.dashboard') {
+                            $breadcrumbs[] = [
+                                'name' => 'Dashboard',
+                                'route' => 'analisis.dashboard',
+                                'current' => true,
+                            ];
+                        } else {
+                            $breadcrumbs[] = [
+                                'name' => trim($__env->yieldContent('header')),
+                                'route' => null,
+                                'current' => true,
+                            ];
+                        }
+                    } elseif (Str::startsWith($route, 'operasional.')) {
+                        // Operasional Harian pages
+                        $breadcrumbs[] = ['name' => 'Operasional Harian', 'route' => null];
+                        $breadcrumbs[] = [
+                            'name' => trim($__env->yieldContent('header')),
+                            'route' => null,
+                            'current' => true,
+                        ];
+                    } elseif (Str::startsWith($route, 'manajemen.')) {
+                        // Manajemen Bisnis pages
+                        $breadcrumbs[] = ['name' => 'Manajemen Bisnis', 'route' => null];
+                        $breadcrumbs[] = [
+                            'name' => trim($__env->yieldContent('header')),
+                            'route' => null,
+                            'current' => true,
+                        ];
+                    } else {
+                        // Fallback – Dashboard
+                        $breadcrumbs[] = ['name' => 'Dashboard', 'route' => 'analisis.dashboard'];
+                        if ($route !== 'analisis.dashboard') {
+                            $breadcrumbs[] = [
+                                'name' => trim($__env->yieldContent('header', 'Page')),
+                                'route' => null,
+                                'current' => true,
+                            ];
                         }
                     }
                 @endphp
-                
+
                 @foreach ($breadcrumbs as $crumb)
-                    <svg class="w-3 h-3 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3 h-3 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                    
-                    @if ($crumb['route'])
-                        <a href="{{ route($crumb['route']) }}" 
-                           class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+
+                    @if (!empty($crumb['route']) && empty($crumb['current']))
+                        <a href="{{ route($crumb['route']) }}"
+                            class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                             {{ $crumb['name'] }}
                         </a>
-                    @elseif (isset($crumb['current']) && $crumb['current'])
-                        <span class="text-gray-600 dark:text-gray-300">
-                            @yield('header', 'Page')
-                        </span>
                     @else
                         <span class="text-gray-600 dark:text-gray-300">
                             {{ $crumb['name'] }}
@@ -61,6 +92,7 @@
                     @endif
                 @endforeach
             </nav>
+
         </div>
     </div>
 
@@ -89,10 +121,15 @@
                 class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group">
 
                 <div class="relative">
-                    <div
-                        class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-gray-900 dark:text-white font-bold text-xs shadow-sm uppercase">
-                        {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
-                    </div>
+                    @if (Auth::user()->photo)
+                        <img src="{{ asset('storage/' . Auth::user()->photo) }}" alt="{{ Auth::user()->name }}"
+                            class="w-9 h-9 rounded-full object-cover shadow-sm border border-gray-200 dark:border-gray-700">
+                    @else
+                        <div
+                            class="w-9 h-9 rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-gray-900 dark:text-white font-bold text-xs shadow-sm uppercase">
+                            {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
+                        </div>
+                    @endif
                     <span
                         class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></span>
                 </div>
@@ -105,15 +142,13 @@
                 </div>
 
                 <svg class="w-4 h-4 text-gray-400 dark:text-gray-600 transform transition-transform duration-200"
-                    :class="{ 'rotate-180': open }"
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
 
             </button>
 
-            <div x-show="open"
-                x-transition:enter="transition ease-out duration-100"
+            <div x-show="open" x-transition:enter="transition ease-out duration-100"
                 x-transition:enter-start="transform opacity-0 scale-95"
                 x-transition:enter-end="transform opacity-100 scale-100"
                 x-transition:leave="transition ease-in duration-75"
@@ -123,20 +158,20 @@
                 style="display: none;">
 
                 <div class="py-1">
-                    <a href="{{ route('profil_bisnis') }}"
+                    <a href="{{ route('profile.edit') }}"
                         class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
-                        <span>Profil Bisnis</span>
+                        <span>Profil Anda</span>
                     </a>
                 </div>
 
                 <div class="py-1">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit"
+                        <button type="submit" onclick="confirmLogout(event)"
                             class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-left">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -151,3 +186,24 @@
         </div>
     </div>
 </header>
+
+<script>
+    function confirmLogout(event) {
+        event.preventDefault();
+        const form = event.target.closest('form');
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Anda akan keluar dari sesi ini.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Keluar!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+</script>

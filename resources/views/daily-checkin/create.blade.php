@@ -23,7 +23,7 @@
 
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                 <div>
-                    <a href="{{ route('daily-checkin.index') }}"
+                    <a href="{{ route('operasional.analisis-penjualan.index') }}"
                         class="inline-flex items-center text-sm text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition mb-2">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('daily-checkin.store') }}" method="POST" @submit="isLoading = true">
+            <form action="{{ route('operasional.analisis-penjualan.store') }}" method="POST" @submit="isLoading = true">
                 @csrf
                 <input type="hidden" name="date" value="{{ $date }}">
 
@@ -127,7 +127,7 @@
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Belum ada produk</h3>
                             <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 max-w-sm">Tambahkan produk di menu
                                 Katalog Produk terlebih dahulu sebelum mengisi laporan.</p>
-                            <a href="{{ route('produk.index') }}"
+                            <a href="{{ route('manajemen.produk.index') }}"
                                 class="mt-4 inline-flex items-center text-sm font-medium text-indigo-600 hover:underline">
                                 Ke Katalog Produk &rarr;
                             </a>
