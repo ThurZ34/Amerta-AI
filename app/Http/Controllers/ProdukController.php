@@ -144,7 +144,13 @@ class ProdukController extends Controller
         $month = now()->format('m');
         $year = now()->format('Y');
 
-        $products = Produk::where('business_id', $business->id)->get();
+        $products = Produk::where('business_id', $business->id)
+            ->where(function($q) {
+                $q->whereNull('harga_coret')
+                  ->orWhere('harga_coret', 0)
+                  ->orWhere('promo_end_date', '<', now());
+            })
+            ->get();
         
         $products->each(function ($produk) use ($month, $year) {
             $produk->total_terjual_bulan_ini = $produk->getTotalTerjualPerBulan($month, $year);

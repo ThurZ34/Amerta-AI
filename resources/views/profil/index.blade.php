@@ -3,76 +3,12 @@
 @section('header', 'Profil Bisnis')
 
 @section('content')
+    {{-- 
+      PERUBAHAN 1: x-data sekarang jauh lebih bersih. 
+      Logic dipanggil dari function di bawah.
+    --}}
     <div class="min-h-screen bg-gray-50/50 dark:bg-gray-900 py-8 transition-colors duration-300 font-sans"
-        x-data="{
-            isEditing: false,
-            categorySearch: '',
-            showCategoryDropdown: false,
-            categories: {{ json_encode($categories->pluck('name')->toArray()) }},
-            selectedCategory: '{{ old('kategori', optional(optional($business)->category)->name ?? '') }}',
-            
-            imagePreview: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
-            originalImage: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
-            deleteImage: false,
-            showImageModal: false,
-            modalImageUrl: '',
-        
-            openImageModal(url) {
-                this.modalImageUrl = url;
-                this.showImageModal = true;
-            },
-            updatePreview(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    this.deleteImage = false;
-                    const reader = new FileReader();
-                    reader.onload = (e) => { this.imagePreview = e.target.result; };
-                    reader.readAsDataURL(file);
-                }
-            },
-            removeImage() {
-                this.imagePreview = '';
-                this.deleteImage = true;
-                document.getElementById('gambar-input').value = '';
-            },
-            toggleEdit() {
-                if (this.isEditing) {
-                    this.isEditing = false;
-                    this.imagePreview = this.originalImage;
-                    this.deleteImage = false;
-                    this.selectedCategory = '{{ optional(optional($business)->category)->name ?? '' }}';
-                    if (document.getElementById('gambar-input')) document.getElementById('gambar-input').value = '';
-                } else {
-                    this.isEditing = true;
-                }
-            },
-            get filteredCategories() {
-                if (!this.categorySearch) return this.categories;
-                return this.categories.filter(cat => cat.toLowerCase().includes(this.categorySearch.toLowerCase()));
-            },
-            get showAddButton() {
-                return this.categorySearch && !this.categories.some(cat => cat.toLowerCase() === this.categorySearch.toLowerCase());
-            },
-            selectCategory(category) {
-                this.selectedCategory = category;
-                this.categorySearch = '';
-                this.showCategoryDropdown = false;
-            },
-            async addNewCategory() {
-                try {
-                    const response = await fetch('{{ route('manajemen.categories.store') }}', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ name: this.categorySearch })
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        this.categories.push(data.category.name);
-                        this.selectCategory(data.category.name);
-                    }
-                } catch (error) { console.error('Error adding category:', error); }
-            }
-        }">
+        x-data="businessProfileLogic()">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -91,7 +27,8 @@
                             :class="isEditing ?
                                 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' :
                                 'bg-indigo-600 text-white border-transparent hover:bg-indigo-700 hover:shadow-indigo-500/30'">
-                            <svg x-show="!isEditing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg x-show="!isEditing" class="w-4 h-4" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
@@ -367,7 +304,6 @@
                     {{-- Card Kode Tim (FIXED DARK MODE) --}}
                     <div
                         class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-gray-900 dark:text-white relative overflow-hidden border border-gray-200 dark:border-gray-700">
-                        {{-- Hapus gradient agar konsisten, gunakan background polos dark mode --}}
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-900/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none">
                         </div>
@@ -642,4 +578,92 @@
         </div>
 
     </div>
+
+    {{-- 
+      PERUBAHAN 2: Script di taruh sendiri di bawah.
+      Saya menggunakan @json() agar parsing datanya lebih aman dan rapi.
+    --}}
+    <script>
+        function businessProfileLogic() {
+            return {
+                isEditing: false,
+                categorySearch: '',
+                showCategoryDropdown: false,
+                categories: @json($categories->pluck('name')->toArray()),
+                selectedCategory: '{{ old('kategori', optional(optional($business)->category)->name ?? '') }}',
+
+                imagePreview: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
+                originalImage: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
+                deleteImage: false,
+                showImageModal: false,
+                modalImageUrl: '',
+
+                openImageModal(url) {
+                    this.modalImageUrl = url;
+                    this.showImageModal = true;
+                },
+                updatePreview(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        this.deleteImage = false;
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.imagePreview = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                },
+                removeImage() {
+                    this.imagePreview = '';
+                    this.deleteImage = true;
+                    document.getElementById('gambar-input').value = '';
+                },
+                toggleEdit() {
+                    if (this.isEditing) {
+                        this.isEditing = false;
+                        this.imagePreview = this.originalImage;
+                        this.deleteImage = false;
+                        this.selectedCategory = '{{ optional(optional($business)->category)->name ?? '' }}';
+                        if (document.getElementById('gambar-input')) document.getElementById('gambar-input').value = '';
+                    } else {
+                        this.isEditing = true;
+                    }
+                },
+                get filteredCategories() {
+                    if (!this.categorySearch) return this.categories;
+                    return this.categories.filter(cat => cat.toLowerCase().includes(this.categorySearch.toLowerCase()));
+                },
+                get showAddButton() {
+                    return this.categorySearch && !this.categories.some(cat => cat.toLowerCase() === this.categorySearch
+                        .toLowerCase());
+                },
+                selectCategory(category) {
+                    this.selectedCategory = category;
+                    this.categorySearch = '';
+                    this.showCategoryDropdown = false;
+                },
+                async addNewCategory() {
+                    try {
+                        const response = await fetch('{{ route('manajemen.categories.store') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                name: this.categorySearch
+                            })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            this.categories.push(data.category.name);
+                            this.selectCategory(data.category.name);
+                        }
+                    } catch (error) {
+                        console.error('Error adding category:', error);
+                    }
+                }
+            }
+        }
+    </script>
 @endsection

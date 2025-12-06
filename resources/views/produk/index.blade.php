@@ -3,7 +3,7 @@
 @section('header', 'Manajemen Produk')
 
 @section('content')
-    <div class="py-8 w-full" x-data="productManager()">
+    <div class="py-8 w-full" x-data="productManager()" @open-ai-edit.window="openModal('edit', $event.detail)">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <!-- Header & Actions -->
@@ -91,13 +91,13 @@
                 </div>
 
                 <div x-show="showResults" x-transition.duration.500ms
-                    class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-100 dark:border-indigo-500/30">
+                    class="bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-100 dark:border-indigo-500/30">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <template x-for="(rec, id) in results" :key="id">
                             <div
                                 class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-indigo-100 dark:border-indigo-500/30 relative overflow-hidden group">
                                 <div
-                                    class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-150">
+                                    class="absolute top-0 right-0 w-16 h-16 bg-linear-to-br from-indigo-500/10 to-purple-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-150">
                                 </div>
 
                                 <div class="flex items-start justify-between mb-2">
@@ -145,7 +145,7 @@
                         x-show="!search || '{{ strtolower($produk->nama_produk) }}'.includes(search.toLowerCase())">
 
                         <!-- Image -->
-                        <div class="aspect-[4/3] bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
+                        <div class="aspect-4/3 bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
                             @if ($produk->gambar)
                                 <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}"
                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
@@ -418,7 +418,7 @@
                     class="relative z-10 inline-block w-full max-w-md p-6 my-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
                     <div class="flex items-center gap-4">
                         <div
-                            class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30">
+                            class="shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30">
                             <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -631,22 +631,30 @@
                     endDate.setDate(endDate.getDate() + (durationDays || 7));
                     const formattedDate = endDate.toISOString().split('T')[0];
 
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const colors = isDark ? {
+                        background: '#1f2937',
+                        color: '#f3f4f6'
+                    } : {
+                        background: '#ffffff',
+                        color: '#1f2937'
+                    };
+
                     Swal.fire({
                         title: 'Terapkan Diskon ' + percent + '%?',
                         html: `
                     Harga akan berubah dari <b>${this.formatRp(oldPrice)}</b> menjadi <b>${this.formatRp(newPrice)}</b><br>
-                    <span class="text-sm text-gray-500">Harga lama disimpan sebagai "Harga Coret".<br>Promo berakhir: ${formattedDate}</span>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">Harga lama disimpan sebagai "Harga Coret".<br>Promo berakhir: ${formattedDate}</span>
                 `,
                         icon: 'question',
+                        ...colors,
                         showCancelButton: true,
                         confirmButtonText: 'Terapkan & Edit',
                         cancelButtonText: 'Batal'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            const mainEl = document.querySelector(
-                                '[x-data="productManager()"]');
-                            if (mainEl && mainEl.__x) {
-                                mainEl.__x.$data.openModal('edit', {
+                            window.dispatchEvent(new CustomEvent('open-ai-edit', {
+                                detail: {
                                     id: id,
                                     nama_produk: product.nama_produk,
                                     modal: product.modal,
@@ -655,8 +663,8 @@
                                     promo_end_date: formattedDate, // Set expiration
                                     jenis_produk: product.jenis_produk,
                                     gambar: product.gambar
-                                });
-                            }
+                                }
+                            }));
                         }
                     });
                 },
