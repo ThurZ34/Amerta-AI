@@ -20,40 +20,53 @@
             <!-- Dynamic Breadcrumbs -->
             <nav class="flex items-center space-x-1.5 text-xs mt-1">
                 <a href="{{ route('main_menu') }}" 
-                   class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                     Main Menu
                 </a>
-                
+
                 @php
-                    $routeName = request()->route()->getName();
+                    $route = request()->route()->getName();
                     $breadcrumbs = [];
-                    
-                    // Define breadcrumb mappings
-                    if (!in_array($routeName, ['main_menu', 'amerta'])) {
-                        $breadcrumbs[] = ['name' => 'Dashboard', 'route' => 'dashboard'];
-                        
-                        // Add specific page breadcrumb if not on dashboard
-                        if ($routeName !== 'dashboard') {
-                            // Current page is not clickable
-                            $breadcrumbs[] = ['name' => '', 'route' => null, 'current' => true];
+
+                    // Determine the breadcrumb category based on route prefix
+                    if (Str::startsWith($route, 'analisis.')) {
+                        // Analisis & Bantuan
+                        $breadcrumbs[] = ['name' => 'Analisis & Bantuan', 'route' => null];
+                        if ($route === 'analisis.dashboard') {
+                            $breadcrumbs[] = ['name' => 'Dashboard', 'route' => 'analisis.dashboard', 'current' => true];
+                        } else {
+                            $breadcrumbs[] = ['name' => trim($__env->yieldContent('header')), 'route' => null, 'current' => true];
+                        }
+
+                    } elseif (Str::startsWith($route, 'operasional.')) {
+                        // Operasional Harian pages
+                        $breadcrumbs[] = ['name' => 'Operasional Harian', 'route' => null];
+                        $breadcrumbs[] = ['name' => trim($__env->yieldContent('header')), 'route' => null, 'current' => true];
+
+                    } elseif (Str::startsWith($route, 'manajemen.')) {
+                        // Manajemen Bisnis pages
+                        $breadcrumbs[] = ['name' => 'Manajemen Bisnis', 'route' => null];
+                        $breadcrumbs[] = ['name' => trim($__env->yieldContent('header')), 'route' => null, 'current' => true];
+
+                    } else {
+                        // Fallback – Dashboard
+                        $breadcrumbs[] = ['name' => 'Dashboard', 'route' => 'analisis.dashboard'];
+                        if ($route !== 'analisis.dashboard') {
+                            $breadcrumbs[] = ['name' => trim($__env->yieldContent('header', 'Page')), 'route' => null, 'current' => true];
                         }
                     }
                 @endphp
-                
+
                 @foreach ($breadcrumbs as $crumb)
                     <svg class="w-3 h-3 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                    
-                    @if ($crumb['route'])
-                        <a href="{{ route($crumb['route']) }}" 
-                           class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+
+                    @if (!empty($crumb['route']) && empty($crumb['current']))
+                        <a href="{{ route($crumb['route']) }}"
+                        class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                             {{ $crumb['name'] }}
                         </a>
-                    @elseif (isset($crumb['current']) && $crumb['current'])
-                        <span class="text-gray-600 dark:text-gray-300">
-                            @yield('header', 'Page')
-                        </span>
                     @else
                         <span class="text-gray-600 dark:text-gray-300">
                             {{ $crumb['name'] }}
@@ -61,6 +74,7 @@
                     @endif
                 @endforeach
             </nav>
+
         </div>
     </div>
 

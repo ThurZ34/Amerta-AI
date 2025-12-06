@@ -218,7 +218,7 @@
                     </div>
 
                     {{-- Menu Item: Laporan Harian --}}
-                    <a href="{{ route('daily-checkin.index') }}"
+                    <a href="{{ route('operasional.analisis-penjualan.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
                             class="absolute top-0 right-0 w-24 h-24 bg-emerald-50 dark:bg-emerald-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
@@ -245,7 +245,7 @@
                     </a>
 
                     {{-- Menu Item: Catat Pengeluaran --}}
-                    <a href="{{ route('riwayat.index') }}"
+                    <a href="{{ route('operasional.riwayat-keuangan.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
                             class="absolute top-0 right-0 w-24 h-24 bg-rose-50 dark:bg-rose-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
@@ -280,7 +280,7 @@
                     </div>
 
                     {{-- Menu Item: Produk --}}
-                    <a href="{{ route('produk.index') }}"
+                    <a href="{{ route('manajemen.produk.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
                             class="absolute top-0 right-0 w-24 h-24 bg-purple-50 dark:bg-purple-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
@@ -306,7 +306,7 @@
                     </a>
 
                     {{-- Menu Item: Profil Bisnis --}}
-                    <a href="{{ route('profil_bisnis') }}"
+                    <a href="{{ route('manajemen.profil-bisnis.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
                             class="absolute top-0 right-0 w-24 h-24 bg-orange-50 dark:bg-orange-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
@@ -341,7 +341,7 @@
                     </div>
 
                     {{-- Menu Item: Dashboard --}}
-                    <a href="{{ route('dashboard') }}"
+                    <a href="{{ route('analisis.dashboard') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
                             class="absolute top-0 right-0 w-24 h-24 bg-blue-50 dark:bg-blue-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">

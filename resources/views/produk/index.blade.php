@@ -15,7 +15,7 @@
 
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <!-- Month/Year Filter -->
-                <form method="GET" action="{{ route('produk.index') }}" class="flex gap-2">
+                <form method="GET" action="{{ route('manajemen.produk.index') }}" class="flex gap-2">
                     <select name="month" onchange="this.form.submit()" class="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 text-gray-900 dark:text-gray-100">
                         @foreach(range(1, 12) as $m)
                             <option value="{{ sprintf('%02d', $m) }}" {{ request('month', now()->format('m')) == sprintf('%02d', $m) ? 'selected' : '' }}>
@@ -128,7 +128,7 @@
             <div x-show="modal !== null" @click="closeModal()" x-transition.opacity class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
             
             <div x-show="modal === 'create' || modal === 'edit'" x-transition class="relative z-10 inline-block w-full max-w-lg my-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
-                <form :action="modal === 'edit' ? '/produk/' + form.id : '{{ route('produk.store') }}'" method="POST" enctype="multipart/form-data">
+                <form :action="modal === 'edit' ? '/manajemen/produk/' + form.id : '{{ route('manajemen.produk.store') }}'" method="POST" enctype="multipart/form-data">
                     @csrf
                     <template x-if="modal === 'edit'"><input type="hidden" name="_method" value="PUT"></template>
 
@@ -260,7 +260,7 @@ function productManager() {
         closeModal() {
             this.modal = null;
             this.resetForm();
-        },
+        },  
 
         resetForm() {
             this.form = { id: null, nama_produk: '', modal: 0, harga_jual: 0, jenis_produk: '' };
@@ -280,7 +280,7 @@ function productManager() {
             this.aiReason = '';
 
             try {
-                const response = await fetch('{{ route('produk.suggest-price') }}', {
+                const response = await fetch('{{ route('manajemen.produk.suggest-price') }}', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                     body: JSON.stringify({ nama_produk: this.form.nama_produk, modal: this.form.modal, jenis_produk: this.form.jenis_produk })

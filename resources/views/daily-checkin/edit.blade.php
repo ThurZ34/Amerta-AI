@@ -23,7 +23,7 @@
 
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                 <div>
-                    <a href="{{ route('daily-checkin.show', $dailySale->id) }}"
+                    <a href="{{ route('operasional.analisis-penjualan.show', $dailySale->id) }}"
                         class="inline-flex items-center text-sm text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition mb-2">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('daily-checkin.update', $dailySale->id) }}" method="POST" @submit="isLoading = true">
+            <form action="{{ route('operasional.analisis-penjualan.update', $dailySale->id) }}" method="POST" @submit="isLoading = true">
                 @csrf
                 @method('PUT')
 
@@ -127,7 +127,7 @@
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Belum ada produk</h3>
                             <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 max-w-sm">Tambahkan produk di menu
                                 Katalog Produk terlebih dahulu sebelum mengisi laporan.</p>
-                            <a href="{{ route('produk.index') }}"
+                            <a href="{{ route('manajemen.produk.index') }}"
                                 class="mt-4 inline-flex items-center text-sm font-medium text-indigo-600 hover:underline">
                                 Ke Katalog Produk &rarr;
                             </a>
@@ -144,7 +144,7 @@
                                     sesuai.</p>
                             </div>
                             <div class="flex gap-3 w-full sm:w-auto">
-                                <a href="{{ route('daily-checkin.show', $dailySale->id) }}"
+                                <a href="{{ route('operasional.analisis-penjualan.show', $dailySale->id) }}"
                                     class="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-3 px-6 rounded-xl transition-all">
                                     Batal
                                 </a>

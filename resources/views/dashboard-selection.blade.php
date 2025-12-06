@@ -72,7 +72,7 @@
                                 <strong class="text-emerald-600 dark:text-emerald-400">{{ Auth::user()->business->nama_bisnis }}</strong>.
                             </p>
                             <div class="mt-auto">
-                                <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30 transition-all active:scale-95">
+                                <a href="{{ route('analisis.dashboard') }}" class="flex items-center justify-center w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30 transition-all active:scale-95">
                                     Masuk Main Menu
                                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                                 </a>

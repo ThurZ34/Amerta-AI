@@ -185,7 +185,7 @@
                     </div>
                 </div>
 
-                <form action="{{ route('riwayat.store') }}" method="POST" @submit.prevent="submitTransaction">
+                <form action="{{ route('operasional.riwayat-keuangan.store') }}" method="POST" @submit.prevent="submitTransaction">
                     @csrf
                     <input type="hidden" name="jenis" value="pendapatan">
                     <input type="hidden" name="tanggal_pembelian" value="{{ date('Y-m-d') }}">

@@ -14,7 +14,7 @@
     <a href="{{ route('google.login') }}"
         class="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg p-3 hover:bg-gray-50 transition">
         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
-        <span class="text-sm font-medium text-gray-700">Masuk dengan Google</span>
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Masuk dengan Google</span>
     </a>
 
     <div class="relative flex py-2 items-center">

@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section ('header', 'Profil Bisnis')
+
 @section('content')
     <div class="min-h-screen bg-gray-50/50 dark:bg-gray-900 py-8 transition-colors duration-300 font-sans"
         x-data="{
@@ -56,7 +58,7 @@
             },
             async addNewCategory() {
                 try {
-                    const response = await fetch('{{ route('categories.store') }}', {
+                    const response = await fetch('{{ route('manajemen.categories.store') }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                         body: JSON.stringify({ name: this.categorySearch })
@@ -78,6 +80,7 @@
                     <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Profil Bisnis</h1>
                     <p class="text-gray-500 dark:text-gray-400 mt-1">Kelola identitas bisnis dan anggota tim Anda.</p>
                 </div>
+                @if(auth()->user()->role === 'owner' && auth()->user()->business && auth()->user()->id === auth()->user()->business->user_id)
                 <div class="flex items-center gap-3">
                     <button @click="toggleEdit()" type="button"
                         class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm border"
@@ -96,6 +99,7 @@
                         <span x-text="isEditing ? 'Batal Edit' : 'Edit Profil'"></span>
                     </button>
                 </div>
+                @endif
             </div>
 
             @if (session('success'))
@@ -116,7 +120,7 @@
 
                 {{-- KOLOM KIRI: FORM PROFIL BISNIS (Lebar 2/3) --}}
                 <div class="lg:col-span-2 space-y-6">
-                    <form action="{{ route('profil_bisnis.update') }}" method="POST" enctype="multipart/form-data"
+                    <form action="{{ route('manajemen.profil-bisnis.update') }}" method="POST" enctype="multipart/form-data"
                         class="space-y-8">
                         @csrf
                         @method('PUT')
@@ -417,7 +421,7 @@
                                             </div>
                                         </div>
                                         <div class="flex gap-2">
-                                            <form action="{{ route('business.request.action', $req->id) }}"
+                                            <form action="{{ route('manajemen.business-request.action', $req->id) }}"
                                                 method="POST" class="flex-1">
                                                 @csrf
                                                 <input type="hidden" name="action" value="approve">
@@ -426,7 +430,7 @@
                                                     Terima
                                                 </button>
                                             </form>
-                                            <form action="{{ route('business.request.action', $req->id) }}"
+                                            <form action="{{ route('manajemen.business-request.action', $req->id) }}"
                                                 method="POST" class="flex-1">
                                                 @csrf
                                                 <input type="hidden" name="action" value="reject">
@@ -515,7 +519,7 @@
                                 <div class="flex items-center justify-between">
                                     <!-- Per Page Selector -->
                                     @if ($staffMembers->total() > 5)
-                                        <form method="GET" action="{{ route('profil_bisnis') }}" class="flex items-center">
+                                        <form method="GET" action="{{ route('manajemen.profil-bisnis.index') }}" class="flex items-center">
                                             <div class="relative">
                                                 <select name="per_page" onchange="this.form.submit()"
                                                     class="h-8 px-3 pr-8 rounded-md border border-gray-300 dark:border-gray-600

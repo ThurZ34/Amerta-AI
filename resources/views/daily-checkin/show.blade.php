@@ -10,7 +10,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('daily-checkin.index') }}"
+                        <a href="{{ route('operasional.analisis-penjualan.index') }}"
                             class="group p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                             title="Kembali ke Kalender">
                             <svg class="w-8 h-8 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors"
@@ -289,7 +289,7 @@
                         </button>
                     </div>
 
-                    <form action="{{ route('daily-checkin.update', $dailySale->id) }}" method="POST"
+                    <form action="{{ route('operasional.analisis-penjualan.update', $dailySale->id) }}" method="POST"
                         @submit="isLoading = true">
                         @csrf
                         @method('PUT')
