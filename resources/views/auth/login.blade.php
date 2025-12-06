@@ -14,7 +14,7 @@
     <a href="{{ route('google.login') }}"
         class="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg p-3 hover:bg-gray-50 transition">
         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
-        <span class="text-sm font-medium text-gray-700">Masuk dengan Google</span>
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Masuk dengan Google</span>
     </a>
 
     <div class="relative flex py-2 items-center">
@@ -51,14 +51,13 @@
         </div>
 
         <button type="submit"
-            class="w-full bg-black dark:bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-indigo-700 transition duration-300 shadow-lg dark:shadow-indigo-900/20">
+            class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-indigo-700 transition duration-300 shadow-lg dark:shadow-indigo-900/20">
             Masuk
         </button>
     </form>
 
     <div class="text-center text-sm text-gray-600 dark:text-gray-400">
         Belum punya akun?
-        <a href="{{ route('register') }}" class="font-semibold text-black dark:text-indigo-400 hover:underline">Daftar
-            Sekarang</a>
+        <a href="{{ route('register') }}" class="font-semibold text-indigo-400 hover:underline">Daftar Sekarang</a>
     </div>
 @endsection

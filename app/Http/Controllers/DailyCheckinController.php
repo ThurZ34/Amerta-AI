@@ -165,7 +165,7 @@ class DailyCheckinController extends Controller
             return back()->withInput()->withErrors('Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
         }
 
-        return redirect()->route('daily-checkin.show', $dailySale->id);
+        return redirect()->route('operasional.analisis-penjualan.show', $dailySale->id);
     }
 
     public function show($id)
@@ -308,6 +308,6 @@ class DailyCheckinController extends Controller
             return back()->withInput()->withErrors('Terjadi kesalahan saat mengupdate data: ' . $e->getMessage());
         }
 
-        return redirect()->route('daily-checkin.show', $dailySale->id)->with('success', 'Data berhasil diupdate!');
+        return redirect()->route('operasional.analisis-penjualan.show', $dailySale->id)->with('success', 'Data berhasil diupdate!');
     }
 }

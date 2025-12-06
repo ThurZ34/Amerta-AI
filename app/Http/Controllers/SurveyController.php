@@ -13,7 +13,7 @@ class SurveyController extends Controller
     public function index()
     {
         if (Auth::user()->business()->exists()) {
-            return redirect()->route('dashboard');
+            return redirect()->route('analisis.dashboard');
         }
 
         return view('setup-bisnis');
@@ -59,10 +59,11 @@ class SurveyController extends Controller
 
         $user = Auth::user();
         $user->business_id = $business->id;
+        $user->role = 'owner';
         $user->save();
 
         session()->flash('first_time_entry', true);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('analisis.dashboard');
     }
 }

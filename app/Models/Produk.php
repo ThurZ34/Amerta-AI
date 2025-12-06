@@ -8,11 +8,19 @@ use Carbon\Carbon;
 class produk extends Model
 {
     protected $table = 'produk';
+    protected $casts = [
+        'modal' => 'decimal:2',
+        'harga_jual' => 'decimal:2',
+        'harga_coret' => 'decimal:2',
+        'promo_end_date' => 'date',
+    ];
     protected $fillable = [
         'business_id',
         'nama_produk',
         'modal',
         'harga_jual',
+        'harga_coret',
+        'promo_end_date',
         'jenis_produk',
         'gambar',
     ];

@@ -9,8 +9,8 @@
         targetDateDisplay: '',
         isLoading: false,
         salesData: {},
-        baseAction: '{{ route('daily-checkin.store') }}',
-        formAction: '{{ route('daily-checkin.store') }}',
+        baseAction: '{{ route('operasional.analisis-penjualan.store') }}',
+        formAction: '{{ route('operasional.analisis-penjualan.store') }}',
         method: 'POST',
     
         init() {
@@ -35,7 +35,7 @@
                 for (const [productId, qty] of Object.entries(existingItems)) {
                     this.salesData[productId] = parseInt(qty);
                 }
-                this.formAction = '{{ url('/daily-checkin') }}/' + id;
+                this.formAction = '{{ url('/operasional/analisis-penjualan') }}/' + id;
                 this.method = 'PUT';
             } else {
                 // Create Mode
@@ -111,7 +111,7 @@
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white">Kalender Penjualan</h2>
                     <div
                         class="flex items-center bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-1">
-                        <a href="{{ route('daily-checkin.index', ['date' => $startOfMonth->copy()->subMonth()->format('Y-m-d')]) }}"
+                        <a href="{{ route('operasional.analisis-penjualan.index', ['date' => $startOfMonth->copy()->subMonth()->format('Y-m-d')]) }}"
                             class="p-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md text-gray-500 dark:text-gray-400 transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -120,7 +120,7 @@
                         <span class="px-4 font-semibold text-gray-900 dark:text-white text-sm min-w-[140px] text-center">
                             {{ $startOfMonth->translatedFormat('F Y') }}
                         </span>
-                        <a href="{{ route('daily-checkin.index', ['date' => $startOfMonth->copy()->addMonth()->format('Y-m-d')]) }}"
+                        <a href="{{ route('operasional.analisis-penjualan.index', ['date' => $startOfMonth->copy()->addMonth()->format('Y-m-d')]) }}"
                             class="p-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md text-gray-500 dark:text-gray-400 transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -182,7 +182,7 @@
                                         </div>
                                     @else
                                         <!-- Analyzed - Click to Show -->
-                                        <a href="{{ route('daily-checkin.show', $dailySale->id) }}"
+                                        <a href="{{ route('operasional.analisis-penjualan.show', $dailySale->id) }}"
                                             class="absolute inset-0 z-10"></a>
 
                                         <div class="absolute top-1 right-1">

@@ -14,9 +14,10 @@ class BusinessRequestController extends Controller
             ->findOrFail($id);
 
         if ($request->action === 'approve') {
-            // 1. Update user business_id
+            // 1. Update user business_id and assign staff role
             $user = User::find($joinRequest->user_id);
             $user->business_id = $joinRequest->business_id;
+            $user->role = 'staf';
             $user->save();
 
             // 2. Hapus request karena sudah diterima
@@ -27,7 +28,7 @@ class BusinessRequestController extends Controller
 
         if ($request->action === 'reject') {
             // Hapus request
-            $joinRequest->delete();
+            $joinRequest->update(['status' => 'rejected']);
             return back()->with('success', 'Permintaan bergabung ditolak.');
         }
 

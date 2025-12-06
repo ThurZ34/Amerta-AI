@@ -1,74 +1,14 @@
 @extends('layouts.app')
 
+@section('header', 'Profil Bisnis')
+
 @section('content')
+    {{--
+      PERUBAHAN 1: x-data sekarang jauh lebih bersih.
+      Logic dipanggil dari function di bawah.
+    --}}
     <div class="min-h-screen bg-gray-50/50 dark:bg-gray-900 py-8 transition-colors duration-300 font-sans"
-        x-data="{
-            isEditing: false,
-            categorySearch: '',
-            showCategoryDropdown: false,
-            categories: {{ json_encode($categories->pluck('name')->toArray()) }},
-            selectedCategory: '{{ old('kategori', optional(optional($business)->category)->name ?? '') }}',
-
-            imagePreview: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
-            originalImage: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
-            deleteImage: false,
-            showImageModal: false,
-            modalImageUrl: '',
-
-            openImageModal(url) { this.modalImageUrl = url;
-                this.showImageModal = true; },
-            updatePreview(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    this.deleteImage = false;
-                    const reader = new FileReader();
-                    reader.onload = (e) => { this.imagePreview = e.target.result; };
-                    reader.readAsDataURL(file);
-                }
-            },
-            removeImage() {
-                this.imagePreview = '';
-                this.deleteImage = true;
-                document.getElementById('gambar-input').value = '';
-            },
-            toggleEdit() {
-                if (this.isEditing) {
-                    this.isEditing = false;
-                    this.imagePreview = this.originalImage;
-                    this.deleteImage = false;
-                    this.selectedCategory = '{{ optional(optional($business)->category)->name ?? '' }}';
-                    if (document.getElementById('gambar-input')) document.getElementById('gambar-input').value = '';
-                } else {
-                    this.isEditing = true;
-                }
-            },
-            get filteredCategories() {
-                if (!this.categorySearch) return this.categories;
-                return this.categories.filter(cat => cat.toLowerCase().includes(this.categorySearch.toLowerCase()));
-            },
-            get showAddButton() {
-                return this.categorySearch && !this.categories.some(cat => cat.toLowerCase() === this.categorySearch.toLowerCase());
-            },
-            selectCategory(category) {
-                this.selectedCategory = category;
-                this.categorySearch = '';
-                this.showCategoryDropdown = false;
-            },
-            async addNewCategory() {
-                try {
-                    const response = await fetch('{{ route('categories.store') }}', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ name: this.categorySearch })
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        this.categories.push(data.category.name);
-                        this.selectCategory(data.category.name);
-                    }
-                } catch (error) { console.error('Error adding category:', error); }
-            }
-        }">
+        x-data="businessProfileLogic()">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -78,46 +18,53 @@
                     <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Profil Bisnis</h1>
                     <p class="text-gray-500 dark:text-gray-400 mt-1">Kelola identitas bisnis dan anggota tim Anda.</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button @click="toggleEdit()" type="button"
-                        class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm border"
-                        :class="isEditing
-                            ?
-                            'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' :
-                            'bg-indigo-600 text-white border-transparent hover:bg-indigo-700 hover:shadow-indigo-500/30'">
-                        <svg x-show="!isEditing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                        <svg x-show="isEditing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        <span x-text="isEditing ? 'Batal Edit' : 'Edit Profil'"></span>
-                    </button>
-                </div>
+                @if (auth()->user()->role === 'owner' &&
+                        auth()->user()->business &&
+                        auth()->user()->id === auth()->user()->business->user_id)
+                    <div class="flex items-center gap-3">
+                        <button @click="toggleEdit()" type="button"
+                            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm border"
+                            :class="isEditing ?
+                                'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' :
+                                'bg-indigo-600 text-white border-transparent hover:bg-indigo-700 hover:shadow-indigo-500/30'">
+                            <svg x-show="!isEditing" class="w-4 h-4" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                            <svg x-show="isEditing" class="w-4 h-4" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span x-text="isEditing ? 'Batal Edit' : 'Edit Profil'"></span>
+                        </button>
+                    </div>
+                @endif
             </div>
 
+            {{-- FLASH MESSAGE --}}
             @if (session('success'))
                 <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-transition
                     class="mb-6 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm"
                     role="alert">
-                    <div class="p-1 bg-emerald-100 dark:bg-emerald-800 rounded-full"><svg
-                            class="w-4 h-4 text-emerald-600 dark:text-emerald-300" fill="none" viewBox="0 0 24 24"
+                    <div class="p-1 bg-emerald-100 dark:bg-emerald-800 rounded-full">
+                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-300" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg></div>
+                        </svg>
+                    </div>
                     <span class="font-medium text-sm">{{ session('success') }}</span>
                 </div>
             @endif
 
-            {{-- GRID LAYOUT (Kiri: Profil, Kanan: Anggota Tim) --}}
+            {{-- GRID LAYOUT --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 {{-- KOLOM KIRI: FORM PROFIL BISNIS (Lebar 2/3) --}}
                 <div class="lg:col-span-2 space-y-6">
-                    <form action="{{ route('profil_bisnis.update') }}" method="POST" enctype="multipart/form-data"
-                        class="space-y-8">
+                    <form action="{{ route('manajemen.profil-bisnis.update') }}" method="POST"
+                        enctype="multipart/form-data" class="space-y-8">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="hapus_gambar" :value="deleteImage ? '1' : '0'">
@@ -164,11 +111,12 @@
                                         </div>
                                     </div>
                                     <button type="button" x-show="isEditing && imagePreview" @click="removeImage()"
-                                        class="absolute -top-2 -right-2 bg-white dark:bg-gray-700 text-red-500 rounded-full p-1.5 shadow-md border border-gray-100 dark:border-gray-600 hover:bg-red-50 transition-colors z-20"><svg
-                                            class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="absolute -top-2 -right-2 bg-white dark:bg-gray-700 text-red-500 rounded-full p-1.5 shadow-md border border-gray-100 dark:border-gray-600 hover:bg-red-50 transition-colors z-20">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M6 18L18 6M6 6l12 12" />
-                                        </svg></button>
+                                        </svg>
+                                    </button>
                                 </div>
 
                                 {{-- Input Nama & Kategori --}}
@@ -197,7 +145,9 @@
                                             class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Kategori</label>
                                         <template x-if="!isEditing">
                                             <span
-                                                class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium border border-indigo-100 dark:border-indigo-800">{{ optional(optional($business)->category)->name ?? 'Belum ada kategori' }}</span>
+                                                class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium border border-indigo-100 dark:border-indigo-800">
+                                                {{ optional(optional($business)->category)->name ?? 'Belum ada kategori' }}
+                                            </span>
                                         </template>
                                         <template x-if="isEditing">
                                             <div class="relative z-50">
@@ -214,7 +164,8 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
                                                             d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                                    </svg></div>
+                                                    </svg>
+                                                </div>
 
                                                 <div x-show="showCategoryDropdown && (filteredCategories.length > 0 || showAddButton)"
                                                     x-transition
@@ -352,20 +303,23 @@
                 {{-- KOLOM KANAN: ANGGOTA TIM (Lebar 1/3) --}}
                 <div class="lg:col-span-1 space-y-6">
 
-                    {{-- Card Kode Tim --}}
+                    {{-- Card Kode Tim (FIXED DARK MODE) --}}
                     <div
-                        class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10">
+                        class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-gray-900 dark:text-white relative overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-900/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none">
                         </div>
-                        <h4 class="text-sm font-semibold text-indigo-100 uppercase tracking-wide mb-4">Kode Tim</h4>
-                        <div class="flex items-center gap-2" x-data="{ copied: false }">
+                        <h4
+                            class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4 relative z-10">
+                            Kode Tim</h4>
+                        <div class="flex items-center gap-2 relative z-10" x-data="{ copied: false }">
                             <code
-                                class="flex-1 bg-white/20 backdrop-blur-sm text-white border border-white/20 px-4 py-3 rounded-xl text-lg font-mono font-bold tracking-widest text-center shadow-inner">
+                                class="flex-1 bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-300 border border-gray-200 dark:border-gray-600 px-4 py-3 rounded-xl text-lg font-mono font-bold tracking-widest text-center shadow-inner">
                                 {{ optional($business)->invite_code ?? '---' }}
                             </code>
                             <button type="button"
                                 @click="navigator.clipboard.writeText('{{ optional($business)->invite_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
-                                class="p-3 bg-white text-indigo-600 rounded-xl hover:bg-indigo-50 transition-colors shadow-lg active:scale-95">
+                                class="p-3 bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors shadow-sm active:scale-95 border border-gray-200 dark:border-gray-600">
                                 <svg x-show="!copied" class="w-5 h-5" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -378,19 +332,32 @@
                                 </svg>
                             </button>
                         </div>
-                        <p class="text-xs text-indigo-200 mt-3 leading-relaxed">Bagikan kode ini kepada staff Anda untuk
-                            bergabung ke dalam workspace ini.</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 leading-relaxed relative z-10">
+                            Bagikan kode ini kepada staff Anda untuk bergabung ke dalam workspace ini.
+                        </p>
                     </div>
 
+                    {{-- Pending Requests --}}
                     @php
                         $pendingRequests = $business->joinRequests()->where('status', 'pending')->with('user')->get();
+
+                        $isOwner = auth()->id() === $business->user_id;
                     @endphp
 
-                    @if ($pendingRequests->count() > 0)
-                        <div
-                            class="bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/30 shadow-sm overflow-hidden mb-6">
-                            <div
-                                class="px-6 py-4 border-b border-amber-100 dark:border-amber-800/30 flex justify-between items-center">
+                    @if ($pendingRequests->count() > 0 && $isOwner)
+                        <div class="mb-8" x-data="{
+                            activeSlide: 0,
+                            total: {{ $pendingRequests->count() }},
+                            next() {
+                                if (this.activeSlide < this.total - 1) this.activeSlide++;
+                            },
+                            prev() {
+                                if (this.activeSlide > 0) this.activeSlide--;
+                            }
+                        }">
+
+                            {{-- Header Section --}}
+                            <div class="flex justify-between items-center mb-4 px-1">
                                 <h4 class="font-bold text-amber-800 dark:text-amber-200 flex items-center gap-2">
                                     <span class="relative flex h-3 w-3">
                                         <span
@@ -399,46 +366,139 @@
                                     </span>
                                     Menunggu Persetujuan
                                 </h4>
+                                {{-- Counter (Misal: 1/3) --}}
+                                <span
+                                    class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-md"
+                                    x-show="total > 1" x-text="(activeSlide + 1) + ' / ' + total"></span>
                             </div>
 
-                            <div class="divide-y divide-amber-100 dark:divide-amber-800/30">
-                                @foreach ($pendingRequests as $req)
-                                    <div class="p-4">
-                                        <div class="flex items-center gap-3 mb-3">
-                                            <div
-                                                class="w-8 h-8 rounded-full bg-amber-200 dark:bg-amber-800 flex items-center justify-center text-amber-800 dark:text-amber-200 font-bold text-xs">
-                                                {{ substr($req->user->name, 0, 2) }}
+                            {{-- CAROUSEL CONTAINER --}}
+                            <div class="relative group">
+
+                                {{-- 1. Main Slider Window --}}
+                                <div
+                                    class="overflow-hidden rounded-2xl border border-amber-100 dark:border-amber-800/30 shadow-sm bg-white dark:bg-gray-800">
+                                    {{-- Track Slider (Bergerak Horizontal) --}}
+                                    <div class="flex transition-transform duration-500 ease-in-out"
+                                        :style="'transform: translateX(-' + (activeSlide * 100) + '%)'">
+
+                                        @foreach ($pendingRequests as $req)
+                                            {{-- SINGLE SLIDE ITEM --}}
+                                            <div class="w-full shrink-0 p-6 relative overflow-hidden">
+                                                {{-- Background Decor --}}
+                                                <div
+                                                    class="absolute top-0 right-0 w-24 h-24 bg-amber-50 dark:bg-amber-900/10 rounded-bl-full -mr-6 -mt-6 pointer-events-none">
+                                                </div>
+
+                                                <div class="relative z-10">
+                                                    <div
+                                                        class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left mb-6">
+                                                        <div
+                                                            class="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-xl border-4 border-white dark:border-gray-700 shadow-sm">
+                                                            {{ substr($req->user->name, 0, 2) }}
+                                                        </div>
+                                                        <div class="flex-1 min-w-0">
+                                                            <h3
+                                                                class="text-lg font-bold text-gray-900 dark:text-white truncate">
+                                                                {{ $req->user->name }}
+                                                            </h3>
+                                                            <p
+                                                                class="text-sm text-gray-500 dark:text-gray-400 mb-2 truncate">
+                                                                {{ $req->user->email }}
+                                                            </p>
+                                                            <div
+                                                                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                <span>Request:
+                                                                    {{ $req->created_at->diffForHumans() }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Action Buttons --}}
+                                                    <div class="flex gap-3">
+                                                        <form
+                                                            action="{{ route('manajemen.business-request.action', $req->id) }}"
+                                                            method="POST" class="flex-1">
+                                                            @csrf
+                                                            <input type="hidden" name="action" value="approve">
+                                                            <button type="submit"
+                                                                class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2" d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                                Terima
+                                                            </button>
+                                                        </form>
+                                                        <form
+                                                            action="{{ route('manajemen.business-request.action', $req->id) }}"
+                                                            method="POST" class="flex-1">
+                                                            @csrf
+                                                            <input type="hidden" name="action" value="reject">
+                                                            <button type="submit"
+                                                                class="w-full py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-colors active:scale-95">
+                                                                Tolak
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p class="text-sm font-bold text-gray-900 dark:text-white">
-                                                    {{ $req->user->name }}</p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                    {{ $req->user->email }}</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex gap-2">
-                                            <form action="{{ route('business.request.action', $req->id) }}"
-                                                method="POST" class="flex-1">
-                                                @csrf
-                                                <input type="hidden" name="action" value="approve">
-                                                <button type="submit"
-                                                    class="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors">
-                                                    Terima
-                                                </button>
-                                            </form>
-                                            <form action="{{ route('business.request.action', $req->id) }}"
-                                                method="POST" class="flex-1">
-                                                @csrf
-                                                <input type="hidden" name="action" value="reject">
-                                                <button type="submit"
-                                                    class="w-full py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 text-xs font-bold rounded-lg transition-colors">
-                                                    Tolak
-                                                </button>
-                                            </form>
-                                        </div>
+                                        @endforeach
                                     </div>
-                                @endforeach
+                                </div>
+
+                                {{-- 2. Navigation Arrows (Hanya muncul jika total > 1) --}}
+                                <template x-if="total > 1">
+                                    <div>
+                                        {{-- Tombol Kiri --}}
+                                        <button @click="prev()" x-show="activeSlide > 0"
+                                            x-transition:enter="transition ease-out duration-200"
+                                            x-transition:enter-start="opacity-0 -translate-x-2"
+                                            x-transition:enter-end="opacity-100 translate-x-0"
+                                            class="absolute top-1/2 -left-4 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-100 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 transition-all">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+
+                                        {{-- Tombol Kanan --}}
+                                        <button @click="next()" x-show="activeSlide < total - 1"
+                                            x-transition:enter="transition ease-out duration-200"
+                                            x-transition:enter-start="opacity-0 translate-x-2"
+                                            x-transition:enter-end="opacity-100 translate-x-0"
+                                            class="absolute top-1/2 -right-4 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-100 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 transition-all">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </template>
                             </div>
+
+                            {{-- 3. Indicators / Breadcrumbs (Dots) --}}
+                            <template x-if="total > 1">
+                                <div class="flex justify-center gap-2 mt-4">
+                                    {{-- Loop sebanyak total request --}}
+                                    <template x-for="idx in total">
+                                        <button @click="activeSlide = idx - 1"
+                                            class="h-2 rounded-full transition-all duration-300"
+                                            :class="activeSlide === (idx - 1) ? 'w-8 bg-indigo-600 dark:bg-indigo-400' :
+                                                'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'">
+                                        </button>
+                                    </template>
+                                </div>
+                            </template>
                         </div>
                     @endif
 
@@ -446,21 +506,20 @@
                     <div
                         class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                         <div
-                            class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 flex justify-between items-center">
-                            <h4 class="font-bold text-gray-900 dark:text-white">Anggota Tim</h4>
-                            <span
-                                class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-xs font-bold px-2 py-1 rounded-md">{{ $business->users->count() }}
-                                Orang</span>
+                            class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-gray-900 dark:text-white">Anggota Tim</h4>
+                                @php
+                                    $totalMembers = ($owner ? 1 : 0) + ($staffMembers ? $staffMembers->total() : 0);
+                                @endphp
+                                <span
+                                    class="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-xs font-bold px-2 py-1 rounded-md">
+                                    {{ $totalMembers }} Orang
+                                </span>
+                            </div>
                         </div>
 
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
-                            {{-- SECTION OWNER --}}
-                            @php
-                                $owner = $business->users->first(); // Asumsi user pertama atau yg create bisnis adalah owner. Sesuaikan logic jika ada kolom role.
-                                // Jika punya kolom 'role' di user/pivot, ganti logic ini.
-                                // Misal: $owner = $business->users->where('role', 'owner')->first();
-                            @endphp
-
                             @if ($owner)
                                 <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                                     <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-2 ml-1">
@@ -470,39 +529,33 @@
                                             class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold text-sm border-2 border-white dark:border-gray-800 shadow-sm">
                                             {{ substr($owner->name, 0, 2) }}
                                         </div>
-                                        <div>
+                                        <div class="flex-1">
                                             <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $owner->name }}
                                             </p>
                                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ $owner->email }}</p>
                                         </div>
-                                        <div class="ml-auto">
-                                            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                        </div>
+                                        <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
                                     </div>
                                 </div>
                             @endif
 
-                            {{-- SECTION STAFF --}}
-                            @php
-                                $staffs = $business->users->where('id', '!=', optional($owner)->id);
-                            @endphp
-
-                            @if ($staffs->count() > 0)
+                            @if ($staffMembers && $staffMembers->count() > 0)
                                 <div class="p-4">
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Staff
-                                        ({{ $staffs->count() }})</p>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">
+                                        Staf ({{ $staffMembers->total() }})
+                                    </p>
                                     <div class="space-y-3">
-                                        @foreach ($staffs as $staff)
+                                        @foreach ($staffMembers as $staff)
                                             <div
                                                 class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                                                 <div
                                                     class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 font-bold text-xs">
                                                     {{ substr($staff->name, 0, 2) }}
                                                 </div>
-                                                <div class="overflow-hidden">
+                                                <div class="flex-1 overflow-hidden">
                                                     <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
                                                         {{ $staff->name }}</p>
                                                     <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -512,14 +565,104 @@
                                         @endforeach
                                     </div>
                                 </div>
-                            @else
+                            @elseif ($owner && (!$staffMembers || $staffMembers->count() == 0))
+                                <div class="p-4">
+                                    <p class="text-sm text-gray-400 italic text-center">Belum ada anggota tim yang
+                                        bergabung.</p>
+                                </div>
+                            @elseif (!$owner)
                                 <div class="p-8 text-center">
-                                    <p class="text-sm text-gray-400 italic">Belum ada staff yang bergabung.</p>
+                                    <p class="text-sm text-gray-400 italic">Belum ada anggota tim.</p>
                                 </div>
                             @endif
                         </div>
-                    </div>
 
+                        @if ($staffMembers && $staffMembers->hasPages())
+                            <div
+                                class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                                <div class="flex items-center justify-between">
+                                    @if ($staffMembers->total() > 5)
+                                        <form method="GET" action="{{ route('manajemen.profil-bisnis.index') }}"
+                                            class="flex items-center">
+                                            <div class="relative">
+                                                <select name="per_page" onchange="this.form.submit()"
+                                                    class="h-8 px-3 pr-8 rounded-md border border-gray-300 dark:border-gray-600
+                                                        bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-gray-100
+                                                        appearance-none -webkit-appearance-none -moz-appearance-none
+                                                        leading-6 py-0 focus:outline-none focus:ring-2 focus:ring-indigo-500/20
+                                                        transition-colors">
+                                                    <option value="5"
+                                                        {{ request('per_page', 5) == 5 ? 'selected' : '' }}>5</option>
+                                                    <option value="10"
+                                                        {{ request('per_page', 5) == 10 ? 'selected' : '' }}>10</option>
+                                                    <option value="20"
+                                                        {{ request('per_page', 5) == 20 ? 'selected' : '' }}>20</option>
+                                                </select>
+
+                                                <span
+                                                    class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2">
+                                                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            class="text-gray-500 dark:text-gray-400" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </form>
+                                    @endif
+
+                                    <div class="flex gap-1">
+                                        @if ($staffMembers->onFirstPage())
+                                            <span
+                                                class="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed">‹</span>
+                                        @else
+                                            <a href="{{ $staffMembers->previousPageUrl() }}"
+                                                class="px-3 py-1 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">‹</a>
+                                        @endif
+
+                                        @php
+                                            $currentPage = $staffMembers->currentPage();
+                                            $lastPage = $staffMembers->lastPage();
+                                            if ($lastPage <= 3) {
+                                                $startPage = 1;
+                                                $endPage = $lastPage;
+                                            } else {
+                                                if ($currentPage <= 2) {
+                                                    $startPage = 1;
+                                                    $endPage = 3;
+                                                } elseif ($currentPage >= $lastPage - 1) {
+                                                    $startPage = $lastPage - 2;
+                                                    $endPage = $lastPage;
+                                                } else {
+                                                    $startPage = $currentPage - 1;
+                                                    $endPage = $currentPage + 1;
+                                                }
+                                            }
+                                        @endphp
+
+                                        @for ($page = $startPage; $page <= $endPage; $page++)
+                                            @if ($page == $currentPage)
+                                                <span
+                                                    class="px-3 py-1 rounded-md bg-indigo-600 text-white font-bold">{{ $page }}</span>
+                                            @else
+                                                <a href="{{ $staffMembers->url($page) }}"
+                                                    class="px-3 py-1 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">{{ $page }}</a>
+                                            @endif
+                                        @endfor
+
+                                        @if ($staffMembers->hasMorePages())
+                                            <a href="{{ $staffMembers->nextPageUrl() }}"
+                                                class="px-3 py-1 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">›</a>
+                                        @else
+                                            <span
+                                                class="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed">›</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -541,4 +684,92 @@
         </div>
 
     </div>
+
+    {{--
+      PERUBAHAN 2: Script di taruh sendiri di bawah.
+      Saya menggunakan @json() agar parsing datanya lebih aman dan rapi.
+    --}}
+    <script>
+        function businessProfileLogic() {
+            return {
+                isEditing: false,
+                categorySearch: '',
+                showCategoryDropdown: false,
+                categories: @json($categories->pluck('name')->toArray()),
+                selectedCategory: '{{ old('kategori', optional(optional($business)->category)->name ?? '') }}',
+
+                imagePreview: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
+                originalImage: '{{ optional($business)->gambar ? Storage::url($business->gambar) : '' }}',
+                deleteImage: false,
+                showImageModal: false,
+                modalImageUrl: '',
+
+                openImageModal(url) {
+                    this.modalImageUrl = url;
+                    this.showImageModal = true;
+                },
+                updatePreview(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        this.deleteImage = false;
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.imagePreview = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                },
+                removeImage() {
+                    this.imagePreview = '';
+                    this.deleteImage = true;
+                    document.getElementById('gambar-input').value = '';
+                },
+                toggleEdit() {
+                    if (this.isEditing) {
+                        this.isEditing = false;
+                        this.imagePreview = this.originalImage;
+                        this.deleteImage = false;
+                        this.selectedCategory = '{{ optional(optional($business)->category)->name ?? '' }}';
+                        if (document.getElementById('gambar-input')) document.getElementById('gambar-input').value = '';
+                    } else {
+                        this.isEditing = true;
+                    }
+                },
+                get filteredCategories() {
+                    if (!this.categorySearch) return this.categories;
+                    return this.categories.filter(cat => cat.toLowerCase().includes(this.categorySearch.toLowerCase()));
+                },
+                get showAddButton() {
+                    return this.categorySearch && !this.categories.some(cat => cat.toLowerCase() === this.categorySearch
+                        .toLowerCase());
+                },
+                selectCategory(category) {
+                    this.selectedCategory = category;
+                    this.categorySearch = '';
+                    this.showCategoryDropdown = false;
+                },
+                async addNewCategory() {
+                    try {
+                        const response = await fetch('{{ route('manajemen.categories.store') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                name: this.categorySearch
+                            })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            this.categories.push(data.category.name);
+                            this.selectCategory(data.category.name);
+                        }
+                    } catch (error) {
+                        console.error('Error adding category:', error);
+                    }
+                }
+            }
+        }
+    </script>
 @endsection

@@ -423,7 +423,7 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Arus kas masuk dan keluar terbaru
                         </p>
                     </div>
-                    <a href="{{ route('riwayat.index') }}"
+                    <a href="{{ route('operasional.riwayat-keuangan.index') }}"
                         class="group flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 px-5 py-2.5 rounded-xl transition">
                         Lihat Semua
                         <svg class="w-4 h-4 group-hover:translate-x-1 transition" fill="none"
