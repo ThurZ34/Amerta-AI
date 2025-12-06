@@ -1,16 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50" x-data="{
-    darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
-    toggleTheme() {
-        this.darkMode = !this.darkMode;
-        localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
-        if (this.darkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    }
-}"
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50" x-data="themeManager"
     :class="{ 'dark': darkMode }">
 
 <head>
@@ -20,15 +9,6 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
-                '(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -36,10 +16,16 @@
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
+                '(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -68,6 +54,7 @@
             display: none !important;
         }
 
+        /* Custom Scrollbar */
         .chat-scroll::-webkit-scrollbar {
             width: 5px;
         }
@@ -103,14 +90,12 @@
         @unless (request()->routeIs('main_menu') ||
                 request()->routeIs('amerta') ||
                 request()->routeIs('dashboard-selection') ||
-                request()->routeIs('dashboard-selection.join') ||
-                request()->routeIs('marketing-tools'))
+                request()->routeIs('dashboard-selection.join'))
             @include('layouts.partials.sidebar')
         @endunless
 
-
         <div class="flex-1 flex flex-col min-w-0 h-full">
-            @unless (request()->routeIs('dashboard-selection') || request()->routeIs('dashboard-selection.join'))
+            @unless (request()->routeIs(['dashboard-selection', 'dashboard-selection.join']))
                 @include('layouts.partials.header')
             @endunless
 
@@ -121,51 +106,8 @@
         </div>
     </div>
 
-    @unless (request()->routeIs('dashboard-selection') ||
-            request()->routeIs('dashboard-selection.join') ||
-            request()->routeIs('main_menu'))
-        <div x-data="{
-            chatOpen: false,
-            isFullscreen: false,
-            isDragging: false,
-            pos: { x: 0, y: 0 },
-            start: { x: 0, y: 0 },
-            limits: { minX: 0, maxX: 0, minY: 0, maxY: 0 },
-        
-            startDrag(e) {
-                if (this.isFullscreen) return;
-                this.isDragging = true;
-                this.start.x = e.clientX - this.pos.x;
-                this.start.y = e.clientY - this.pos.y;
-                const winW = window.innerWidth;
-                const winH = window.innerHeight;
-                const rect = this.$refs.chatModal.getBoundingClientRect();
-                const baseRight = 24;
-                const baseBottom = 96;
-        
-                this.limits = {
-                    maxX: baseRight,
-                    minX: -(winW - rect.width - baseRight),
-                    maxY: baseBottom,
-                    minY: -(winH - rect.height - baseBottom)
-                };
-            },
-            doDrag(e) {
-                if (this.isDragging) {
-                    let rawX = e.clientX - this.start.x;
-                    let rawY = e.clientY - this.start.y;
-                    this.pos.x = Math.max(this.limits.minX, Math.min(rawX, this.limits.maxX));
-                    this.pos.y = Math.max(this.limits.minY, Math.min(rawY, this.limits.maxY));
-                }
-            },
-            stopDrag() {
-                this.isDragging = false;
-            },
-            toggleFullscreen() {
-                this.isFullscreen = !this.isFullscreen;
-                this.pos = { x: 0, y: 0 };
-            }
-        }" @mousemove.window="doDrag($event)" @mouseup.window="stopDrag()"
+    @unless (request()->routeIs(['dashboard-selection', 'dashboard-selection.join', 'main_menu']))
+        <div x-data="chatWidget" @mousemove.window="doDrag($event)" @mouseup.window="stopDrag()"
             class="relative z-[9999]">
 
             <div x-show="!isFullscreen" class="fixed bottom-6 right-6 z-[100000]">
@@ -249,12 +191,89 @@
         </div>
     @endunless
 
+    <script>
+        document.addEventListener('alpine:init', () => {
+            // Theme Logic
+            Alpine.data('themeManager', () => ({
+                darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) &&
+                    window.matchMedia('(prefers-color-scheme: dark)').matches),
+                toggleTheme() {
+                    this.darkMode = !this.darkMode;
+                    localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+                    if (this.darkMode) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                }
+            }));
+
+            // Chat Widget Logic
+            Alpine.data('chatWidget', () => ({
+                chatOpen: false,
+                isFullscreen: false,
+                isDragging: false,
+                pos: {
+                    x: 0,
+                    y: 0
+                },
+                start: {
+                    x: 0,
+                    y: 0
+                },
+                limits: {
+                    minX: 0,
+                    maxX: 0,
+                    minY: 0,
+                    maxY: 0
+                },
+
+                startDrag(e) {
+                    if (this.isFullscreen) return;
+                    this.isDragging = true;
+                    this.start.x = e.clientX - this.pos.x;
+                    this.start.y = e.clientY - this.pos.y;
+
+                    const winW = window.innerWidth;
+                    const winH = window.innerHeight;
+                    const rect = this.$refs.chatModal.getBoundingClientRect();
+                    const baseRight = 24;
+                    const baseBottom = 96;
+
+                    this.limits = {
+                        maxX: baseRight,
+                        minX: -(winW - rect.width - baseRight),
+                        maxY: baseBottom,
+                        minY: -(winH - rect.height - baseBottom)
+                    };
+                },
+                doDrag(e) {
+                    if (this.isDragging) {
+                        let rawX = e.clientX - this.start.x;
+                        let rawY = e.clientY - this.start.y;
+                        this.pos.x = Math.max(this.limits.minX, Math.min(rawX, this.limits.maxX));
+                        this.pos.y = Math.max(this.limits.minY, Math.min(rawY, this.limits.maxY));
+                    }
+                },
+                stopDrag() {
+                    this.isDragging = false;
+                },
+                toggleFullscreen() {
+                    this.isFullscreen = !this.isFullscreen;
+                    this.pos = {
+                        x: 0,
+                        y: 0
+                    };
+                }
+            }));
+        });
+    </script>
+
     @if (session('first_time_entry'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const businessName = "{{ Auth::user()->business->nama_bisnis ?? 'Bisnis Anda' }}";
                 const isDarkMode = document.documentElement.classList.contains('dark');
-
                 const bgColor = isDarkMode ? '#1f2937' : '#ffffff';
                 const textColor = isDarkMode ? '#f9fafb' : '#111827';
 
@@ -272,7 +291,6 @@
                     width: '280px',
                     background: bgColor,
                     color: textColor,
-
                     didOpen: (toast) => {
                         toast.onmouseenter = Swal.stopTimer;
                         toast.onmouseleave = Swal.resumeTimer;
