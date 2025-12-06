@@ -1,10 +1,11 @@
+
+@section('header' , 'Marketing Tools')
+
 <div class="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
 
-    {{-- Header Banner --}}
     <div class="relative bg-gradient-to-br from-pink-600 via-purple-600 to-indigo-700 pb-32 overflow-hidden">
         <div class="absolute inset-0">
             <div class="absolute inset-0 bg-gradient-to-b from-pink-600/90 to-purple-900/95 mix-blend-multiply"></div>
-            {{-- Decorative elements --}}
             <div class="absolute top-10 left-10 w-72 h-72 bg-yellow-400/20 rounded-full blur-3xl animate-pulse"></div>
             <div class="absolute bottom-10 right-10 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl animate-pulse"
                 style="animation-delay: 1s"></div>
@@ -34,13 +35,11 @@
     <main class="-mt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
 
         @if (!$selectedTool)
-            {{-- Tool Selection Grid --}}
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                 @foreach ($tools as $key => $tool)
                     <button wire:click="selectTool('{{ $key }}')"
                         class="group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden text-left">
 
-                        {{-- Background decoration --}}
                         <div
                             class="absolute top-0 right-0 w-24 h-24 bg-{{ $tool['color'] }}-50 dark:bg-{{ $tool['color'] }}-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-150 duration-500">
                         </div>

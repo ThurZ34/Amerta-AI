@@ -2,7 +2,7 @@
 
 @section('header', 'Menu Utama')
 
-@section('content') <div class="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+@section('content') <div class="min-h-full w-full bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
 
         <div class="relative bg-indigo-600 pb-32 overflow-hidden">
             <div class="absolute inset-0">
@@ -361,33 +361,43 @@
                         </div>
                     </a>
 
-                    <a href="{{ route('marketing-tools') }}"
-                        class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-br from-pink-600/0 to-purple-600/0 dark:from-pink-900/30 dark:to-purple-900/30 transition-opacity">
-                        </div>
 
-                        <div
-                            class="absolute top-0 right-0 w-32 h-32 bg-pink-50 dark:bg-pink-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
-                        </div>
-
-                        <div class="relative flex items-start gap-4 z-10">
-                            <div
-                                class="w-12 h-12 bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-500/30 dark:to-purple-500/30 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-pink-50 dark:border-pink-500/20 group-hover:rotate-12 transition-transform">
-                                <span class="text-2xl">🎨</span>
-                            </div>
-                            <div>
-                                <h4
-                                    class="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
-                                    AI Marketing Studio</h4>
-                                <p class="text-sm text-gray-500 dark:text-pink-200">Buat caption, promo & konten dengan AI.
-                                </p>
-                            </div>
-                        </div>
-                    </a>
                 </div>
 
             </div>
+
+            {{-- AI Marketing Studio Full Width --}}
+            <a href="{{ route('marketing-tools') }}"
+                class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-600/10 dark:from-pink-900/40 dark:to-purple-900/40 opacity-50 group-hover:opacity-100 transition-opacity">
+                </div>
+
+                <div
+                    class="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-pink-400/20 to-purple-600/20 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-125 transition-transform duration-700">
+                </div>
+
+                <div class="relative z-10 flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform">
+                        <span class="text-3xl sm:text-4xl">🎨</span>
+                    </div>
+
+                    <div class="flex-1">
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">AI Marketing Studio
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 max-w-2xl">
+                            Buat konten marketing profesional dalam hitungan detik. Generate caption Instagram, deskripsi
+                            produk marketplace, ide konten, dan broadcast WhatsApp dengan bantuan AI cerdas.
+                        </p>
+                    </div>
+
+                    <div
+                        class="shrink-0 bg-white/50 dark:bg-black/20 backdrop-blur-sm px-6 py-3 rounded-full border border-pink-200 dark:border-pink-500/30 text-pink-700 dark:text-pink-300 font-semibold group-hover:bg-pink-600 group-hover:text-white transition-all">
+                        Coba Sekarang &rarr;
+                    </div>
+                </div>
+            </a>
         </main>
     </div>
 @endsection
