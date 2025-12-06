@@ -70,7 +70,8 @@
 
         <div class="hidden md:block w-1/2 bg-cover bg-center relative"
              style="background-image: url('@yield('image_url')');">
-             <div class="absolute inset-0 bg-black bg-opacity-10 dark:bg-opacity-40 transition-opacity duration-300"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(160deg,#7b3efc,#6b2af3,#4b1fd0)]"></div>
+
         </div>
 
     </div>
