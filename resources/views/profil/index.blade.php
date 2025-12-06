@@ -3,8 +3,8 @@
 @section('header', 'Profil Bisnis')
 
 @section('content')
-    {{-- 
-      PERUBAHAN 1: x-data sekarang jauh lebih bersih. 
+    {{--
+      PERUBAHAN 1: x-data sekarang jauh lebih bersih.
       Logic dipanggil dari function di bawah.
     --}}
     <div class="min-h-screen bg-gray-50/50 dark:bg-gray-900 py-8 transition-colors duration-300 font-sans"
@@ -338,9 +338,11 @@
                     {{-- Pending Requests --}}
                     @php
                         $pendingRequests = $business->joinRequests()->where('status', 'pending')->with('user')->get();
+
+                        $isOwner = auth()->id() === $business->user_id;
                     @endphp
 
-                    @if ($pendingRequests->count() > 0)
+                    @if ($pendingRequests->count() > 0 && $isOwner)
                         <div
                             class="bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/30 shadow-sm overflow-hidden mb-6">
                             <div
@@ -579,7 +581,7 @@
 
     </div>
 
-    {{-- 
+    {{--
       PERUBAHAN 2: Script di taruh sendiri di bawah.
       Saya menggunakan @json() agar parsing datanya lebih aman dan rapi.
     --}}
