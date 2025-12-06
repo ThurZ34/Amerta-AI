@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('header', 'Kasir')
+
 @section('content')
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900" x-data="cashier()">
     {{-- Header --}}
