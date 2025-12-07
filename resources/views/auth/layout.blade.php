@@ -60,7 +60,7 @@
     </style>
 </head>
 
-<body class="bg-white dark:bg-gray-950 transition-colors duration-300">
+<body class="bg-white dark:bg-gray-950 transition-colors duration-300 overflow-hidden">
 
     <div class="flex h-screen overflow-hidden">
 
