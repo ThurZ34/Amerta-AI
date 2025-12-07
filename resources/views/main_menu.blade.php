@@ -45,14 +45,14 @@
 <body
     class="h-full antialiased text-gray-900 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
 
         {{-- Hero Section --}}
-        <div class="relative bg-indigo-600 pb-32 overflow-hidden">
+        <div class="relative bg-gray-900 pb-32">
             <div class="absolute inset-0">
-                <img class="w-full h-full object-cover opacity-20 dark:opacity-10 mix-blend-overlay"
-                    src="{{ asset('images/main_menu_bg.jpg') }}" alt="Background Pattern">
-                <div class="absolute inset-0 bg-gradient-to-b from-indigo-600/90 to-indigo-900/95 mix-blend-multiply">
+                <img class="w-full h-full object-cover" src="{{ asset('images/main_menu_bg.jpg') }}"
+                    alt="Background Banner">
+                <div class="absolute inset-0 bg-black/40">
                 </div>
             </div>
 
@@ -91,49 +91,78 @@
 
                 {{-- Right Side: Profile & Tools --}}
                 <div class="flex items-center gap-4">
-                    <div
-                        class="flex items-center gap-3 bg-white/10 border border-white/20 backdrop-blur-md px-4 py-2 rounded-2xl transition-all duration-300">
-                        {{-- Avatar (Klik untuk ke Edit Profile) --}}
-                        <a href="{{ route('profile.edit') }}"
-                            class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg overflow-hidden border border-white/30 hover:ring-2 hover:ring-indigo-400 transition-all">
-                            @if (Auth::user()->business && Auth::user()->business->logo)
-                                <img src="{{ asset('storage/' . Auth::user()->business->logo) }}" alt="Logo"
-                                    class="w-full h-full object-cover">
-                            @else
-                                {{ substr(Auth::user()->name, 0, 1) }}
-                            @endif
-                        </a>
-
-                        {{-- Text & Logout Button --}}
-                        <div class="text-left hidden sm:block">
-                            {{-- Nama User --}}
+                    {{-- Profile Section Wrapper --}}
+                    <div class="flex flex-col gap-2">
+                        {{-- User Profile Card --}}
+                        <div
+                            class="flex items-center gap-3 bg-white/10 border border-white/20 backdrop-blur-md px-4 py-2 rounded-2xl transition-all duration-300">
+                            {{-- Avatar (Klik untuk ke Edit Profile) --}}
                             <a href="{{ route('profile.edit') }}"
-                                class="text-sm font-bold text-white hover:text-indigo-200 transition-colors block leading-tight">
-                                {{ Auth::user()->name }}
+                                class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg overflow-hidden border border-white/30 hover:ring-2 hover:ring-indigo-400 transition-all">
+                                @if (Auth::user()->business && Auth::user()->business->logo)
+                                    <img src="{{ asset('storage/' . Auth::user()->business->logo) }}" alt="Logo"
+                                        class="w-full h-full object-cover">
+                                @else
+                                    {{ substr(Auth::user()->name, 0, 1) }}
+                                @endif
                             </a>
 
-                            {{-- Role & Logout --}}
-                            <div class="flex items-center gap-2 mt-0.5">
-                                <p class="text-[10px] text-indigo-200 uppercase tracking-wider">
-                                    {{ Auth::user()->role ?? 'Owner' }}
-                                </p>
-                                <span class="text-indigo-200/40 text-[10px]">|</span>
+                            {{-- Text & Logout Button --}}
+                            <div class="text-left hidden sm:block">
+                                {{-- Nama User --}}
+                                <a href="{{ route('profile.edit') }}"
+                                    class="text-sm font-bold text-white hover:text-indigo-200 transition-colors block leading-tight">
+                                    {{ Auth::user()->name }}
+                                </a>
 
-                                {{-- Tombol Logout --}}
-                                <form method="POST" action="{{ route('logout') }}" class="inline">
-                                    @csrf
-                                    <button type="submit" onclick="confirmLogout(event)"
-                                        class="text-[10px] font-bold text-rose-300 hover:text-rose-100 transition-colors cursor-pointer flex items-center gap-1">
-                                        Keluar
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                </form>
+                                {{-- Role & Logout --}}
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <p class="text-[10px] text-indigo-200 uppercase tracking-wider">
+                                        {{ Auth::user()->role ?? 'Owner' }}
+                                    </p>
+                                    <span class="text-indigo-200/40 text-[10px]">|</span>
+
+                                    {{-- Tombol Logout --}}
+                                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                                        @csrf
+                                        <button type="submit" onclick="confirmLogout(event)"
+                                            class="text-[10px] font-bold text-rose-300 hover:text-rose-100 transition-colors cursor-pointer flex items-center gap-1">
+                                            Keluar
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
+
+                        {{-- Business Profile Card (NEW) --}}
+                        <a href="{{ route('manajemen.profil-bisnis.index') }}"
+                            class="flex items-center gap-3 bg-white/10 border border-white/20 backdrop-blur-md px-4 py-2 rounded-2xl hover:bg-white/20 transition-all duration-300 group">
+                            {{-- Icon Toko --}}
+                            <div
+                                class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white border border-white/30 group-hover:ring-2 group-hover:ring-orange-400 transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                    </path>
+                                </svg>
+                            </div>
+
+                            <div class="text-left hidden sm:block">
+                                <span
+                                    class="text-sm font-bold text-white group-hover:text-orange-200 transition-colors block leading-tight">
+                                    Profil Bisnis
+                                </span>
+                                <p class="text-[10px] text-indigo-200">
+                                    Kelola Data Toko
+                                </p>
+                            </div>
+                        </a>
                     </div>
 
                     {{-- Theme Toggle --}}
@@ -170,8 +199,8 @@
                 <div x-data="{ showModal: false }"
                     class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
                     <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <svg class="w-16 h-16 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                        <svg class="w-16 h-16 text-indigo-600 dark:text-indigo-400" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                         </svg>
@@ -316,7 +345,7 @@
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         {{-- Background Gradient & Blob --}}
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-emerald-600/0 to-teal-600/0 dark:from-emerald-900/20 dark:to-teal-900/20 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-emerald-600/0 to-teal-600/0 dark:from-emerald-900/20 dark:to-teal-900/20 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 dark:bg-emerald-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -345,7 +374,7 @@
                     <a href="{{ route('operasional.riwayat-keuangan.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-rose-600/0 to-red-600/0 dark:from-rose-900/20 dark:to-red-900/20 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-rose-600/0 to-red-600/0 dark:from-rose-900/20 dark:to-red-900/20 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-rose-50 dark:bg-rose-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -381,7 +410,7 @@
                     <a href="{{ route('manajemen.produk.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-purple-600/0 to-fuchsia-600/0 dark:from-purple-900/20 dark:to-fuchsia-900/20 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-purple-600/0 to-fuchsia-600/0 dark:from-purple-900/20 dark:to-fuchsia-900/20 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-purple-50 dark:bg-purple-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -398,17 +427,18 @@
                             </div>
                             <div>
                                 <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Manajemen Produk</h4>
-                                <p class="text-sm text-gray-500 dark:text-purple-100/70">Atur katalog produk, harga,
-                                    dan stok barang.</p>
+                                <p class="text-sm text-gray-500 dark:text-purple-100/70">Atur katalog produk anda
+                                    dengan mudah.</p>
                             </div>
                         </div>
                     </a>
 
                     {{-- Menu Item: Profil Bisnis --}}
-                    <a href="{{ route('manajemen.profil-bisnis.index') }}"
+                    {{-- Menu Item: Kasir (Replaces Profil Bisnis) --}}
+                    <a href="{{ route('operasional.kasir') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-orange-600/0 to-amber-600/0 dark:from-orange-900/20 dark:to-amber-900/20 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-orange-600/0 to-amber-600/0 dark:from-orange-900/20 dark:to-amber-900/20 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-orange-50 dark:bg-orange-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -420,14 +450,14 @@
                                 <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
                                     </path>
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Profil Bisnis</h4>
-                                <p class="text-sm text-gray-500 dark:text-orange-100/70">Kelola informasi bisnis dan
-                                    pengaturan dasar.</p>
+                                <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Kasir Toko</h4>
+                                <p class="text-sm text-gray-500 dark:text-orange-100/70">Proses transaksi penjualan
+                                    dengan cepat.</p>
                             </div>
                         </div>
                     </a>
@@ -444,7 +474,7 @@
                     <a href="{{ route('analisis.dashboard') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-blue-600/0 to-cyan-600/0 dark:from-blue-900/20 dark:to-cyan-900/20 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-blue-600/0 to-cyan-600/0 dark:from-blue-900/20 dark:to-cyan-900/20 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -472,7 +502,7 @@
                     <a href="{{ route('amerta') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-indigo-600/0 to-purple-600/0 dark:from-indigo-900/40 dark:to-purple-900/40 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-indigo-600/0 to-purple-600/0 dark:from-indigo-900/40 dark:to-purple-900/40 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -582,4 +612,3 @@
 </body>
 
 </html>
-```

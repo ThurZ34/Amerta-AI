@@ -43,41 +43,8 @@ class RiwayatController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $dailySales = DailySale::where('business_id', $business->id)
-            ->whereMonth('date', $month)
-            ->whereYear('date', $year)
-            ->with('items.produk')
-            ->get()
-            ->map(function ($sale) {
-                $grossProfit = $sale->items->sum(function ($item) {
-                    return ($item->price - $item->cost) * $item->quantity;
-                });
-
-                $itemDetails = $sale->items->map(function ($item) {
-                    return "{$item->quantity}x {$item->produk->nama_produk}";
-                })->take(3)->join(', ');
-
-                if ($sale->items->count() > 3) {
-                    $itemDetails .= ', dll';
-                }
-
-                $description = "Profit dari penjualan: {$itemDetails}";
-
-                return (object) [
-                    'id' => 'daily_sale_' . $sale->id,
-                    'is_manual' => false,
-                    'nama_barang' => 'Profit Penjualan Harian',
-                    'tanggal_pembelian' => $sale->date->format('Y-m-d'),
-                    'total_harga' => $grossProfit,
-                    'keterangan' => $description,
-                    'bukti_pembayaran' => null,
-                    'jenis' => 'pendapatan',
-                    'metode_pembayaran' => 'Kas',
-                    'created_at' => $sale->created_at,
-                ];
-            });
-
-        $mergedRiwayats = $riwayats->concat($dailySales)->sortByDesc('tanggal_pembelian')->values();
+        // DailySale logic removed from this list to prevent duplication.
+        // The Riwayat page should strictly show transaction history.
 
         $categories = Riwayat::where('business_id', $business->id)
             ->whereNotNull('kategori')
@@ -88,7 +55,7 @@ class RiwayatController extends Controller
             ->values();
 
         return view('riwayat.index', [
-            'riwayats' => $mergedRiwayats,
+            'riwayats' => $riwayats,
             'currentMonth' => $month,
             'currentYear' => $year,
             'categories' => $categories
