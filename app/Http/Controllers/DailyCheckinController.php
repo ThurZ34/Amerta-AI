@@ -97,9 +97,12 @@ class DailyCheckinController extends Controller
                 'ai_analysis' => 'Analyzing...',
             ]);
 
+            $productIds = array_keys(array_filter($request->sales, fn($qty) => $qty > 0));
+            $products = Produk::whereIn('id', $productIds)->get()->keyBy('id');
+
             foreach ($request->sales as $produkId => $qty) {
                 if ($qty > 0) {
-                    $produk = Produk::find($produkId);
+                    $produk = $products->get($produkId);
                     if ($produk) {
                         $revenue = $produk->harga_jual * $qty;
                         $cost = $produk->modal * $qty;
@@ -240,9 +243,12 @@ class DailyCheckinController extends Controller
 
             DailySaleItem::where('daily_sale_id', $dailySale->id)->delete();
 
+            $productIds = array_keys(array_filter($request->sales, fn($qty) => $qty > 0));
+            $products = Produk::whereIn('id', $productIds)->get()->keyBy('id');
+
             foreach ($request->sales as $produkId => $qty) {
                 if ($qty > 0) {
-                    $produk = Produk::find($produkId);
+                    $produk = $products->get($produkId);
                     if ($produk) {
                         $revenue = $produk->harga_jual * $qty;
                         $cost = $produk->modal * $qty;

@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\CashJournal;
+use App\Models\DailySale;
 use App\Models\Produk;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use App\Models\DailySale;
 
 class MainMenuController extends Controller
 {
@@ -44,9 +43,9 @@ class MainMenuController extends Controller
         $targetPercentage = min($targetPercentage, 100);
 
         $topProducts = Produk::where('business_id', $businessId)
-        ->inRandomOrder()
-        ->limit(3)
-        ->get();
+            ->inRandomOrder()
+            ->limit(3)
+            ->get();
 
         $streakDays = $this->calculateStreak();
 
@@ -87,7 +86,9 @@ class MainMenuController extends Controller
             ->values()
             ->all();
 
-        if (empty($checkins)) return 0;
+        if (empty($checkins)) {
+            return 0;
+        }
 
         $streak = 0;
         $today = Carbon::today()->format('Y-m-d');
@@ -118,17 +119,17 @@ class MainMenuController extends Controller
         $messages = [];
 
         if ($profit > 0) {
-            $messages[] = "Kemarin Anda mencetak profit sebesar Rp " . number_format($profit, 0, ',', '.') . ". Pertahankan momentum ini!";
+            $messages[] = 'Kemarin Anda mencetak profit sebesar Rp '.number_format($profit, 0, ',', '.').'. Pertahankan momentum ini!';
         } elseif ($profit < 0) {
-            $messages[] = "Kemarin ada defisit sebesar Rp " . number_format(abs($profit), 0, ',', '.') . ". Cek pengeluaran Anda.";
+            $messages[] = 'Kemarin ada defisit sebesar Rp '.number_format(abs($profit), 0, ',', '.').'. Cek pengeluaran Anda.';
         } else {
-            $messages[] = "Belum ada aktivitas keuangan yang signifikan kemarin.";
+            $messages[] = 'Belum ada aktivitas keuangan yang signifikan kemarin.';
         }
 
         if ($profit >= 0) {
-            $messages[] = "Semua sistem berjalan lancar. Fokus pada pengembangan bisnis hari ini!";
+            $messages[] = 'Semua sistem berjalan lancar. Fokus pada pengembangan bisnis hari ini!';
         }
 
-        return implode(" ", $messages);
+        return implode(' ', $messages);
     }
 }
