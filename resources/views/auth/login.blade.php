@@ -2,62 +2,350 @@
 
 @section('title', 'Login')
 
-@section('image_url',
-    'https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')
-
+@section('image_url', asset('images/banner_login.png'))
 @section('content')
-    <div class="text-left">
-        <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Selamat Datang Kembali</h1>
-        <p class="text-gray-500 dark:text-gray-400">Silakan masukkan detail akun anda.</p>
+
+    <div class="text-left mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Login to Continue</h1>
     </div>
 
+    {{-- Google Login --}}
     <a href="{{ route('google.login') }}"
-        class="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg p-3 hover:bg-gray-50 transition">
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
+       class="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg p-3 hover:bg-gray-50 transition">
+        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" class="w-5 h-5">
         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Masuk dengan Google</span>
     </a>
 
-    <div class="relative flex py-2 items-center">
+    {{-- Garis pemisah --}}
+    <div class="relative flex py-3 items-center">
         <div class="grow border-t border-gray-200 dark:border-gray-700"></div>
-        <span class="shrink-0 mx-4 text-gray-400 text-sm">atau dengan email</span>
+        <span class="shrink-0 mx-4 text-gray-400 text-sm">atau</span>
         <div class="grow border-t border-gray-200 dark:border-gray-700"></div>
     </div>
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-4">
+    {{-- FORM LOGIN --}}
+    <form method="POST" action="{{ route('login') }}" class="space-y-5">
         @csrf
 
+        {{-- EMAIL --}}
         <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-            <input autocomplete="off" type="email" name="email" required autofocus
-                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-indigo-500 focus:border-transparent outline-none transition bg-white dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                placeholder="nama@email.com">
+            <div class="flex items-center gap-3 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 bg-white dark:bg-gray-800">
+                <img src="{{ asset('images/email.png')}}" class="w-6 h-6 opacity-70">
+                <input autocomplete="off" type="email" name="email" required autofocus
+                    class="flex-1 outline-none bg-transparent dark:text-white placeholder-gray-400"
+                    placeholder="Email">
+            </div>
             @error('email')
                 <span class="text-red-500 text-sm">{{ $message }}</span>
             @enderror
         </div>
 
+        {{-- PASSWORD --}}
         <div>
-            <div class="flex justify-between items-center mb-1">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-                @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}"
-                        class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Lupa
-                        Password?</a>
-                @endif
+
+
+            <div class="flex items-center gap-3 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 bg-white dark:bg-gray-800">
+                <img src="{{ asset('images/password.png')}}" class="w-6 h-6 opacity-70">
+                <input type="password" name="password" required
+                    class="flex-1 outline-none bg-transparent dark:text-white placeholder-gray-400"
+                    placeholder="Password">
             </div>
-            <input type="password" name="password" required
-                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-indigo-500 focus:border-transparent outline-none transition bg-white dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                placeholder="••••••••">
         </div>
 
-        <button type="submit"
-            class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-indigo-700 transition duration-300 shadow-lg dark:shadow-indigo-900/20">
-            Masuk
-        </button>
-    </form>
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
+                @if (Route::has('password.request'))
+                <button type="button"
+                    onclick="openForgotModal()"
+                    class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">
+                    Lupa Password ?
+                </button>
 
-    <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+
+                @endif
+        </div>
+
+        {{-- TOMBOL LOGIN BESAR --}}
+        <button type="submit"
+            class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 text-lg rounded-xl transition shadow-md">
+            LOGIN
+        </button>
+
+    </form>
+    
+    <div class="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
         Belum punya akun?
-        <a href="{{ route('register') }}" class="font-semibold text-indigo-400 hover:underline">Daftar Sekarang</a>
+        <a href="{{ route('register') }}" class="font-semibold text-purple-500 hover:underline">Daftar Sekarang</a>
     </div>
+
+    {{-- Teks bawah --}}
+    <p class="text-center text-gray-600 dark:text-gray-400 text-sm mt-4">
+        By continuing, you agree to the
+        <span class="font-medium text-black dark:text-white">Terms of use</span>
+        and
+        <span class="font-medium text-black dark:text-white">Privacy Policy.</span>
+    </p>
+
+
+
 @endsection
+{{-- ============================
+      POPUP FORGOT PASSWORD (3 STEP)
+============================= --}}
+<div id="forgotModal"
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50">
+
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-xl p-6 shadow-xl">
+
+        {{-- STEP 1: MASUKKAN EMAIL --}}
+        <div id="stepEmail">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-3">
+                Reset Password
+            </h2>
+
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                Masukkan email anda untuk menerima kode OTP.
+            </p>
+
+            <input type="email" id="resetEmail"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg 
+                bg-white dark:bg-gray-800 dark:text-white outline-none"
+                placeholder="Masukkan email anda">
+
+            <button onclick="sendOTP()"
+                class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 rounded-lg mt-4">
+                Kirim Kode OTP
+            </button>
+
+            <button onclick="closeForgotModal()"
+                class="text-center w-full mt-3 text-sm text-gray-500 hover:text-gray-700">
+                Batal
+            </button>
+        </div>
+
+
+        {{-- STEP 2: MASUKKAN OTP --}}
+        <div id="stepOTP" class="hidden text-center">
+
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-3">
+                Masukkan Kode OTP
+            </h2>
+
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                Masukkan 6 digit kode yang telah kami kirim ke email anda.
+            </p>
+
+            <div class="flex justify-center gap-3 mb-4">
+                @for ($i = 1; $i <= 6; $i++)
+                    <input id="otp{{ $i }}" maxlength="1"
+                        class="w-10 h-12 border border-gray-300 dark:border-gray-700 rounded-lg text-center text-xl
+                        bg-white dark:bg-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-purple-500"
+                        oninput="moveToNext(this, {{ $i }})">
+                @endfor
+            </div>
+
+            <button onclick="verifyOTP()"
+                class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 rounded-lg">
+                Verifikasi
+            </button>
+
+            <button onclick="backToEmail()"
+                class="text-center w-full mt-3 text-sm text-gray-500 hover:text-gray-700">
+                Kembali
+            </button>
+        </div>
+
+
+        {{-- STEP 3: RESET PASSWORD BARU --}}
+        <div id="stepReset" class="hidden">
+
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-3">
+                Buat Password Baru
+            </h2>
+
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                Masukkan password baru anda, lalu konfirmasi kembali.
+            </p>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Password Baru
+                    </label>
+                    <input type="password" id="newPassword"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg 
+                        bg-white dark:bg-gray-800 dark:text-white outline-none"
+                        placeholder="Minimal 8 karakter">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Ulangi Password Baru
+                    </label>
+                    <input type="password" id="confirmPassword"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg 
+                        bg-white dark:bg-gray-800 dark:text-white outline-none"
+                        placeholder="Ketik ulang password">
+                </div>
+            </div>
+
+            <button onclick="saveNewPassword()"
+                class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 rounded-lg mt-4">
+                Simpan Password
+            </button>
+
+            <button onclick="closeForgotModal()"
+                class="text-center w-full mt-3 text-sm text-gray-500 hover:text-gray-700">
+                Batal
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    function openForgotModal() {
+        document.getElementById('forgotModal').classList.remove('hidden');
+        document.getElementById('forgotModal').classList.add('flex');
+
+        document.getElementById('stepEmail').classList.remove('hidden');
+        document.getElementById('stepOTP').classList.add('hidden');
+        document.getElementById('stepReset').classList.add('hidden');
+    }
+
+    function closeForgotModal() {
+        document.getElementById('forgotModal').classList.add('hidden');
+        document.getElementById('forgotModal').classList.remove('flex');
+    }
+
+    async function sendOTP() {
+        const email = document.getElementById('resetEmail').value;
+
+        if (!email) {
+            alert('Email tidak boleh kosong.');
+            return;
+        }
+
+        try {
+            const res = await fetch("{{ route('forgot.send-otp') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                alert(data.message || 'Gagal mengirim OTP.');
+                return;
+            }
+
+            alert(data.message);
+            document.getElementById('stepEmail').classList.add('hidden');
+            document.getElementById('stepOTP').classList.remove('hidden');
+
+        } catch (e) {
+            console.error(e);
+            alert('Terjadi kesalahan. Coba lagi nanti.');
+        }
+    }
+
+    function backToEmail() {
+        document.getElementById('stepOTP').classList.add('hidden');
+        document.getElementById('stepEmail').classList.remove('hidden');
+    }
+
+    function moveToNext(field, index) {
+        if (field.value.length === 1 && index < 6) {
+            document.getElementById("otp" + (index + 1)).focus();
+        }
+    }
+
+    async function verifyOTP() {
+        const email = document.getElementById('resetEmail').value;
+        let otp = '';
+        for (let i = 1; i <= 6; i++) {
+            otp += document.getElementById('otp' + i).value;
+        }
+
+        if (otp.length !== 6) {
+            alert('Kode OTP harus 6 digit.');
+            return;
+        }
+
+        try {
+            const res = await fetch("{{ route('forgot.verify-otp') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ email, otp }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                alert(data.message || 'OTP tidak valid.');
+                return;
+            }
+
+            alert(data.message);
+            document.getElementById('stepOTP').classList.add('hidden');
+            document.getElementById('stepReset').classList.remove('hidden');
+
+            // simpan otp di hidden input untuk reset
+            window.__lastOtp = otp;
+
+        } catch (e) {
+            console.error(e);
+            alert('Terjadi kesalahan. Coba lagi.');
+        }
+    }
+
+    async function saveNewPassword() {
+        const email = document.getElementById('resetEmail').value;
+        const otp = window.__lastOtp;
+        const password = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!password || password.length < 8) {
+            alert('Password minimal 8 karakter.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert('Konfirmasi password tidak sama.');
+            return;
+        }
+
+        try {
+            const res = await fetch("{{ route('forgot.reset-by-otp') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ email, otp, password, password_confirmation: confirmPassword }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                alert(data.message || 'Gagal mengubah password.');
+                return;
+            }
+
+            alert(data.message);
+            closeForgotModal();
+
+        } catch (e) {
+            console.error(e);
+            alert('Terjadi kesalahan. Coba lagi.');
+        }
+    }
+</script>

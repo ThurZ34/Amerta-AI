@@ -11,6 +11,7 @@ use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\SurveyController;
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\ForgotPasswordOtpController;
 
 Route::get('/', function () {
     return view('landing_page');
@@ -104,3 +105,12 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 });
+
+Route::post('/forgot-password/send-otp', [ForgotPasswordOtpController::class, 'sendOtp'])
+    ->name('forgot.send-otp');
+
+Route::post('/forgot-password/verify-otp', [ForgotPasswordOtpController::class, 'verifyOtp'])
+    ->name('forgot.verify-otp');
+
+Route::post('/forgot-password/reset-by-otp', [ForgotPasswordOtpController::class, 'resetPassword'])
+    ->name('forgot.reset-by-otp');
