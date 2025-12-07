@@ -1,6 +1,6 @@
 import './bootstrap';
-import Alpine from 'alpinejs';
+document.addEventListener('alpine:init', () => {
+    const Alpine = window.Alpine;
 
-window.Alpine = Alpine;
-
-Alpine.start();
+    console.log('Alpine manual berhasil dimuat via Livewire Injection');
+});

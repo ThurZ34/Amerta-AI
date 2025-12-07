@@ -347,7 +347,6 @@
                         <img src="{{ $image->temporaryUrl() }}"
                             class="h-16 w-auto rounded-lg border border-gray-300 shadow-sm">
                         <button wire:click="removeImage"
-                            @click="document.querySelector('form')._x_dataStack[0].hasImage = false"
                             class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow-md">
                             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -359,25 +358,21 @@
 
                 <form x-data="{
                     userMessage: '',
-                    hasImage: false,
                     adjustHeight() {
                         $refs.inputArea.style.height = 'auto';
                         $refs.inputArea.style.height = $refs.inputArea.scrollHeight + 'px';
                     },
-                    resetUI() {
-                        this.userMessage = '';
-                        this.hasImage = false;
-                        this.adjustHeight();
-                        // Reset input file secara manual
-                        if (document.getElementById('file-upload')) {
-                            document.getElementById('file-upload').value = '';
+                    submitForm() {
+                        if (this.userMessage.trim() !== '' || $wire.image) {
+                            $wire.sendMessage(this.userMessage);
+                            this.userMessage = '';
+                            $refs.inputArea.style.height = 'auto';
                         }
                     },
                     handleEnter(e) {
                         if (!e.shiftKey) {
                             e.preventDefault();
-                            // Trigger event submit pada form ini
-                            this.$el.requestSubmit();
+                            this.submitForm();
                         } else {
                             this.$nextTick(() => {
                                 this.adjustHeight();
@@ -385,22 +380,13 @@
                             });
                         }
                     }
-                }"
-                    @submit.prevent="
-    // LOGIKA UTAMA DI SINI (Menggunakan @this agar tidak error 'undefined')
-    if (userMessage.trim() !== '' || hasImage) {
-        @this.call('sendMessage', userMessage);
-        resetUI();
-    }
-"
+                }" @submit.prevent="submitForm()"
                     class="relative flex items-end gap-2 bg-gray-100 dark:bg-gray-800 rounded-3xl p-2 border border-transparent focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all">
 
                     @if ($mode === 'full')
                         <div class="pb-2 pl-2">
-                            {{-- Input File --}}
                             <input type="file" wire:model="image" id="file-upload" class="hidden"
-                                accept="image/*" @change="hasImage = $event.target.files.length > 0">
-
+                                accept="image/*">
                             <label for="file-upload"
                                 class="cursor-pointer text-gray-400 hover:text-indigo-600 transition-colors p-2 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -411,17 +397,14 @@
                         </div>
                     @endif
 
-                    {{-- Textarea --}}
                     <textarea x-model="userMessage" x-ref="inputArea" rows="1" @input="adjustHeight()"
                         @keydown.enter="handleEnter($event)" placeholder="Kirim pesan ke Amerta..."
                         class="flex-1 bg-transparent border-none outline-none shadow-none ring-0 focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 py-3 px-2 resize-none max-h-[200px] overflow-y-auto custom-scrollbar leading-relaxed"
                         autocomplete="off" @if ($isThinking) disabled @endif></textarea>
 
-                    {{-- Tombol Submit --}}
                     <button type="submit"
                         class="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-2 mr-2 shrink-0 h-10 w-10 flex items-center justify-center"
-                        :disabled="(userMessage.trim() === '' && !hasImage) || @js($isThinking)">
-
+                        :disabled="(userMessage.trim() === '' && !$wire.image) || @js($isThinking)">
                         <svg wire:loading.remove wire:target="sendMessage" class="w-5 h-5 ml-0.5" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
