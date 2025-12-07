@@ -125,7 +125,7 @@
                 <div class="flex items-start justify-between mb-5">
                     <div class="flex items-center gap-3">
                         <div
-                            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
+                            class="w-10 h-10 rounded-xl bg-linear-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
                             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
                                 <path d="M12 2L3 7v10l9 5 9-5V7l-9-5Z" stroke="currentColor" stroke-width="1.6"
                                     stroke-linejoin="round" class="opacity-80" />
