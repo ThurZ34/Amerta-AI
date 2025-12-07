@@ -93,6 +93,18 @@
 
             <div class="flex-1 overflow-y-auto scrollbar-hide px-8 py-6 pb-20">
 
+                <div class="mb-6">
+                    <a href="{{ route('dashboard-selection') }}"
+                        class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 transition-colors group">
+                        <svg class="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
+                        Kembali ke Pemilihan Peran
+                    </a>
+                </div>
+
                 <div class="mb-10">
                     <div
                         class="flex justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2.5 uppercase tracking-wide">
