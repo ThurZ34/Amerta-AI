@@ -187,57 +187,108 @@ class Dashboard extends Component
 
         switch ($this->range) {
             case 'day':
+                // Fetch all data for today in one query
+                $rawData = CashJournal::operatingRevenues()
+                    ->whereDate('transaction_date', Carbon::today())
+                    ->get(['created_at', 'amount']);
+
+                // Group by hour in memory
+                $grouped = $rawData->groupBy(function ($item) {
+                    return $item->created_at->format('H');
+                });
+
                 for ($i = 0; $i <= 23; $i++) {
-                    $chartLabels[] = sprintf('%02d:00', $i);
-                    $chartData[] = CashJournal::operatingRevenues()
-                        ->whereDate('transaction_date', Carbon::today())
-                        ->whereTime('created_at', '>=', sprintf('%02d:00:00', $i))
-                        ->whereTime('created_at', '<=', sprintf('%02d:59:59', $i))
-                        ->sum('amount');
+                    $hour = sprintf('%02d', $i);
+                    $chartLabels[] = $hour . ':00';
+                    $chartData[] = $grouped->has($hour) ? $grouped->get($hour)->sum('amount') : 0;
                 }
                 break;
 
             case 'month':
                 $daysInMonth = $now->daysInMonth;
+                // Fetch all data for this month in one query
+                $rawData = CashJournal::operatingRevenues()
+                    ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
+                    ->get(['transaction_date', 'amount']);
+
+                $grouped = $rawData->groupBy(function ($item) {
+                    return $item->transaction_date->format('j'); // Day of month without leading zeros
+                });
+
                 for ($i = 1; $i <= $daysInMonth; $i++) {
-                    $date = Carbon::createFromDate($now->year, $now->month, $i);
-                    $chartLabels[] = (string) $i;
-                    $chartData[] = CashJournal::operatingRevenues()
-                        ->whereDate('transaction_date', $date)
-                        ->sum('amount');
+                    $day = (string)$i;
+                    $chartLabels[] = $day;
+                    $chartData[] = $grouped->has($day) ? $grouped->get($day)->sum('amount') : 0;
                 }
                 break;
 
             case 'year':
+                // Fetch all data for this year in one query
+                $startOfYear = $now->copy()->startOfYear();
+                $endOfYear = $now->copy()->endOfYear();
+                
+                $rawData = CashJournal::operatingRevenues()
+                    ->whereBetween('transaction_date', [$startOfYear, $endOfYear])
+                    ->get(['transaction_date', 'amount']);
+
+                $grouped = $rawData->groupBy(function ($item) {
+                    return $item->transaction_date->format('n'); // Month number without leading zeros
+                });
+
                 for ($i = 1; $i <= 12; $i++) {
                     $date = Carbon::createFromDate($now->year, $i, 1);
                     $chartLabels[] = $date->translatedFormat('M');
-                    $chartData[] = $date->gt($now) ? 0 : CashJournal::operatingRevenues()
-                        ->whereYear('transaction_date', $now->year)
-                        ->whereMonth('transaction_date', $i)
-                        ->sum('amount');
+                    $monthNum = (string)$i;
+                    
+                    // Future months logic preserved
+                    if ($date->gt($now)) {
+                        $chartData[] = 0;
+                    } else {
+                        $chartData[] = $grouped->has($monthNum) ? $grouped->get($monthNum)->sum('amount') : 0;
+                    }
                 }
                 break;
 
             case 'decade':
                 $currentYear = $now->year;
+                $startYear = $currentYear - 9;
+                
+                // Fetch all data for the last 10 years
+                $rawData = CashJournal::operatingRevenues()
+                    ->whereYear('transaction_date', '>=', $startYear)
+                    ->whereYear('transaction_date', '<=', $currentYear)
+                    ->get(['transaction_date', 'amount']);
+
+                $grouped = $rawData->groupBy(function ($item) {
+                    return $item->transaction_date->format('Y');
+                });
+
                 for ($i = 9; $i >= 0; $i--) {
-                    $year = $currentYear - $i;
-                    $chartLabels[] = (string) $year;
-                    $chartData[] = CashJournal::operatingRevenues()
-                        ->whereYear('transaction_date', $year)
-                        ->sum('amount');
+                    $year = (string)($currentYear - $i);
+                    $chartLabels[] = $year;
+                    $chartData[] = $grouped->has($year) ? $grouped->get($year)->sum('amount') : 0;
                 }
                 break;
 
             case 'week':
             default:
+                // Fetch all data for the last 7 days
+                $startDate = Carbon::today()->subDays(6);
+                $endDate = Carbon::today();
+
+                $rawData = CashJournal::operatingRevenues()
+                    ->whereBetween('transaction_date', [$startDate, $endDate])
+                    ->get(['transaction_date', 'amount']);
+
+                $grouped = $rawData->groupBy(function ($item) {
+                    return $item->transaction_date->format('Y-m-d');
+                });
+
                 for ($i = 6; $i >= 0; $i--) {
                     $date = Carbon::today()->subDays($i);
+                    $dateString = $date->format('Y-m-d');
                     $chartLabels[] = $date->translatedFormat('l');
-                    $chartData[] = CashJournal::operatingRevenues()
-                        ->whereDate('transaction_date', $date)
-                        ->sum('amount');
+                    $chartData[] = $grouped->has($dateString) ? $grouped->get($dateString)->sum('amount') : 0;
                 }
                 break;
         }
