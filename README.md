@@ -21,42 +21,126 @@
 
 ## Pengenalan
 
+<div>
 Amerta AI adalah website all-in-one yang dirancang untuk menjadi solusi digital universal bagi seluruh jenis Usaha Mikro, Kecil, dan Menengah (UMKM) di Indonesia, melampaui batasan aplikasi Point-of-Sale (POS) atau akuntansi konvensional. Target kami adalah membantu UMKM sektor barang (toko, online shop) maupun sektor jasa (barbershop, bengkel, laundry, klinik, katering) mengatasi masalah inti: stabilitas keuangan, promosi yang efektif, dan manajemen keuangan.
+</div>
 
 ---
 
 ## Fitur Utama Amerta AI
 
-| Deskripsi Fitur | Tampilan Visual |
-| :--- | :--- |
-| **Dashboard Data & Grafik** <br> Visualisasi data keuangan dari bisnis yang dimiliki memudahkan pengguna menganalisis hasil penjualan serta pengeluaran berdasarkan waktunya. | <img src="public/images/demo/dashboard1.png" alt="Dashboard" width="800" /> |
-| **Dashboard Transaksi Serta Kesehatan Bisnis** <br> Menampilkan transaksi terakhir yang dilakukan termasuk arus kas yang masuk dan keluar. | <img src="public/images/demo/dashboard2.png" alt="Dashboard" width="800" /> |
-| **Katalog Produk Bisnis** <br> Visualisasi berbagai jenis produk yang sudah dibuat beserta analisis profit dan margin dari produk tersebut. | <img src="public/images/demo/katalog-produk.png" alt="Katalog Produk" width="800" /> |
-| **Fitur Bantuan AI Untuk Menambah Produk** <br> Kemudahan bagi pengguna yang didapatkan dari masukan AI. | <img src="public/images/demo/ai-produk.png" alt="Fitur AI Tambah Produk" width="800" /> |
-| **Laporan Harian Penjualan Produk** <br> Tiap tiap tanggal dalam kalender untuk mencatat produk yang terjual beserta total omset dan profit yang didapat. | <img src="public/images/demo/laporan.png" alt="Laporan Harian" width="800" /> |
-| **Detail Laporan Penjualan Produk** <br> Menampilkan detail laporan produk yang terjual berdasarkan tanggalnya. Dan insight yang diberikan AI untuk menambah wawasan bagi penjual produk. | <img src="public/images/demo/detail-laporan.png" alt="Detail Laporan" width="800" /> |
-| **Pencatatan Riwayat Transaksi** <br> Visualisasi riwayat yang sudah dilakukan oleh pengguna menggunakan pencatatan pemasukan dan pengeluaran. | <img src="public/images/demo/riwayat-transaksi.png" alt="Riwayat Transaksi" width="800" /> |
+<div>
+  <table>
+    <tr>
+      <th align="left">Deskripsi Fitur</th>
+      <th align="left">Tampilan Visual</th>
+    </tr>
+    <tr>
+      <td>
+        <strong>Dashboard Data & Grafik</strong><br>
+        Visualisasi data keuangan dari bisnis yang dimiliki memudahkan pengguna menganalisis hasil penjualan serta pengeluaran berdasarkan waktunya.
+      </td>
+      <td>
+        <img src="public/images/demo/dashboard1.png" alt="Dashboard" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Dashboard Transaksi Serta Kesehatan Bisnis</strong><br>
+        Menampilkan transaksi terakhir yang dilakukan termasuk arus kas yang masuk dan keluar.
+      </td>
+      <td>
+        <img src="public/images/demo/dashboard2.png" alt="Dashboard" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Katalog Produk Bisnis</strong><br>
+        Visualisasi berbagai jenis produk yang sudah dibuat beserta analisis profit dan margin dari produk tersebut.
+      </td>
+      <td>
+        <img src="public/images/demo/katalog-produk.png" alt="Katalog Produk" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Fitur Bantuan AI Untuk Menambah Produk</strong><br>
+        Kemudahan bagi pengguna yang didapatkan dari masukan AI.
+      </td>
+      <td>
+        <img src="public/images/demo/ai-produk.png" alt="Fitur AI Tambah Produk" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Laporan Harian Penjualan Produk</strong><br>
+        Tiap tiap tanggal dalam kalender untuk mencatat produk yang terjual beserta total omset dan profit yang didapat.
+      </td>
+      <td>
+        <img src="public/images/demo/laporan.png" alt="Laporan Harian" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Detail Laporan Penjualan Produk</strong><br>
+        Menampilkan detail laporan produk yang terjual berdasarkan tanggalnya. Dan insight yang diberikan AI untuk menambah wawasan bagi penjual produk.
+      </td>
+      <td>
+        <img src="public/images/demo/detail-laporan.png" alt="Detail Laporan" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Pencatatan Riwayat Transaksi</strong><br>
+        Visualisasi riwayat yang sudah dilakukan oleh pengguna menggunakan pencatatan pemasukan dan pengeluaran.
+      </td>
+      <td>
+        <img src="public/images/demo/riwayat-transaksi.png" alt="Riwayat Transaksi" width="800" />
+      </td>
+    </tr>
+  </table>
+</div>
 
 ---
 
 ## Dampak dan Keunggulan
 
 ### Dampak Nyata Yang Didapatkan
-- **Efisiensi Manajemen Keuangan**  
-  Memberikan kemudahan bagi pelaku bisnis dalam mengatur keuangan berkat tampilan analisa keuangan
 
-- **Menghemat Waktu**  
-  Fungsionalitas yang mendukung kecepatan dalam menghitung dan mencatat data keuangan
-
-- **Operasi Bisnis Yang Rapi**  
-  Dengan fitur laporan harian menyajikan laporan penjualan dengan visualisasi menggunakan kalender
+<div>
+  <ul>
+    <li>
+      <strong>Efisiensi Manajemen Keuangan</strong><br>
+      Memberikan kemudahan bagi pelaku bisnis dalam mengatur keuangan berkat tampilan analisa keuangan
+    </li>
+    <li>
+      <strong>Menghemat Waktu</strong><br>
+      Fungsionalitas yang mendukung kecepatan dalam menghitung dan mencatat data keuangan
+    </li>
+    <li>
+      <strong>Operasi Bisnis Yang Rapi</strong><br>
+      Dengan fitur laporan harian menyajikan laporan penjualan dengan visualisasi menggunakan kalender
+    </li>
+  </ul>
+</div>
 
 ### Keunggulan Dari Sistem Ini
-- **Untuk Semua Jenis Usaha**  
-  Mendukung berbagai jenis usaha termasuk produk barang maupun jasa.
 
-- **Promosi Otomatis Berbasis Data**  
-  Dengan fitur Amerta Studio pengguna tidak perlu repot untuk memikirkan langkah-langkah dalam membuat promosi produk ataupun jasanya.
+<div>
+  <ul>
+    <li>
+      <strong>Untuk Semua Jenis Usaha</strong><br>
+      Mendukung berbagai jenis usaha termasuk produk barang maupun jasa.
+    </li>
+    <li>
+      <strong>Promosi Otomatis Berbasis Data</strong><br>
+      Dengan fitur Amerta Studio pengguna tidak perlu repot untuk memikirkan langkah-langkah dalam membuat promosi produk ataupun jasanya.
+    </li>
+    <li>
+      <strong>Ringan dan Mudah Digunakan</strong><br>
+      Dengan hanya menekan, pengguna sudah bisa mencatat keuangan mereka tanpa perlu mengetik lagi.
+    </li>
+  </ul>
+</div>
 
-- **Ringan dan Mudah Digunakan**  
-  Dengan hanya menekan, pengguna sudah bisa mencatat keuangan mereka tanpa perlu mengetik lagi.
+---

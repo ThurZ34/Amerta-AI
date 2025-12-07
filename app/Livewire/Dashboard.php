@@ -307,7 +307,7 @@ class Dashboard extends Component
             'aiMessage',
             'businessHealth'
         ))
-            ->extends('layouts.app') 
+            ->extends('layouts.app')
             ->section('content');
     }
 }
