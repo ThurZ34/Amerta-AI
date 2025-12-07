@@ -19,7 +19,6 @@ php artisan key:generate
 > Buka file .env dan lengkapi konfigurasi berikut untuk mengaktifkan fitur AI:
 ```bash
 KOLOSAL_API_KEY=...
-GEMINI_API_KEY=...
 ```
 ## 4. Konfigurasi Google Login (Opsional)
 > Fitur ini memungkinkan login otomatis menggunakan akun Google.
