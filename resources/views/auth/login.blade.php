@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="text-left mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Login to Continue</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Login untuk melanjutkan</h1>
     </div>
 
     {{-- Google Login --}}
@@ -108,22 +108,7 @@
         Belum punya akun?
         <a href="{{ route('register') }}" class="font-semibold text-purple-500 hover:underline">Daftar Sekarang</a>
     </div>
-
-    {{-- Teks bawah --}}
-    <p class="text-center text-gray-600 dark:text-gray-400 text-sm mt-4">
-        By continuing, you agree to the
-        <span class="font-medium text-black dark:text-white">Terms of use</span>
-        and
-        <span class="font-medium text-black dark:text-white">Privacy Policy.</span>
-    </p>
-
 @endsection
-
-{{-- ============================
-      POPUP FORGOT PASSWORD (3 STEP)
-============================= --}}
-{{-- ... (popup & HTML kamu tetap sama, aku nggak ubah) ... --}}
-
 <script>
     // === SHOW / HIDE PASSWORD LOGIN ===
     function toggleLoginPassword() {

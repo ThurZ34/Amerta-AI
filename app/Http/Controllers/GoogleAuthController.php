@@ -6,7 +6,6 @@ use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Str;
 
 class GoogleAuthController extends Controller
 {
@@ -26,29 +25,24 @@ class GoogleAuthController extends Controller
                 if (!$user->google_id) {
                     $user->update(['google_id' => $googleUser->getId()]);
                 }
-
-                Auth::login($user);
-
-                return redirect('dashboard-selection');
             } else {
-                $newUser = User::create([
+                $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'password' => null,
                     'email_verified_at' => now(),
                 ]);
-
-                Auth::login($newUser);
-
-                $user = $newUser;
             }
 
+            Auth::login($user);
+
             if ($user->business_id) {
-                return redirect()->intended('analisis.dashboard');
+                return redirect('main_menu');
             } else {
                 return redirect('dashboard-selection');
             }
+
          } catch (Exception $e) {
             return redirect('/login')->with('error', 'Login Google Gagal: ' . $e->getMessage());
          }
