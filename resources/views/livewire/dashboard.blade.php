@@ -567,7 +567,8 @@
                                             ? 'Pemasukan'
                                             : 'Pengeluaran');
                                 @endphp
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition duration-200">
+                                <tr wire:key="transaction-{{ $trx->id }}"
+                                    class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition duration-200">
                                     <td class="px-8 py-5">
                                         <div class="flex items-center gap-4">
                                             <div
@@ -630,12 +631,7 @@
                     </table>
                 </div>
 
-                @if ($recentTransactions->hasPages())
-                    <div
-                        class="px-8 py-5 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
-                        {{ $recentTransactions->links() }}
-                    </div>
-                @endif
+                {{-- Pagination removed --}}
             </div>
 
 

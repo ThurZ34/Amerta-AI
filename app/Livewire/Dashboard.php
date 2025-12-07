@@ -16,7 +16,7 @@ use Livewire\WithPagination;
 
 class Dashboard extends Component
 {
-    use WithPagination;
+    // use WithPagination; // Pagination removed as per request
 
     public $range = 'week';
 
@@ -264,7 +264,8 @@ class Dashboard extends Component
         $recentTransactions = CashJournal::with('coa')
             ->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->simplePaginate(5);
+            ->take(5)
+            ->get();
 
         $aiMessage = null;
         if (!Session::has('amerta_insight_dismissed')) {
