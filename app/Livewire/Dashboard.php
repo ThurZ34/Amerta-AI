@@ -162,8 +162,9 @@ class Dashboard extends Component
             ->where('kategori', 'like', '%Bahan Baku%')
             ->sum('total_harga');
 
-        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth) {
-            $q->whereBetween('date', [$startOfMonth, $endOfMonth]);
+        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth, $businessId) {
+            $q->where('business_id', $businessId) 
+                ->whereBetween('date', [$startOfMonth, $endOfMonth]);
         })
             ->sum(DB::raw('cost * quantity'));
 
