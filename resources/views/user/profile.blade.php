@@ -7,7 +7,7 @@
         x-data="profileForm()">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
+
             {{-- Header Section --}}
             <div class="mb-8">
                 <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Profil Saya</h1>
@@ -34,11 +34,11 @@
                 @method('PUT')
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
+
                     {{-- KOLOM KIRI: FOTO PROFIL (Kartu Visual) --}}
                     <div class="lg:col-span-1 space-y-6">
                         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center text-center relative overflow-hidden">
-                            
+
                             {{-- Background Decoration --}}
                             <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
 
@@ -59,7 +59,7 @@
                                 </div>
 
                                 {{-- Upload Button Overlay --}}
-                                <div @click="document.getElementById('photo').click()" 
+                                <div @click="document.getElementById('photo').click()"
                                      class="absolute bottom-1 right-1 z-20 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 rounded-full p-2.5 shadow-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                                      title="Ganti Foto">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,7 +67,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
                                 </div>
-                                
+
                                 {{-- Hidden Input --}}
                                 <input type="file" name="photo" id="photo" class="hidden" accept="image/*" @change="updatePreview($event)">
                             </div>
@@ -89,7 +89,7 @@
                     {{-- KOLOM KANAN: FORM DATA (Kartu Edit) --}}
                     <div class="lg:col-span-2">
                         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
-                            
+
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                                 <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -98,7 +98,7 @@
                             </h3>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                
+
                                 {{-- Nama Lengkap --}}
                                 <div class="col-span-1 md:col-span-2">
                                     <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Nama Lengkap</label>
@@ -106,7 +106,7 @@
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                         </div>
-                                        <input type="text" name="name" value="{{ old('name', $user->name) }}" 
+                                        <input type="text" name="name" value="{{ old('name', $user->name) }}"
                                             class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-gray-900 dark:text-white transition-all">
                                     </div>
                                     @error('name') <p class="mt-1 text-xs text-red-500 font-medium">{{ $message }}</p> @enderror
@@ -207,23 +207,21 @@
             return {
                 photoPreview: null,
                 errorMessage: '',
-                
+
                 updatePreview(event) {
                     const file = event.target.files[0];
-                    const maxSize = 2 * 1024 * 1024; // 2MB
-                    
+                    const maxSize = 2 * 1024 * 1024;
+
                     this.errorMessage = '';
 
                     if (file) {
-                        // Validasi ukuran
                         if (file.size > maxSize) {
                             this.errorMessage = 'Ukuran gambar terlalu besar (Maksimal 2MB).';
                             this.photoPreview = null;
-                            event.target.value = ''; // Reset input
+                            event.target.value = '';
                             return;
                         }
 
-                        // Buat preview
                         const reader = new FileReader();
                         reader.onload = (e) => {
                             this.photoPreview = e.target.result;

@@ -456,8 +456,8 @@
                     nama_produk: '',
                     modal: 0,
                     harga_jual: 0,
-                    harga_coret: 0, // Added
-                    promo_end_date: null, // Added
+                    harga_coret: 0,
+                    promo_end_date: null,
                     jenis_produk: ''
                 },
                 search: '',
@@ -479,12 +479,10 @@
                 openPromoModal(data) {
                     this.openModal('edit', data);
 
-                    // If no active promo, initialize manual promo mode
                     if (!this.form.harga_coret || this.form.harga_coret == 0) {
                         this.form.harga_coret = this.form.harga_jual;
-                        this.form.harga_jual = Math.round(this.form.harga_jual * 0.9); // Default 10% off
+                        this.form.harga_jual = Math.round(this.form.harga_jual * 0.9);
 
-                        // Set default duration 7 days
                         const date = new Date();
                         date.setDate(date.getDate() + 7);
                         this.form.promo_end_date = date.toISOString().split('T')[0];
@@ -492,7 +490,6 @@
                 },
 
                 removePromo() {
-                    // Restore original price
                     this.form.harga_jual = this.form.harga_coret;
                     this.form.harga_coret = 0;
                     this.form.promo_end_date = null;
@@ -509,8 +506,8 @@
                         nama_produk: '',
                         modal: 0,
                         harga_jual: 0,
-                        harga_coret: 0, // Added
-                        promo_end_date: null, // Added
+                        harga_coret: 0,
+                        promo_end_date: null,
                         jenis_produk: ''
                     };
                     this.imagePreview = null;
@@ -574,7 +571,6 @@
             }
         }
 
-        // Populate window.allProducts for AI feature
         document.addEventListener('DOMContentLoaded', () => {
             window.allProducts = {};
             @foreach ($produks as $p)
@@ -583,7 +579,7 @@
                     modal: {{ $p->modal }},
                     harga_jual: {{ $p->harga_jual }},
                     harga_coret: {{ $p->harga_coret ?? 0 }},
-                    promo_end_date: "{{ $p->promo_end_date ? \Carbon\Carbon::parse($p->promo_end_date)->format('Y-m-d') : '' }}", // Added
+                    promo_end_date: "{{ $p->promo_end_date ? \Carbon\Carbon::parse($p->promo_end_date)->format('Y-m-d') : '' }}",
                     jenis_produk: "{{ addslashes($p->jenis_produk) }}",
                     gambar: "{{ $p->gambar }}"
                 };
@@ -626,7 +622,6 @@
                     const oldPrice = product.harga_jual;
                     const newPrice = Math.round(oldPrice * ((100 - percent) / 100));
 
-                    // Calculate Promo End Date
                     const endDate = new Date();
                     endDate.setDate(endDate.getDate() + (durationDays || 7));
                     const formattedDate = endDate.toISOString().split('T')[0];
@@ -659,8 +654,8 @@
                                     nama_produk: product.nama_produk,
                                     modal: product.modal,
                                     harga_jual: newPrice,
-                                    harga_coret: oldPrice, // Set old price as strike-through
-                                    promo_end_date: formattedDate, // Set expiration
+                                    harga_coret: oldPrice,
+                                    promo_end_date: formattedDate,
                                     jenis_produk: product.jenis_produk,
                                     gambar: product.gambar
                                 }
@@ -681,7 +676,6 @@
             }));
         });
 
-        // Toast notifications
         document.addEventListener('DOMContentLoaded', () => {
             const Toast = Swal.mixin({
                 toast: true,

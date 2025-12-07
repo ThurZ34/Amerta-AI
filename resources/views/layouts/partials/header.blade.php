@@ -28,9 +28,7 @@
                     $route = request()->route()->getName();
                     $breadcrumbs = [];
 
-                    // Determine the breadcrumb category based on route prefix
                     if (Str::startsWith($route, 'analisis.')) {
-                        // Analisis & Bantuan
                         $breadcrumbs[] = ['name' => 'Analisis & Bantuan', 'route' => null];
                         if ($route === 'analisis.dashboard') {
                             $breadcrumbs[] = [
@@ -46,7 +44,6 @@
                             ];
                         }
                     } elseif (Str::startsWith($route, 'operasional.')) {
-                        // Operasional Harian pages
                         $breadcrumbs[] = ['name' => 'Operasional Harian', 'route' => null];
                         $breadcrumbs[] = [
                             'name' => trim($__env->yieldContent('header')),
@@ -54,7 +51,6 @@
                             'current' => true,
                         ];
                     } elseif (Str::startsWith($route, 'manajemen.')) {
-                        // Manajemen Bisnis pages
                         $breadcrumbs[] = ['name' => 'Manajemen Bisnis', 'route' => null];
                         $breadcrumbs[] = [
                             'name' => trim($__env->yieldContent('header')),
@@ -62,7 +58,6 @@
                             'current' => true,
                         ];
                     } else {
-                        // Fallback – Dashboard
                         $breadcrumbs[] = ['name' => 'Dashboard', 'route' => 'analisis.dashboard'];
                         if ($route !== 'analisis.dashboard') {
                             $breadcrumbs[] = [
@@ -192,7 +187,6 @@
         event.preventDefault();
         const form = event.target.closest('form');
 
-        // detect Tailwind's dark mode (html class="dark")
         const isDark = document.documentElement.classList.contains('dark');
 
         Swal.fire({
@@ -204,7 +198,7 @@
             cancelButtonColor: '#d33',
             confirmButtonText: 'Ya, Keluar!',
             cancelButtonText: 'Batal',
-            theme: isDark ? 'dark' : 'light' 
+            theme: isDark ? 'dark' : 'light'
         }).then((result) => {
             if (result.isConfirmed) {
                 form.submit();

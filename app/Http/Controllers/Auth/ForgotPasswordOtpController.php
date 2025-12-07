@@ -12,7 +12,6 @@ use Illuminate\Support\Carbon;
 
 class ForgotPasswordOtpController extends Controller
 {
-    // Kirim OTP ke email
     public function sendOtp(Request $request)
     {
         $request->validate([
@@ -28,9 +27,8 @@ class ForgotPasswordOtpController extends Controller
             ], 404);
         }
 
-        $otp = rand(100000, 999999); // 6 digit
+        $otp = rand(100000, 999999);
 
-        // simpan atau update OTP
         PasswordOtp::updateOrCreate(
             ['email' => $request->email, 'used' => false],
             [
@@ -40,7 +38,6 @@ class ForgotPasswordOtpController extends Controller
             ]
         );
 
-        // kirim email sederhana
         Mail::raw("Kode OTP reset password Anda: {$otp}", function ($message) use ($user) {
             $message->to($user->email)
                 ->subject('Kode OTP Reset Password');
@@ -52,7 +49,6 @@ class ForgotPasswordOtpController extends Controller
         ]);
     }
 
-    // Verifikasi OTP
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -73,8 +69,6 @@ class ForgotPasswordOtpController extends Controller
             ], 422);
         }
 
-        // tandai otp ini sebagai "terverifikasi sementara"
-        // bisa simpan di session agar aman
         session([
             'password_otp_email' => $request->email,
             'password_otp_code'  => $request->otp,
@@ -86,7 +80,6 @@ class ForgotPasswordOtpController extends Controller
         ]);
     }
 
-    // Simpan password baru
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -117,15 +110,12 @@ class ForgotPasswordOtpController extends Controller
             ], 404);
         }
 
-        // update password
         $user->password = Hash::make($request->password);
         $user->save();
 
-        // OTP ditandai sudah digunakan
         $record->used = true;
         $record->save();
 
-        // hapus session
         session()->forget(['password_otp_email', 'password_otp_code']);
 
         return response()->json([

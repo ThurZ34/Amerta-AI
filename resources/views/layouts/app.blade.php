@@ -193,7 +193,6 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
-            // Theme Logic
             Alpine.data('themeManager', () => ({
                 darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) &&
                     window.matchMedia('(prefers-color-scheme: dark)').matches),
@@ -208,7 +207,6 @@
                 }
             }));
 
-            // Chat Widget Logic
             Alpine.data('chatWidget', () => ({
                 chatOpen: false,
                 isFullscreen: false,

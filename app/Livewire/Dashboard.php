@@ -12,17 +12,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class Dashboard extends Component
 {
-    // use WithPagination; // Pagination removed as per request
-
     public $range = 'week';
 
     public function updatedRange()
     {
-        $this->resetPage();
+        // ga digunain
     }
 
     public function dismissInsight()
@@ -162,8 +159,9 @@ class Dashboard extends Component
             ->where('kategori', 'like', '%Bahan Baku%')
             ->sum('total_harga');
 
-        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth) {
-            $q->whereBetween('date', [$startOfMonth, $endOfMonth]);
+        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth, $businessId) {
+            $q->where('business_id', $businessId)
+                ->whereBetween('date', [$startOfMonth, $endOfMonth]);
         })
             ->sum(DB::raw('cost * quantity'));
 
@@ -309,7 +307,7 @@ class Dashboard extends Component
             'chartData',
             'expenseLabels',
             'expenseData',
-            'expenseAllocationQuery', // Pass full collection for legend
+            'expenseAllocationQuery', 
             'aiMessage',
             'businessHealth',
             'initialCapital'

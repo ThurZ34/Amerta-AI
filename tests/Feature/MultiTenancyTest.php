@@ -15,10 +15,8 @@ class MultiTenancyTest extends TestCase
 
     public function test_users_cannot_see_other_business_products()
     {
-        // Create a category first
         $category = \App\Models\Category::create(['name' => 'General']);
 
-        // Setup User A and Business A
         $userA = User::factory()->create();
         $businessA = Business::create([
             'user_id' => $userA->id,
@@ -31,8 +29,7 @@ class MultiTenancyTest extends TestCase
             'jumlah_tim' => 1,
             'tujuan_utama' => 'Profit',
         ]);
-        
-        // Create Product for Business A
+
         $productA = Produk::create([
             'business_id' => $businessA->id,
             'nama_produk' => 'Product A',
@@ -43,7 +40,6 @@ class MultiTenancyTest extends TestCase
             'gambar' => 'path/to/image.jpg',
         ]);
 
-        // Setup User B and Business B
         $userB = User::factory()->create();
         $businessB = Business::create([
             'user_id' => $userB->id,
@@ -57,15 +53,12 @@ class MultiTenancyTest extends TestCase
             'tujuan_utama' => 'Profit',
         ]);
 
-        // Authenticate as User B
         $this->actingAs($userB);
 
-        // Visit Product Index
         $response = $this->get(route('produk.index'));
         $response->assertStatus(200);
         $response->assertDontSee('Product A');
 
-        // Create Product for Business B
         $response = $this->post(route('produk.store'), [
             'nama_produk' => 'Product B',
             'modal' => 20000,
@@ -76,7 +69,6 @@ class MultiTenancyTest extends TestCase
         ]);
         $response->assertRedirect(route('produk.index'));
 
-        // Verify Product B is created and associated with Business B
         $this->assertDatabaseHas('produk', [
             'nama_produk' => 'Product B',
             'business_id' => $businessB->id,
@@ -85,10 +77,8 @@ class MultiTenancyTest extends TestCase
 
     public function test_users_cannot_see_other_business_daily_sales()
     {
-        // Create a category first
         $category = \App\Models\Category::firstOrCreate(['name' => 'General']);
 
-        // Setup User A and Business A
         $userA = User::factory()->create();
         $businessA = Business::create([
             'user_id' => $userA->id,
@@ -101,8 +91,7 @@ class MultiTenancyTest extends TestCase
             'jumlah_tim' => 1,
             'tujuan_utama' => 'Profit',
         ]);
-        
-        // Create Daily Sale for Business A
+
         $dailySaleA = DailySale::create([
             'business_id' => $businessA->id,
             'date' => now()->format('Y-m-d'),
@@ -111,7 +100,6 @@ class MultiTenancyTest extends TestCase
             'ai_analysis' => 'Good job',
         ]);
 
-        // Setup User B and Business B
         $userB = User::factory()->create();
         $businessB = Business::create([
             'user_id' => $userB->id,
@@ -125,19 +113,14 @@ class MultiTenancyTest extends TestCase
             'tujuan_utama' => 'Profit',
         ]);
 
-        // Authenticate as User B
         $this->actingAs($userB);
 
-        // Visit Daily Checkin Index
         $response = $this->get(route('daily-checkin.index'));
         $response->assertStatus(200);
-        // We can't easily assertDontSee the ID or date if it's just a list, but we can check the view data
         $response->assertViewHas('dailySales', function ($dailySales) {
             return $dailySales->isEmpty();
         });
 
-        // Create Daily Sale for Business B (same date)
-        // We need a product first
         $productB = Produk::create([
             'business_id' => $businessB->id,
             'nama_produk' => 'Product B',
@@ -152,17 +135,13 @@ class MultiTenancyTest extends TestCase
             'date' => now()->format('Y-m-d'),
             'sales' => [$productB->id => 5],
         ]);
-        
-        // It might redirect to show page
+
         $response->assertRedirect();
-        
-        // Verify Daily Sale B is created
-        // Verify Daily Sale B is created
+
         $this->assertEquals(1, DailySale::where('business_id', $businessB->id)->count());
         $dailySaleB = DailySale::where('business_id', $businessB->id)->first();
         $this->assertEquals(now()->format('Y-m-d'), $dailySaleB->date->format('Y-m-d'));
-        
-        // Verify we have 2 daily sales in total
+
         $this->assertEquals(2, DailySale::count());
     }
 }

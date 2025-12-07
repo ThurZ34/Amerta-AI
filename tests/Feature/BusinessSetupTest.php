@@ -62,15 +62,12 @@ class BusinessSetupTest extends TestCase
 
         $response->assertRedirect(route('analisis.dashboard'));
 
-        // Check that category was created
         $this->assertDatabaseHas('categories', [
             'name' => 'Teknologi',
         ]);
 
-        // Get the created category
         $category = Category::where('name', 'Teknologi')->first();
 
-        // Check that business was created with correct category_id
         $this->assertDatabaseHas('businesses', [
             'user_id' => $user->id,
             'nama_bisnis' => 'My Business',
