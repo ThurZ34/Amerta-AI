@@ -191,6 +191,10 @@
     function confirmLogout(event) {
         event.preventDefault();
         const form = event.target.closest('form');
+
+        // detect Tailwind's dark mode (html class="dark")
+        const isDark = document.documentElement.classList.contains('dark');
+
         Swal.fire({
             title: 'Apakah Anda yakin?',
             text: "Anda akan keluar dari sesi ini.",
@@ -199,7 +203,8 @@
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Ya, Keluar!',
-            cancelButtonText: 'Batal'
+            cancelButtonText: 'Batal',
+            theme: isDark ? 'dark' : 'light' 
         }).then((result) => {
             if (result.isConfirmed) {
                 form.submit();
@@ -207,3 +212,4 @@
         });
     }
 </script>
+

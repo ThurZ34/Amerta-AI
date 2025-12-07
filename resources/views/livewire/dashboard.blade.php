@@ -2,7 +2,7 @@
     @section('header', 'Dashboard')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <div class="min-h-screen bg-gray-200/50 dark:bg-gray-900 transition-colors duration-300 font-sans pb-24">
+    <div class="min-h-screen bg-gray-50/50 dark:bg-gray-900 transition-colors duration-300 font-sans pb-24">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
 
