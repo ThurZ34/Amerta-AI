@@ -73,7 +73,7 @@ class RiwayatController extends Controller
                 return back()->with('error', 'Gagal menganalisa struk. Pastikan gambar jelas.');
             }
 
-            return redirect()->route('riwayat.index')
+            return redirect()->route('operasional.riwayat-keuangan.index')
                 ->with('scan_result', $data)
                 ->with('success', 'Struk berhasil dianalisa! Silakan cek data sebelum disimpan.');
 
@@ -165,7 +165,7 @@ class RiwayatController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('riwayat.index')->with('success', 'Data berhasil ditambahkan.');
+            return redirect()->route('operasional.riwayat-keuangan.index')->with('success', 'Data berhasil ditambahkan.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -222,7 +222,7 @@ class RiwayatController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('riwayat.index')->with('success', 'Data berhasil diperbarui.');
+            return redirect()->route('operasional.riwayat-keuangan.index')->with('success', 'Data berhasil diperbarui.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -247,7 +247,7 @@ class RiwayatController extends Controller
             $riwayat->delete();
 
             DB::commit();
-            return redirect()->route('riwayat.index')->with('success', 'Data berhasil dihapus.');
+            return redirect()->route('operasional.riwayat-keuangan.index')->with('success', 'Data berhasil dihapus.');
 
         } catch (\Exception $e) {
             DB::rollBack();

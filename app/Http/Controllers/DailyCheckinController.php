@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashJournal;
+use App\Models\Coa;
 use App\Models\DailySale;
 use App\Models\DailySaleItem;
 use App\Models\Produk;
-use App\Models\CashJournal;
-use App\Models\Coa;
 use App\Services\KolosalService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -35,11 +35,11 @@ class DailyCheckinController extends Controller
             ->with('items')
             ->get()
             ->map(function ($sale) {
-                $revenue = $sale->items->sum(function($item) {
+                $revenue = $sale->items->sum(function ($item) {
                     return $item->price * $item->quantity;
                 });
 
-                $hpp = $sale->items->sum(function($item) {
+                $hpp = $sale->items->sum(function ($item) {
                     return $item->cost * $item->quantity;
                 });
 
@@ -48,7 +48,7 @@ class DailyCheckinController extends Controller
 
                 return $sale;
             })
-            ->keyBy(fn($sale) => $sale->date->format('Y-m-d'));
+            ->keyBy(fn ($sale) => $sale->date->format('Y-m-d'));
 
         return view('daily-checkin.index', compact('dailySales', 'startOfMonth', 'endOfMonth', 'produks'));
     }
@@ -59,10 +59,10 @@ class DailyCheckinController extends Controller
 
         $existing = DailySale::where('date', $date)->first();
         if ($existing) {
-            return redirect()->route('daily-checkin.show', $existing->id);
+            return redirect()->route('operasional.analisis-penjualan.show', $existing->id);
         }
 
-        $produks = Produk::all();
+        $produks = Produk::where('business_id', auth()->user()->business->id)->get();
 
         return view('daily-checkin.create', compact('produks', 'date'));
     }
@@ -83,8 +83,9 @@ class DailyCheckinController extends Controller
         $coaRevenue = Coa::where('name', 'Penjualan Produk')->first();
         $coaCost = Coa::where('name', 'Beban Bahan Baku')->first();
 
-        if (!$coaRevenue || !$coaCost) {
-            Log::error("COA not found for sales transaction: Revenue exists=" . ($coaRevenue ? 'Yes' : 'No') . ", Cost exists=" . ($coaCost ? 'Yes' : 'No'));
+        if (! $coaRevenue || ! $coaCost) {
+            Log::error('COA not found for sales transaction: Revenue exists='.($coaRevenue ? 'Yes' : 'No').', Cost exists='.($coaCost ? 'Yes' : 'No'));
+
             return back()->withInput()->withErrors('Konfigurasi Akun Keuangan (COA) belum lengkap. Harap cek data seeder.');
         }
 
@@ -97,7 +98,7 @@ class DailyCheckinController extends Controller
                 'ai_analysis' => 'Analyzing...',
             ]);
 
-            $productIds = array_keys(array_filter($request->sales, fn($qty) => $qty > 0));
+            $productIds = array_keys(array_filter($request->sales, fn ($qty) => $qty > 0));
             $products = Produk::whereIn('id', $productIds)->get()->keyBy('id');
 
             foreach ($request->sales as $produkId => $qty) {
@@ -119,7 +120,6 @@ class DailyCheckinController extends Controller
                             'price' => $produk->harga_jual,
                             'cost' => $produk->modal,
                         ]);
-
 
                         CashJournal::create([
                             'business_id' => auth()->user()->business->id,
@@ -164,8 +164,9 @@ class DailyCheckinController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error during DailySale store and CashJournal creation: " . $e->getMessage());
-            return back()->withInput()->withErrors('Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+            Log::error('Error during DailySale store and CashJournal creation: '.$e->getMessage());
+
+            return back()->withInput()->withErrors('Terjadi kesalahan saat menyimpan data: '.$e->getMessage());
         }
 
         return redirect()->route('operasional.analisis-penjualan.show', $dailySale->id);
@@ -177,12 +178,12 @@ class DailyCheckinController extends Controller
             ->with('items.produk')
             ->findOrFail($id);
 
-        $produks = Produk::all();
+        $produks = Produk::where('business_id', auth()->user()->business->id)->get();
 
         $totalRevenue = 0;
         $totalCost = 0;
 
-        foreach($dailySale->items as $item) {
+        foreach ($dailySale->items as $item) {
             $totalRevenue += $item->price * $item->quantity;
 
             $totalCost += $item->cost * $item->quantity;
@@ -200,7 +201,7 @@ class DailyCheckinController extends Controller
             ->with('items.produk')
             ->findOrFail($id);
 
-        $produks = Produk::where('business_id', auth()->user()->business->id)->get();
+        $produks = Produk::where('business_id', auth()->user()->business_id)->get();
 
         $existingSales = [];
         foreach ($dailySale->items as $item) {
@@ -228,22 +229,29 @@ class DailyCheckinController extends Controller
         $coaRevenue = Coa::where('name', 'Penjualan Produk')->first();
         $coaCost = Coa::where('name', 'Beban Bahan Baku')->first();
 
-        if (!$coaRevenue || !$coaCost) {
-            Log::error("COA not found for sales transaction update");
+        if (! $coaRevenue || ! $coaCost) {
+            Log::error('COA not found for sales transaction update');
+
             return back()->withInput()->withErrors('Konfigurasi Akun Keuangan (COA) belum lengkap. Harap cek data seeder.');
         }
 
         DB::beginTransaction();
 
         try {
-            CashJournal::where('business_id', auth()->user()->business->id)
-                ->whereDate('transaction_date', $dailySale->date)
-                ->where('coa_id', $coaRevenue->id)
-                ->delete();
+            $hasKasirData = \App\Models\Riwayat::where('business_id', auth()->user()->business->id)
+                ->whereDate('tanggal_pembelian', $dailySale->date)
+                ->exists();
+
+            if (!$hasKasirData) {
+                CashJournal::where('business_id', auth()->user()->business->id)
+                    ->whereDate('transaction_date', $dailySale->date)
+                    ->where('coa_id', $coaRevenue->id)
+                    ->delete();
+            }
 
             DailySaleItem::where('daily_sale_id', $dailySale->id)->delete();
 
-            $productIds = array_keys(array_filter($request->sales, fn($qty) => $qty > 0));
+            $productIds = array_keys(array_filter($request->sales, fn ($qty) => $qty > 0));
             $products = Produk::whereIn('id', $productIds)->get()->keyBy('id');
 
             foreach ($request->sales as $produkId => $qty) {
@@ -266,16 +274,17 @@ class DailyCheckinController extends Controller
                             'cost' => $produk->modal,
                         ]);
 
-
-                        CashJournal::create([
-                            'business_id' => auth()->user()->business->id,
-                            'transaction_date' => $dailySale->date,
-                            'coa_id' => $coaRevenue->id,
-                            'amount' => $revenue,
-                            'is_inflow' => true,
-                            'payment_method' => 'Kas',
-                            'description' => "Penjualan {$qty} unit {$produk->nama_produk}",
-                        ]);
+                        if (!$hasKasirData) {
+                            CashJournal::create([
+                                'business_id' => auth()->user()->business->id,
+                                'transaction_date' => $dailySale->date,
+                                'coa_id' => $coaRevenue->id,
+                                'amount' => $revenue,
+                                'is_inflow' => true,
+                                'payment_method' => 'Kas',
+                                'description' => "Penjualan {$qty} unit {$produk->nama_produk}",
+                            ]);
+                        }
 
                         $salesData[] = [
                             'name' => $produk->nama_produk,
@@ -310,8 +319,9 @@ class DailyCheckinController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error during DailySale update: " . $e->getMessage());
-            return back()->withInput()->withErrors('Terjadi kesalahan saat mengupdate data: ' . $e->getMessage());
+            Log::error('Error during DailySale update: '.$e->getMessage());
+
+            return back()->withInput()->withErrors('Terjadi kesalahan saat mengupdate data: '.$e->getMessage());
         }
 
         return redirect()->route('operasional.analisis-penjualan.show', $dailySale->id)->with('success', 'Data berhasil diupdate!');
