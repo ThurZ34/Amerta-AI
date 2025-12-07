@@ -47,7 +47,7 @@ Amerta AI adalah website all-in-one yang dirancang untuk menjadi solusi digital 
     <tr>
       <td>
         <strong>Katalog Produk Bisnis</strong><br>
-        Visualisasi berbagai jenis produk yang sudah dibuat beserta analisis profit dan margin dari produk tersebut.
+        Visualisasi berbagai jenis produk yang sudah dibuat beserta analisis profit dan margin dari produk tersebut. Dengan masukan dari AI untuk mengatur harga promo dari produk tersebut.
       </td>
       <td>
         <img src="public/images/demo/katalog-produk.png" alt="Katalog Produk" width="800" />
@@ -78,6 +78,15 @@ Amerta AI adalah website all-in-one yang dirancang untuk menjadi solusi digital 
       </td>
       <td>
         <img src="public/images/demo/riwayat-transaksi.png" alt="Riwayat Transaksi" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Profil Bisnis</strong><br>
+        Identitas bisnis beserta staf yang dapat diundang menggunakan kode referal.
+      </td>
+      <td>
+        <img src="public/images/demo/profilbisnis.png" alt="Riwayat Transaksi" width="800" />
       </td>
     </tr>
   </table>
