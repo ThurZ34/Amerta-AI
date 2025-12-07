@@ -45,21 +45,58 @@
 
     <div class="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
 
-        {{-- Hero Section --}}
-        <div class="relative bg-indigo-600 pb-32">
-            <div class="absolute inset-0">
-                <img class="w-full h-auto object-cover opacity-20 dark:opacity-10 mix-blend-overlay"
-                    src="{{ asset('images/main_menu_bg.jpg') }}" alt="Background Pattern">
-                <div class="absolute inset-0 bg-gradient-to-b from-indigo-600/90 to-indigo-900/95 mix-blend-multiply">
-                </div>
-            </div>
+{{-- Hero Section --}}
+{{-- Hero Section --}}
+<div class="relative bg-[#5610C6] pb-32 overflow-hidden">
+    <div class="absolute inset-0">
+        {{-- Gradient utama (atas ungu muda → bawah ungu gelap) --}}
+        <div
+            class="absolute inset-0 bg-gradient-to-b from-[#DCC6FF]/90 to-[#5610C6]/95 mix-blend-multiply">
+        </div>
+
+        {{-- Bubble blur kanan atas --}}
+        <div
+            class="absolute -top-16 -right-10 w-56 h-56 bg-white/25 dark:bg-white/10 rounded-full blur-3xl opacity-90">
+        </div>
+
+        {{-- Bubble blur kiri bawah --}}
+        <div
+            class="absolute -bottom-24 -left-10 w-72 h-72 bg-[#9C73DF]/45 rounded-full blur-3xl opacity-90">
+        </div>
+
+        {{-- Sinar-sinar gerak --}}
+        <div class="hero-ray"></div>
+        <div class="hero-ray hero-ray--2"></div>
+        <div class="hero-ray hero-ray--3"></div>
+{{-- Sinar-sinar gerak sisi kiri --}}
+<div class="hero-ray"></div>
+
+
+{{-- Sinar-sinar gerak sisi kanan --}}
+<div class="hero-ray-right"></div>
+<div class="hero-ray-right hero-ray-right--2"></div>
+
+        {{-- Siluet kota di bawah --}}
+        <div
+            class="pointer-events-none absolute inset-x-0 bottom-0 h-100
+                   bg-[url('{{ asset('images/city_mono.png') }}')]
+                   bg-bottom bg-no-repeat bg-cover
+                   opacity-10">
+        </div>
+    
+
+    </div>
 
             <div
                 class="relative max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 {{-- Left Side: Greeting & Stats --}}
                 <div class="text-center md:text-left flex-1">
                     <h1 class="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl mb-2">
-                        Halo, {{ Auth::user()->name }}! 👋
+                        Halo,
+                        <span class="user-name-glow">
+                            {{ Auth::user()->name }}
+                        </span>
+                        ! 👋
                     </h1>
                     <p class="text-indigo-100 text-lg max-w-2xl mb-4 leading-relaxed">
                         {{ $insight }}
