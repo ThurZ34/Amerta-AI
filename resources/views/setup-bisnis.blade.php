@@ -268,31 +268,10 @@
                         </div>
                     </div>
 
-                    <!-- STEP 3: TIM & TUJUAN -->
+                    <!-- STEP 3: TUJUAN -->
                     <div x-show="step === 3" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 translate-y-4"
                         x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6" x-cloak>
-
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Ukuran Tim
-                                (Jumlah Orang)</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                    </svg>
-                                </div>
-                                <input type="number" x-model="formData.jumlah_tim" min="1" max="20"
-                                    @input="if($el.value > 20) $el.value = 20; if($el.value < 0) $el.value = '';"
-                                    placeholder="Contoh: 5 (Maks. 20)"
-                                    :class="{ '!border-red-500': errors.jumlah_tim }"
-                                    class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all">
-                            </div>
-                            <span x-show="errors.jumlah_tim" class="text-xs text-red-500 mt-1.5 block"
-                                x-text="errors.jumlah_tim_msg || 'Jumlah tim wajib diisi.'"></span>
-                        </div>
 
                         <div>
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Tujuan
@@ -385,7 +364,6 @@
                     channel_penjualan: '',
                     target_pasar: '',
                     range_omset: '',
-                    jumlah_tim: '',
                     tujuan_utama: ''
                 },
 
@@ -399,11 +377,11 @@
                     return ['Identitas Bisnis', 'Market', 'Goals'][this.step - 1];
                 },
                 get stepHeader() {
-                    return ['Informasi Dasar', 'Target & Penjualan', 'Tim & Tujuan'][this.step - 1];
+                    return ['Informasi Dasar', 'Target & Penjualan', 'Tujuan'][this.step - 1];
                 },
                 get stepDesc() {
                     return ['Mulai dengan nama dan kategori bisnis Anda.',
-                        'Seberapa besar jangkauan pasar Anda saat ini?', 'Ceritakan tentang tim dan visi Anda.'
+                        'Seberapa besar jangkauan pasar Anda saat ini?', 'Ceritakan tentang visi bisnis Anda.'
                     ][this.step - 1];
                 },
 
@@ -468,11 +446,6 @@
                             isValid = false;
                         }
                     } else if (this.step === 3) {
-                        // jumlah_tim sekarang input number, validasi string kosong
-                        if (!f.jumlah_tim) {
-                            this.errors.jumlah_tim = true;
-                            isValid = false;
-                        }
                         if (!f.tujuan_utama.trim()) {
                             this.errors.tujuan_utama = true;
                             isValid = false;

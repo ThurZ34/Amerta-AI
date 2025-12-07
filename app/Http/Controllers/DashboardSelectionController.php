@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
-use App\Models\User;
 use App\Models\BusinessJoinRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,7 +22,8 @@ class DashboardSelectionController extends Controller
 
             $rejectedRequest->delete();
 
-            return redirect()->route('dashboard-selection')
+            return redirect()
+                ->route('dashboard-selection')
                 ->with('rejection_alert', "Maaf, permintaan Anda ditolak oleh Owner dari bisnis: $businessName.");
         }
 
@@ -43,9 +44,8 @@ class DashboardSelectionController extends Controller
 
         $business = Business::where('invite_code', $request->invite_code)->firstOrFail();
 
-        // Cek apakah bisnis penuh
-        // (Asumsi jumlah_tim dihitung dari user yang sudah masuk + owner)
-        if ($business->users()->count() >= $business->jumlah_tim) {
+        // Cek apakah bisnis penuh (hanya jika jumlah_tim sudah di-set)
+        if ($business->jumlah_tim && $business->users()->count() >= $business->jumlah_tim) {
             return back()->withErrors(['invite_code' => 'Maaf, kuota tim bisnis ini sudah penuh.']);
         }
 
