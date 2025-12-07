@@ -7,7 +7,6 @@
 
     <div
         class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center relative overflow-hidden px-4 sm:px-6 lg:px-8">
-        {{-- Background Decor --}}
         <div class="absolute inset-0 w-full h-full">
             <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
             <div class="absolute inset-0"
@@ -33,7 +32,6 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                {{-- CARD OWNER (Kiri) --}}
                 <div
                     class="group relative bg-white dark:bg-gray-800 rounded-[2rem] border border-gray-200 dark:border-gray-700 p-8 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
                     <div

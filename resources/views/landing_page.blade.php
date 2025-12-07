@@ -388,7 +388,7 @@
             </div>
 
             <!-- Mobile Menu Panel -->
-            <div x-show="mobileOpen" 
+            <div x-show="mobileOpen"
                  x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0 -translate-y-1"
                  x-transition:enter-end="opacity-100 translate-y-0"
@@ -407,7 +407,7 @@
                     <a href="#pricing" @click="mobileOpen = false"
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{{ __('Pricing') }}</a>
                 </div>
-                
+
                 @auth
                     <!-- Mobile User Menu -->
                     <div class="pt-4 pb-3 border-t border-gray-200 dark:border-gray-800">
@@ -897,7 +897,6 @@
             document.querySelectorAll('.fade-in-section, .fade-in-left, .fade-in-right').forEach(s => observer
                 .observe(s));
 
-            // Parallax Blobs
             window.addEventListener('scroll', () => {
                 const s = window.pageYOffset;
                 ['blob-1', 'blob-2', 'blob-3'].forEach((id, i) => {
