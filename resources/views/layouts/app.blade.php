@@ -106,7 +106,7 @@
         </div>
     </div>
 
-    @unless (request()->routeIs(['dashboard-selection', 'dashboard-selection.join', 'main_menu', 'profil_bisnis', 'operasional.kasir']))
+    @unless (request()->routeIs(['dashboard-selection', 'dashboard-selection.join', 'main_menu', 'manajemen.profil-bisnis.index', 'operasional.kasir']))
         <div x-data="chatWidget" @mousemove.window="doDrag($event)" @mouseup.window="stopDrag()"
             class="relative z-[9999]">
 
