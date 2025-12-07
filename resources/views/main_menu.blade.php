@@ -17,6 +17,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {{-- Alpine is handled by app.js usually, but we include logic here --}}
 
+    @livewireStyles
+
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
                 '(prefers-color-scheme: dark)').matches)) {
@@ -532,7 +534,7 @@
 
                 Swal.fire({
                     title: 'Selamat Datang!',
-                    text: `Halo ${userName}, selamat datang kembali!`,
+                    text: `Halo ${userName}, selamat datang!`,
                     icon: 'success',
                     timer: 2000,
                     showConfirmButton: false,
@@ -575,6 +577,8 @@
             });
         }
     </script>
+
+    @livewireScripts
 </body>
 
 </html>

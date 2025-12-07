@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Setup Bisnis - Amerta AI</title>
 
+    @livewireStyles
+
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
                 '(prefers-color-scheme: dark)').matches)) {
@@ -555,6 +557,8 @@
             }
         }
     </script>
+
+    @livewireScripts
 </body>
 
 </html>

@@ -7,7 +7,7 @@ use App\Models\DailySale;
 use App\Models\CashJournal;
 use App\Models\Coa;
 use App\Models\Produk;
-use App\Services\GeminiService;
+use App\Services\KolosalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -15,18 +15,18 @@ use App\Models\DailySaleItem;
 
 class RiwayatController extends Controller
 {
-    protected $geminiService;
+    protected $kolosalService;
 
-    public function __construct(GeminiService $geminiService)
+    public function __construct(KolosalService $kolosalService)
     {
-        $this->geminiService = $geminiService;
+        $this->kolosalService = $kolosalService;
     }
 
     public function kasir()
     {
         $business = auth()->user()->business;
         $products = Produk::where('business_id', $business->id)->get();
-        
+
         return view('riwayat.kasir', compact('products'));
     }
 
@@ -103,7 +103,7 @@ class RiwayatController extends Controller
 
         try {
             $path = $request->file('receipt_image')->store('receipts', 'public');
-            $data = $this->geminiService->analyzeReceipt($path);
+            $data = $this->kolosalService->analyzeReceipt($path);
 
             if (! $data) {
                 return back()->with('error', 'Gagal menganalisa struk. Pastikan gambar jelas.');
@@ -200,7 +200,7 @@ class RiwayatController extends Controller
                             ]);
                         }
                     }
-                     
+
                     // Opsi: Trigger ulang AI Analysis jika diperlukan, atau biarkan update manual/nanti
                 }
             }
@@ -280,7 +280,7 @@ class RiwayatController extends Controller
             if ($riwayat->bukti_pembayaran) {
                 Storage::disk('public')->delete($riwayat->bukti_pembayaran);
             }
-            
+
             if ($riwayat->cash_journal_id) {
                 CashJournal::destroy($riwayat->cash_journal_id);
             }
