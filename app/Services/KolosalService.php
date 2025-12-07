@@ -16,14 +16,19 @@ class KolosalService
     public function __construct()
     {
         $this->apiKey = env('KOLOSAL_API_KEY');
+        // Pastikan base URL mengarah ke endpoint chat completions
         $this->baseUrl = env('KOLOSAL_BASE_URL', 'https://api.kolosal.ai/v1/chat/completions');
         $this->model = env('KOLOSAL_MODEL', 'Claude Sonnet 4.5');
     }
 
+    /**
+     * Fungsi 1: Chatbot Umum (Amerta)
+     */
     public function sendChat(string $message, Business $business, ?string $imagePath = null)
     {
         $categoryName = $business->category ? $business->category->name : 'Tidak ada';
 
+        // Prompt System sama persis dengan GeminiService
         $systemInstruction = "
             PERAN: Kamu adalah 'Amerta', asisten konsultan bisnis profesional untuk UMKM.
             PROFIL BISNIS PENGGUNA:
@@ -38,26 +43,33 @@ class KolosalService
 
             INSTRUKSI UTAMA:
             1. Jawab pertanyaan user secara spesifik berdasarkan data profil di atas.
-            2. Gunakan FORMAT MARKDOWN (Bold poin kunci, bullet points).
-            3. Gaya bahasa: Profesional, santai, suportif.
-            4. Jika user sapaan, sapa balik dengan nama bisnis.
-            5. JANGAN bahas di luar topik bisnis.
+            2. Gunakan FORMAT MARKDOWN:
+               - Gunakan **bold** untuk poin kunci.
+               - Gunakan daftar (bullet points) untuk langkah-langkah.
+               - Berikan spasi antar paragraf agar enak dibaca.
+            3. Gaya bahasa: Profesional, santai, suportif (seperti mentor yang baik).
+            4. Jika user hanya menyapa (Halo/Hai), sapa balik dengan menyebut nama bisnisnya.
+            5. JANGAN menjawab hal di luar topik bisnis.
 
             TUGAS VISUAL (JIKA ADA GAMBAR):
-            Analisa apakah relevan (Struk, Produk, Laporan). Jika selfie/meme, tolak dengan sopan.
+            1. ANALISA GAMBAR: Cek apakah gambar relevan dengan operasional bisnis (Struk, Laporan Tulis Tangan, Produk, Tempat Usaha, Promosi).
+            2. TOLAK JIKA TIDAK RELEVAN: Jika gambar adalah selfie, pemandangan, hewan, atau meme, jawab: 'Maaf, saya hanya bisa menganalisa gambar yang berkaitan dengan bisnis {$business->nama_bisnis}.'
+            3. EKSEKUSI: Jika relevan (misal struk), baca detail angkanya dan berikan saran keuangan/stok.
         ";
 
+        // Siapkan konten User
         $userContent = [];
 
+        // Masukkan Text
         $userContent[] = [
             'type' => 'text',
             'text' => $message
         ];
 
+        // Masukkan Gambar (Jika ada)
         if ($imagePath && Storage::disk('public')->exists($imagePath)) {
             $mimeType = Storage::disk('public')->mimeType($imagePath);
             $imageData = base64_encode(Storage::disk('public')->get($imagePath));
-
             $base64Url = "data:{$mimeType};base64,{$imageData}";
 
             $userContent[] = [
@@ -68,7 +80,9 @@ class KolosalService
             ];
         }
 
+        // Kirim Request ke Kolosal
         $response = Http::withToken($this->apiKey)
+            ->timeout(60) // Tambahkan timeout biar aman
             ->post($this->baseUrl, [
                 'model' => $this->model,
                 'messages' => [
@@ -84,12 +98,89 @@ class KolosalService
                 'status' => $response->status(),
                 'body' => $response->body()
             ]);
-            return "Waduh, koneksi ke Amerta (Kolosal) sedang gangguan. Coba kirim ulang ya Bos.";
+            return "Waduh, koneksi ke otak AI (Kolosal) terganggu. Coba kirim ulang ya Bos.";
         }
 
-        return $response->json()['choices'][0]['message']['content'] ?? "Maaf, respon kosong.";
+        return $response->json()['choices'][0]['message']['content'] ?? "Maaf, respon AI kosong.";
     }
 
+    /**
+     * Fungsi 2: Analisa Produk & Diskon
+     * (Sebelumnya tidak ada di KolosalService, ini saya tambahkan dari GeminiService)
+     */
+    public function analyzeProductPromotions($business, $products)
+    {
+        // Format product data for prompt (Logic Copy dari GeminiService)
+        $productsData = "";
+        foreach ($products as $p) {
+            $sales = $p->total_terjual_bulan_ini ?? 0;
+            // $margin = $p->harga_jual - $p->modal; // (Optional calculation)
+            $ageDays = $p->created_at ? round(now()->diffInDays($p->created_at)) : 30;
+            $productsData .= "- ID: {$p->id} | Nama: {$p->nama_produk} | Harga: {$p->harga_jual} | Modal: {$p->modal} | Terjual Bulan Ini: {$sales} | Umur: {$ageDays} hari\n";
+        }
+
+        $prompt = "
+            PERAN: Kamu adalah Konsultan Bisnis & Pricing Expert.
+
+            KONTEKS BISNIS:
+            Nama: {$business->nama_bisnis}
+
+            DATA PRODUK:
+            {$productsData}
+
+            TUGAS:
+            Analisis data penjualan. Identifikasi produk yang butuh diskon/promosi.
+
+            PANDUAN STRATEGI:
+            1. Jika 'Umur' < 7 hari dan sales 0: JANGAN anggap stok mati. Ini produk baru. Diskon hanya jika 'Intro Price' strategis (maks 10-15%).
+            2. Jika 'Umur' > 30 hari dan sales 0: Ini 'Dead Stock'. Diskon agresif (20-50%) untuk cuci gudang.
+            3. Jika Sales tinggi & Margin tebal: Tawarkan 'Bundling' atau 'Volume Discount'.
+
+            OUTPUT JSON (HANYA JSON):
+            Kembalikan object JSON dimana KEY adalah ID Produk, dan VALUE adalah object rekomendasi.
+            Hanya sertakan produk yang MEMANG butuh tindakan strategis.
+
+            Key 'duration_days' adalah rekomendasi durasi promo dalam hari (misal 3, 7, 30).
+
+            Contoh Format JSON (Jangan pakai markdown code block):
+            {
+                \"12\": {
+                    \"type\": \"Cuci Gudang\",
+                    \"discount_percent\": 20,
+                    \"duration_days\": 7,
+                    \"reason\": \"Barang lama (60 hari) tidak laku, perlu likuidasi stok.\"
+                }
+            }
+        ";
+
+        $response = Http::withToken($this->apiKey)
+            ->timeout(60)
+            ->post($this->baseUrl, [
+                'model' => $this->model,
+                'messages' => [
+                    ['role' => 'user', 'content' => $prompt] // Kirim sebagai single prompt
+                ],
+                'temperature' => 0.2, // Rendah agar output JSON konsisten
+                'response_format' => ['type' => 'json_object'] // Force JSON mode (jika disupport model)
+            ]);
+
+        if ($response->failed()) {
+            return [];
+        }
+
+        $text = $response->json()['choices'][0]['message']['content'] ?? null;
+
+        if ($text) {
+            $text = str_replace(['```json', '```'], '', $text);
+            return json_decode(trim($text), true) ?? [];
+        }
+
+        return [];
+    }
+
+    /**
+     * Fungsi 3: Analisa Struk/Gambar
+     */
     public function analyzeReceipt(string $imagePath)
     {
         if (!Storage::disk('public')->exists($imagePath)) {
@@ -112,6 +203,7 @@ class KolosalService
         ";
 
         $response = Http::withToken($this->apiKey)
+            ->timeout(60)
             ->post($this->baseUrl, [
                 'model' => $this->model,
                 'messages' => [
@@ -123,7 +215,7 @@ class KolosalService
                         ]
                     ]
                 ],
-                'temperature' => 0.1
+                'temperature' => 0.1, // Sangat rendah untuk akurasi data
             ]);
 
         if ($response->failed()) {

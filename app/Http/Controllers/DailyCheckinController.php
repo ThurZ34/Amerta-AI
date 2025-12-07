@@ -7,7 +7,7 @@ use App\Models\DailySaleItem;
 use App\Models\Produk;
 use App\Models\CashJournal;
 use App\Models\Coa;
-use App\Services\GeminiService;
+use App\Services\KolosalService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,11 +15,11 @@ use Illuminate\Support\Facades\Log;
 
 class DailyCheckinController extends Controller
 {
-    protected $geminiService;
+    protected $kolosalService;
 
-    public function __construct(GeminiService $geminiService)
+    public function __construct(KolosalService $kolosalService)
     {
-        $this->geminiService = $geminiService;
+        $this->kolosalService = $kolosalService;
     }
 
     public function index(Request $request)
@@ -151,7 +151,7 @@ class DailyCheckinController extends Controller
                 throw new \Exception('Bisnis tidak ditemukan. Silakan setup bisnis terlebih dahulu.');
             }
 
-            $aiResponse = $this->geminiService->sendChat($prompt, $business);
+            $aiResponse = $this->kolosalService->sendChat($prompt, $business);
 
             $dailySale->update([
                 'ai_analysis' => $aiResponse,
@@ -294,7 +294,7 @@ class DailyCheckinController extends Controller
                 throw new \Exception('Bisnis tidak ditemukan. Silakan setup bisnis terlebih dahulu.');
             }
 
-            $aiResponse = $this->geminiService->sendChat($prompt, $business);
+            $aiResponse = $this->kolosalService->sendChat($prompt, $business);
 
             $dailySale->update([
                 'ai_analysis' => $aiResponse,
