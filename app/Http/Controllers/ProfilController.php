@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Business;
-use App\Models\User;
 use App\Models\Category;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProfilController extends Controller
@@ -46,8 +46,8 @@ class ProfilController extends Controller
 
         $business = Business::where('user_id', auth()->user()->id)->first();
 
-        if (!$business) {
-            $business = new Business();
+        if (! $business) {
+            $business = new Business;
             $business->user_id = auth()->user()->id;
         }
 
@@ -59,7 +59,7 @@ class ProfilController extends Controller
             $business->category_id = $category->id;
         }
 
-        if ($request->input('hapus_gambar') == '1' && !$request->hasFile('gambar')) {
+        if ($request->input('hapus_gambar') == '1' && ! $request->hasFile('gambar')) {
             if ($business->gambar && Storage::disk('public')->exists($business->gambar)) {
                 Storage::disk('public')->delete($business->gambar);
             }
@@ -82,7 +82,7 @@ class ProfilController extends Controller
         $business->fill($request->except(['kategori', 'gambar', 'hapus_gambar']));
         $business->save();
 
-        return redirect()->route('profil_bisnis')->with('success', 'Profil bisnis berhasil diperbarui.');
+        return redirect()->route('manajemen.profil-bisnis.index')->with('success', 'Profil bisnis berhasil diperbarui.');
     }
 
     public function storeCategory(Request $request)
@@ -112,8 +112,8 @@ class ProfilController extends Controller
         $user = auth()->user();
         $business = $user->ownedBusiness ?? $user->business;
 
-        if (!$business) {
-             return back()->with('error', 'Bisnis tidak ditemukan.');
+        if (! $business) {
+            return back()->with('error', 'Bisnis tidak ditemukan.');
         }
 
         $equityCoa = \App\Models\Coa::firstOrCreate(

@@ -5,7 +5,7 @@ namespace App\Livewire;
 use App\Models\CashJournal;
 use App\Models\DailySaleItem;
 use App\Models\Riwayat;
-use App\Services\GeminiService;
+use App\Services\KolosalService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +21,7 @@ class Dashboard extends Component
 
     public function updatedRange()
     {
-        $this->resetPage();
+        // jangan diisi
     }
 
     public function dismissInsight()
@@ -83,7 +83,7 @@ class Dashboard extends Component
         }
 
         try {
-            $geminiService = app(GeminiService::class);
+            $kolosalService = app(KolosalService::class);
             $business = auth()->user()->business;
 
             $prompt = "Kamu adalah konsultan bisnis UMKM bernama Amerta. Data bisnis bulan ini:\n";
@@ -111,7 +111,7 @@ class Dashboard extends Component
                 $prompt .= 'Prioritaskan: (1) menstabilkan cash flow (2) menghentikan kebocoran uang. Tegas tapi suportif.';
             }
 
-            $message = $geminiService->sendChat($prompt, $business);
+            $message = $kolosalService->sendChat($prompt, $business);
         } catch (\Exception $e) {
             if ($status === 'SEHAT') {
                 $message = 'Bisnis kamu berjalan bagus! Fluktuasi penjualan itu normal, yang penting konsisten. Pertahankan! 🔥';
@@ -148,11 +148,13 @@ class Dashboard extends Component
         $cashBalance = $totalInflow - $totalOutflow;
 
         $revenueThisMonth = CashJournal::operatingRevenues()
+            ->where('business_id', $businessId)
             ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
             ->where('description', '!=', 'Modal Awal Bisnis')
             ->sum('amount');
 
         $expenseThisMonth = CashJournal::outflows()
+            ->where('business_id', $businessId)
             ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
             ->sum('amount');
 
@@ -163,8 +165,9 @@ class Dashboard extends Component
             ->whereNotNull('cash_journal_id')
             ->sum('total_harga');
 
-        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth) {
-            $q->whereBetween('date', [$startOfMonth, $endOfMonth]);
+        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth, $businessId) {
+            $q->where('business_id', $businessId)
+                ->whereBetween('date', [$startOfMonth, $endOfMonth]);
         })
             ->sum(DB::raw('cost * quantity'));
 
@@ -327,9 +330,9 @@ class Dashboard extends Component
                 try {
                     $business = Auth::user()->business;
                     if ($business) {
-                        $gemini = app(GeminiService::class);
+                        $kolosal = app(KolosalService::class);
                         $prompt = 'Berikan satu kalimat motivasi singkat, unik, dan semangat untuk pemilik bisnis ini. Jangan terlalu panjang, maksimal 15-20 kata. Gaya bahasa santai tapi profesional. jangan memakai emoji ataupun simbol';
-                        $aiMessage = $gemini->sendChat($prompt, $business);
+                        $aiMessage = $kolosal->sendChat($prompt, $business);
 
                         $aiMessage = trim($aiMessage, '"\'');
 
