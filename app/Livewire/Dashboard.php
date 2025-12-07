@@ -16,7 +16,7 @@ use Livewire\WithPagination;
 
 class Dashboard extends Component
 {
-    use WithPagination;
+    // use WithPagination; // Pagination removed as per request
 
     public $range = 'week';
 
@@ -148,7 +148,7 @@ class Dashboard extends Component
         $totalOutflow = CashJournal::outflows()->sum('amount');
         $cashBalance = $totalInflow - $totalOutflow;
 
-        $revenueThisMonth = CashJournal::inflows()
+        $revenueThisMonth = CashJournal::operatingRevenues()
             ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
             ->sum('amount');
 
@@ -171,7 +171,7 @@ class Dashboard extends Component
 
         $profitThisMonth = $revenueThisMonth - $hppThisMonth - $operationalExpense;
 
-        $revenueLastMonth = CashJournal::inflows()
+        $revenueLastMonth = CashJournal::operatingRevenues()
             ->whereBetween('transaction_date', [$startOfMonth->copy()->subMonth(), $endOfMonth->copy()->subMonth()])
             ->sum('amount');
 
@@ -189,7 +189,7 @@ class Dashboard extends Component
             case 'day':
                 for ($i = 0; $i <= 23; $i++) {
                     $chartLabels[] = sprintf('%02d:00', $i);
-                    $chartData[] = CashJournal::inflows()
+                    $chartData[] = CashJournal::operatingRevenues()
                         ->whereDate('transaction_date', Carbon::today())
                         ->whereTime('created_at', '>=', sprintf('%02d:00:00', $i))
                         ->whereTime('created_at', '<=', sprintf('%02d:59:59', $i))
@@ -202,7 +202,7 @@ class Dashboard extends Component
                 for ($i = 1; $i <= $daysInMonth; $i++) {
                     $date = Carbon::createFromDate($now->year, $now->month, $i);
                     $chartLabels[] = (string) $i;
-                    $chartData[] = CashJournal::inflows()
+                    $chartData[] = CashJournal::operatingRevenues()
                         ->whereDate('transaction_date', $date)
                         ->sum('amount');
                 }
@@ -212,7 +212,7 @@ class Dashboard extends Component
                 for ($i = 1; $i <= 12; $i++) {
                     $date = Carbon::createFromDate($now->year, $i, 1);
                     $chartLabels[] = $date->translatedFormat('M');
-                    $chartData[] = $date->gt($now) ? 0 : CashJournal::inflows()
+                    $chartData[] = $date->gt($now) ? 0 : CashJournal::operatingRevenues()
                         ->whereYear('transaction_date', $now->year)
                         ->whereMonth('transaction_date', $i)
                         ->sum('amount');
@@ -224,7 +224,7 @@ class Dashboard extends Component
                 for ($i = 9; $i >= 0; $i--) {
                     $year = $currentYear - $i;
                     $chartLabels[] = (string) $year;
-                    $chartData[] = CashJournal::inflows()
+                    $chartData[] = CashJournal::operatingRevenues()
                         ->whereYear('transaction_date', $year)
                         ->sum('amount');
                 }
@@ -235,7 +235,7 @@ class Dashboard extends Component
                 for ($i = 6; $i >= 0; $i--) {
                     $date = Carbon::today()->subDays($i);
                     $chartLabels[] = $date->translatedFormat('l');
-                    $chartData[] = CashJournal::inflows()
+                    $chartData[] = CashJournal::operatingRevenues()
                         ->whereDate('transaction_date', $date)
                         ->sum('amount');
                 }
@@ -264,7 +264,8 @@ class Dashboard extends Component
         $recentTransactions = CashJournal::with('coa')
             ->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->paginate(4);
+            ->take(5)
+            ->get();
 
         $aiMessage = null;
         if (!Session::has('amerta_insight_dismissed')) {
@@ -291,6 +292,10 @@ class Dashboard extends Component
         }
 
 
+        $initialCapital = CashJournal::where('business_id', $businessId)
+            ->where('description', 'Modal Awal Bisnis')
+            ->value('amount') ?? 0;
+
         $businessHealth = $this->getBusinessHealth($revenueThisMonth, $expenseThisMonth, $profitThisMonth, $cashBalance);
 
         return view('livewire.dashboard', compact(
@@ -304,8 +309,10 @@ class Dashboard extends Component
             'chartData',
             'expenseLabels',
             'expenseData',
+            'expenseAllocationQuery', // Pass full collection for legend
             'aiMessage',
-            'businessHealth'
+            'businessHealth',
+            'initialCapital'
         ))
             ->extends('layouts.app')
             ->section('content');

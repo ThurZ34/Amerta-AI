@@ -43,7 +43,8 @@ class TorMonitorSeeder extends Seeder
                 'telepon' => '081234567890',
             ]);
         } catch (\Exception $e) {
-            $this->command->error('Error creating business: ' . $e->getMessage());
+            $this->command->error('Error creating business: '.$e->getMessage());
+
             return;
         }
 
@@ -63,6 +64,6 @@ class TorMonitorSeeder extends Seeder
         $this->command->info('20 team members created for the business.');
         $this->command->info('Email: tormonitor@amerta.ai');
         $this->command->info('Password: 123123123 (for all users)');
-        $this->command->info('Invite Code: ' . $business->invite_code);
+        $this->command->info('Invite Code: '.$business->invite_code);
     }
 }

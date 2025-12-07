@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('coa', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->enum('type', ['INFLOW', 'OUTFLOW']);
+            $table->enum('type', ['INFLOW', 'OUTFLOW', 'EQUITY']);
             $table->boolean('is_operational')->default(true);
             $table->timestamps();
         });

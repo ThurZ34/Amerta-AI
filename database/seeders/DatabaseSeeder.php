@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call(TorMonitorSeeder::class);
+        $this->call(DemoDataSeeder::class);
     }
 }
