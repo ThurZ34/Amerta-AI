@@ -30,6 +30,12 @@ Amerta AI adalah website all-in-one yang dirancang untuk menjadi solusi digital 
 ## Fitur Utama Amerta AI
 
 <div>
+<a href= https://drive.google.com/drive/u/1/folders/1k98PskArAn0gZW4Y3i6CODq9-wki4BjY>Link Video Demo</a>
+<a href= http://amerta-ai-production.up.railway.app>Release</a>
+</div>
+
+
+<div>
   <table>
     <tr>
       <th align="left">Deskripsi Fitur</th>
