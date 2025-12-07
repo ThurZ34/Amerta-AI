@@ -376,15 +376,33 @@
                                 <canvas></canvas>
                             </div>
                         </div>
-                        <div class="flex-1 text-center sm:text-left">
-                            <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Alokasi Biaya</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Distribusi pengeluaranmu bulan ini
-                            </p>
-                            <div class="inline-block px-4 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                                <span class="text-[10px] text-gray-400 uppercase font-bold">Total</span>
-                                <p class="text-xl font-black text-gray-900 dark:text-white">Rp
-                                    {{ number_format($expenseThisMonth, 0, ',', '.') }}</p>
-                            </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-3">Alokasi Biaya</h4>
+
+                            @if ($expenseAllocationQuery->isEmpty())
+                                <p class="text-sm text-gray-500">Belum ada data pengeluaran.</p>
+                            @else
+                                <div class="space-y-3">
+                                    @php
+                                        $chartColors = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#a855f7'];
+                                    @endphp
+                                    @foreach ($expenseAllocationQuery as $index => $expense)
+                                        <div class="flex justify-between items-center text-xs sm:text-sm">
+                                            <div class="flex items-center gap-2 truncate">
+                                                <span class="w-2.5 h-2.5 rounded-full shrink-0"
+                                                    style="background-color: {{ $chartColors[$index] ?? '#9ca3af' }}"></span>
+                                                <span class="text-gray-600 dark:text-gray-300 truncate"
+                                                    title="{{ $expense->kategori }}">
+                                                    {{ Str::limit($expense->kategori ?: 'Lain-lain', 15) }}
+                                                </span>
+                                            </div>
+                                            <span class="font-bold text-gray-900 dark:text-white shrink-0">
+                                                Rp {{ number_format($expense->total, 0, ',', '.') }}
+                                            </span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

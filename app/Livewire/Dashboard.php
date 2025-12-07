@@ -264,7 +264,7 @@ class Dashboard extends Component
         $recentTransactions = CashJournal::with('coa')
             ->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->paginate(4);
+            ->simplePaginate(5);
 
         $aiMessage = null;
         if (!Session::has('amerta_insight_dismissed')) {
@@ -308,6 +308,7 @@ class Dashboard extends Component
             'chartData',
             'expenseLabels',
             'expenseData',
+            'expenseAllocationQuery', // Pass full collection for legend
             'aiMessage',
             'businessHealth',
             'initialCapital'

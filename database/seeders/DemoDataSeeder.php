@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Business;
 use App\Models\CashJournal;
-use App\Models\Category;
 use App\Models\Coa;
 use App\Models\DailySale;
 use App\Models\DailySaleItem;
@@ -13,22 +11,22 @@ use App\Models\Riwayat;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class DemoDataSeeder extends Seeder
 {
     public function run(): void
     {
         $user = User::where('email', 'tormonitor@amerta.ai')->first();
-        if (!$user || !$user->business) {
+        if (! $user || ! $user->business) {
             $this->command->error('User or Business not found. Please run TorMonitorSeeder first.');
+
             return;
         }
 
         $business = $user->business;
         $businessId = $business->id;
 
-        $this->command->info('Seeding demo data for: ' . $business->nama_bisnis);
+        $this->command->info('Seeding demo data for: '.$business->nama_bisnis);
 
         // 1. Initial Capital (Modal Awal)
         // Target: 15.000.000 Opening Balance
@@ -40,7 +38,7 @@ class DemoDataSeeder extends Seeder
         CashJournal::firstOrCreate(
             [
                 'business_id' => $businessId,
-                'description' => 'Modal Awal Bisnis'
+                'description' => 'Modal Awal Bisnis',
             ],
             [
                 'transaction_date' => Carbon::now()->startOfMonth()->subDay(), // Start of yesterday/month
@@ -76,13 +74,13 @@ class DemoDataSeeder extends Seeder
         // 3. Generate Transactions for this Month
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now();
-        
+
         $salesCoa = Coa::firstOrCreate(['name' => 'Penjualan Produk'], ['type' => 'INFLOW']);
 
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             // High volume for healthy stats
-            $txCount = rand(35, 55); 
-            
+            $txCount = rand(35, 55);
+
             // Daily Aggregation Variables
             $dailyRevenue = 0;
             $dailyCost = 0;
@@ -103,14 +101,14 @@ class DemoDataSeeder extends Seeder
                     'amount' => $totalPrice, // Revenue
                     'is_inflow' => true,
                     'payment_method' => 'Cash',
-                    'description' => 'Penjualan ' . $prod->nama_produk,
+                    'description' => 'Penjualan '.$prod->nama_produk,
                 ]);
 
                 // Create Riwayat (Transaction History)
                 Riwayat::create([
                     'business_id' => $businessId,
                     'tanggal_pembelian' => $date,
-                    'nama_barang' => $prod->nama_produk . ' x' . $qty,
+                    'nama_barang' => $prod->nama_produk.' x'.$qty,
                     'keterangan' => 'Penjualan Kasir',
                     'total_harga' => $totalPrice,
                     'jenis' => 'pendapatan',
@@ -122,7 +120,7 @@ class DemoDataSeeder extends Seeder
                 $dailyRevenue += $totalPrice;
                 $dailyCost += $totalCost;
 
-                if (!isset($dailyItemsMap[$prod->id])) {
+                if (! isset($dailyItemsMap[$prod->id])) {
                     $dailyItemsMap[$prod->id] = ['qty' => 0, 'price' => $prod->harga_jual, 'cost' => $prod->modal];
                 }
                 $dailyItemsMap[$prod->id]['qty'] += $qty;
