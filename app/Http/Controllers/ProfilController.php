@@ -82,7 +82,7 @@ class ProfilController extends Controller
         $business->fill($request->except(['kategori', 'gambar', 'hapus_gambar']));
         $business->save();
 
-        return redirect()->route('profil_bisnis')->with('success', 'Profil bisnis berhasil diperbarui.');
+        return redirect()->route('manajemen.profil-bisnis.index')->with('success', 'Profil bisnis berhasil diperbarui.');
     }
 
     public function storeCategory(Request $request)
