@@ -89,6 +89,7 @@ Route::middleware(['auth'])->group(function () {
             Route::controller(ProfilController::class)->prefix('profil-bisnis')->name('profil-bisnis.')->group(function () {
                 Route::get('/', 'bussiness_index')->name('index');
                 Route::put('/', 'update')->name('update');
+                Route::post('/initial-capital', 'updateInitialCapital')->name('update-initial-capital');
             });
 
             // Categories (used by Profil Bisnis)
