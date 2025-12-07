@@ -61,4 +61,20 @@ class CashJournal extends Model
     {
         return $query->where('is_inflow', false);
     }
+
+    public function scopeOperatingRevenues($query)
+    {
+        return $query->where('is_inflow', true)
+                     ->whereHas('coa', function($q) {
+                         $q->where('type', '!=', 'EQUITY');
+                     });
+    }
+
+    public function scopeOperatingExpenses($query)
+    {
+        return $query->where('is_inflow', false)
+                     ->whereHas('coa', function($q) {
+                         $q->where('is_operational', true);
+                     });
+    }
 }

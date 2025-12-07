@@ -37,7 +37,7 @@
                         </button>
 
                         <div class="relative z-10 flex gap-4 items-start">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <div
                                     class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/20 flex items-center justify-center animate-pulse">
                                     <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-300" fill="none"
@@ -66,8 +66,28 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div
-                    class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition duration-300 group">
+                <div x-data="{
+                    showCapitalModal: false,
+                    rawValue: '{{ $initialCapital }}',
+                    displayValue: '{{ number_format((float) $initialCapital, 0, ',', '.') }}',
+                    formatMoney(value) {
+                        let number = value.replace(/[^0-9]/g, '');
+                        this.rawValue = number;
+                        this.displayValue = new Intl.NumberFormat('id-ID').format(number);
+                    }
+                }"
+                    class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition duration-300 group relative">
+
+                    {{-- Edit Button (Simplified & Positioned Top-Right) --}}
+                    <button @click="showCapitalModal = true"
+                        class="absolute top-6 right-6 p-2 rounded-lg text-gray-300 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all opacity-0 group-hover:opacity-100"
+                        title="Atur Modal Awal">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                    </button>
+
                     <div class="flex items-center gap-3 mb-4">
                         <div
                             class="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
@@ -92,8 +112,83 @@
                             </div>
                         </div>
                     </div>
+
                     <h3 class="text-2xl lg:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Rp
                         {{ number_format($cashBalance, 0, ',', '.') }}</h3>
+
+                    {{-- Modal Popup --}}
+                    <div x-show="showCapitalModal" x-cloak class="fixed inset-0 z-50"
+                        x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-150"
+                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showCapitalModal = false"></div>
+                        <div class="fixed inset-0 overflow-y-auto">
+                            <div class="min-h-full flex items-center justify-center p-4">
+                                <div class="relative bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl transform transition-all"
+                                    x-transition:enter="ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 scale-95"
+                                    x-transition:enter-end="opacity-100 scale-100" @click.stop>
+
+                                    <button @click="showCapitalModal = false"
+                                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition z-10">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+
+                                    <div class="mb-6">
+                                        <div
+                                            class="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/50 rounded-2xl flex items-center justify-center mb-4 text-indigo-600 dark:text-indigo-400">
+                                            <svg class="w-8 h-8" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Modal Awal Bisnis
+                                        </h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                            Masukkan jumlah uang tunai yang Anda bawa saat memulai pencatatan ini.
+                                        </p>
+                                    </div>
+
+                                    <form action="{{ route('manajemen.profil-bisnis.update-initial-capital') }}"
+                                        method="POST">
+                                        @csrf
+                                        <div class="mb-6">
+                                            <label
+                                                class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                                                Nominal (Rp)
+                                            </label>
+                                            <div class="relative">
+                                                <span
+                                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">Rp</span>
+
+                                                {{-- Amount Input (submits '1.000.000', sanitized in backend) --}}
+                                                <input type="text" name="amount" x-model="displayValue"
+                                                    @input="formatMoney($event.target.value)"
+                                                    class="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white font-bold text-lg transition-all"
+                                                    placeholder="0" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex gap-3">
+                                            <button type="button" @click="showCapitalModal = false"
+                                                class="flex-1 px-5 py-3 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                                                Batal
+                                            </button>
+                                            <button type="submit"
+                                                class="flex-1 px-5 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition transform active:scale-95">
+                                                Simpan Modal
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div
