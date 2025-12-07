@@ -43,14 +43,14 @@
 <body
     class="h-full antialiased text-gray-900 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
 
         {{-- Hero Section --}}
-        <div class="relative bg-indigo-600 pb-32">
+        <div class="relative bg-gray-900 pb-32">
             <div class="absolute inset-0">
-                <img class="w-full h-auto object-cover opacity-20 dark:opacity-10 mix-blend-overlay"
-                    src="{{ asset('images/main_menu_bg.jpg') }}" alt="Background Pattern">
-                <div class="absolute inset-0 bg-gradient-to-b from-indigo-600/90 to-indigo-900/95 mix-blend-multiply">
+                <img class="w-full h-full object-cover" src="{{ asset('images/main_menu_bg.jpg') }}"
+                    alt="Background Banner">
+                <div class="absolute inset-0 bg-black/40">
                 </div>
             </div>
 
@@ -343,7 +343,7 @@
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         {{-- Background Gradient & Blob --}}
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-emerald-600/0 to-teal-600/0 dark:from-emerald-900/20 dark:to-teal-900/20 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-emerald-600/0 to-teal-600/0 dark:from-emerald-900/20 dark:to-teal-900/20 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 dark:bg-emerald-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -372,7 +372,7 @@
                     <a href="{{ route('operasional.riwayat-keuangan.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-rose-600/0 to-red-600/0 dark:from-rose-900/20 dark:to-red-900/20 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-rose-600/0 to-red-600/0 dark:from-rose-900/20 dark:to-red-900/20 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-rose-50 dark:bg-rose-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -408,7 +408,7 @@
                     <a href="{{ route('manajemen.produk.index') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-purple-600/0 to-fuchsia-600/0 dark:from-purple-900/20 dark:to-fuchsia-900/20 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-purple-600/0 to-fuchsia-600/0 dark:from-purple-900/20 dark:to-fuchsia-900/20 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-purple-50 dark:bg-purple-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -425,8 +425,8 @@
                             </div>
                             <div>
                                 <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Manajemen Produk</h4>
-                                <p class="text-sm text-gray-500 dark:text-purple-100/70">Atur katalog produk, harga,
-                                    dan stok barang.</p>
+                                <p class="text-sm text-gray-500 dark:text-purple-100/70">Atur katalog produk anda
+                                    dengan mudah.</p>
                             </div>
                         </div>
                     </a>
@@ -436,7 +436,7 @@
                     <a href="{{ route('operasional.kasir') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-orange-600/0 to-amber-600/0 dark:from-orange-900/20 dark:to-amber-900/20 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-orange-600/0 to-amber-600/0 dark:from-orange-900/20 dark:to-amber-900/20 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-orange-50 dark:bg-orange-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -472,7 +472,7 @@
                     <a href="{{ route('analisis.dashboard') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-blue-600/0 to-cyan-600/0 dark:from-blue-900/20 dark:to-cyan-900/20 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-blue-600/0 to-cyan-600/0 dark:from-blue-900/20 dark:to-cyan-900/20 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
@@ -500,7 +500,7 @@
                     <a href="{{ route('amerta') }}"
                         class="block group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-indigo-600/0 to-purple-600/0 dark:from-indigo-900/40 dark:to-purple-900/40 transition-opacity">
+                            class="absolute inset-0 bg-linear-to-br from-indigo-600/0 to-purple-600/0 dark:from-indigo-900/40 dark:to-purple-900/40 transition-opacity">
                         </div>
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-indigo-500/10 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-500">
