@@ -1,15 +1,15 @@
 <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col transition-transform duration-300 transform md:relative md:translate-x-0 shrink-0">
 
-    <div class="h-20 flex items-center px-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
-        <a href="{{ route('main_menu') }}" class="flex items-center gap-3 w-full group">
-            <div
-                class="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform duration-300">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-            </div>
+        <div class="h-20 flex items-center px-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+            <a href="{{ route('main_menu') }}" class="flex items-center gap-3 w-full group">
+                <div
+                    class="flex items-center justify-center w-14 h-14 rounded-xl shadow-lg shadow-gray-200/70 dark:shadow-gray-900/40 group-hover:scale-105 transition-transform duration-300">
+                    <img src="{{ asset('amerta/Amerta-Ai.png') }}"
+                        alt="Logo"
+                        class="w-12 h-12 object-contain">
+                </div>
+
             <div class="flex flex-col">
                 <span class="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-none">
                     Amerta<span class="text-indigo-600 dark:text-indigo-400">.AI</span>
