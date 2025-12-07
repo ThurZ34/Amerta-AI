@@ -3,23 +3,25 @@
 namespace App\Livewire;
 
 use App\Models\CashJournal;
-use App\Models\Produk;
-use App\Services\KolosalService;
 use App\Models\DailySaleItem;
-use \App\Models\Riwayat;
+use App\Models\Riwayat;
+use App\Services\GeminiService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Dashboard extends Component
 {
+    // use WithPagination; // Pagination removed as per request
+
     public $range = 'week';
 
     public function updatedRange()
     {
-        // ga digunain
+        $this->resetPage();
     }
 
     public function dismissInsight()
@@ -29,7 +31,7 @@ class Dashboard extends Component
 
     protected function getBusinessHealth($revenueThisMonth, $expenseThisMonth, $profitThisMonth, $cashBalance)
     {
-        $cacheKey = 'business_health_' . auth()->user()->business_id;
+        $cacheKey = 'business_health_'.auth()->user()->business_id;
         if (Session::has($cacheKey)) {
             $cached = Session::get($cacheKey);
             if (Carbon::parse($cached['generated_at'])->diffInHours(now()) < 24) {
@@ -81,14 +83,14 @@ class Dashboard extends Component
         }
 
         try {
-            $kolosalService = app(KolosalService::class);
+            $geminiService = app(GeminiService::class);
             $business = auth()->user()->business;
 
             $prompt = "Kamu adalah konsultan bisnis UMKM bernama Amerta. Data bisnis bulan ini:\n";
-            $prompt .= "- Omset: Rp " . number_format($revenueThisMonth, 0, ',', '.') . "\n";
-            $prompt .= "- Pengeluaran: Rp " . number_format($expenseThisMonth, 0, ',', '.') . "\n";
-            $prompt .= "- Profit: Rp " . number_format($profitThisMonth, 0, ',', '.') . "\n";
-            $prompt .= "- Saldo kas: Rp " . number_format($cashBalance, 0, ',', '.') . "\n\n";
+            $prompt .= '- Omset: Rp '.number_format($revenueThisMonth, 0, ',', '.')."\n";
+            $prompt .= '- Pengeluaran: Rp '.number_format($expenseThisMonth, 0, ',', '.')."\n";
+            $prompt .= '- Profit: Rp '.number_format($profitThisMonth, 0, ',', '.')."\n";
+            $prompt .= '- Saldo kas: Rp '.number_format($cashBalance, 0, ',', '.')."\n\n";
 
             $prompt .= "PENTING: Format jawabanmu menggunakan HTML tag agar rapi di website:\n";
             $prompt .= "- Gunakan tag <b>...</b> untuk menebalkan kata kunci (JANGAN pakai markdown **).\n";
@@ -98,18 +100,18 @@ class Dashboard extends Component
 
             if ($status === 'SEHAT') {
                 $prompt .= "Bisnis ini SEHAT dengan skor {$score}/100. Berikan 1-2 kalimat motivasi singkat. ";
-                $prompt .= "Ingatkan bahwa fluktuasi penjualan itu normal dan pertahankan konsistensi. Gunakan emoji dan bahasa santai.";
+                $prompt .= 'Ingatkan bahwa fluktuasi penjualan itu normal dan pertahankan konsistensi. Gunakan emoji dan bahasa santai.';
             } elseif ($status === 'WASPADA') {
                 $prompt .= "Bisnis ini perlu PERHATIAN dengan skor {$score}/100. ";
-                $prompt .= "Berikan 2 saran KONKRET dan SPESIFIK untuk memperbaiki kondisi. ";
-                $prompt .= "Fokus pada: (1) cara meningkatkan omset atau (2) cara mengurangi pengeluaran. Bahasa santai.";
+                $prompt .= 'Berikan 2 saran KONKRET dan SPESIFIK untuk memperbaiki kondisi. ';
+                $prompt .= 'Fokus pada: (1) cara meningkatkan omset atau (2) cara mengurangi pengeluaran. Bahasa santai.';
             } else {
                 $prompt .= "Bisnis ini dalam kondisi KRITIS dengan skor {$score}/100. ";
-                $prompt .= "Berikan 2-3 langkah URGENT yang harus segera dilakukan untuk menyelamatkan bisnis. ";
-                $prompt .= "Prioritaskan: (1) menstabilkan cash flow (2) menghentikan kebocoran uang. Tegas tapi suportif.";
+                $prompt .= 'Berikan 2-3 langkah URGENT yang harus segera dilakukan untuk menyelamatkan bisnis. ';
+                $prompt .= 'Prioritaskan: (1) menstabilkan cash flow (2) menghentikan kebocoran uang. Tegas tapi suportif.';
             }
 
-            $message = $kolosalService->sendChat($prompt, $business);
+            $message = $geminiService->sendChat($prompt, $business);
         } catch (\Exception $e) {
             if ($status === 'SEHAT') {
                 $message = 'Bisnis kamu berjalan bagus! Fluktuasi penjualan itu normal, yang penting konsisten. Pertahankan! 🔥';
@@ -147,6 +149,7 @@ class Dashboard extends Component
 
         $revenueThisMonth = CashJournal::operatingRevenues()
             ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
+            ->where('description', '!=', 'Modal Awal Bisnis')
             ->sum('amount');
 
         $expenseThisMonth = CashJournal::outflows()
@@ -157,15 +160,15 @@ class Dashboard extends Component
             ->where('jenis', 'pengeluaran')
             ->whereBetween('tanggal_pembelian', [$startOfMonth, $endOfMonth])
             ->where('kategori', 'like', '%Bahan Baku%')
+            ->whereNotNull('cash_journal_id')
             ->sum('total_harga');
 
-        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth, $businessId) {
-            $q->where('business_id', $businessId)
-                ->whereBetween('date', [$startOfMonth, $endOfMonth]);
+        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth) {
+            $q->whereBetween('date', [$startOfMonth, $endOfMonth]);
         })
             ->sum(DB::raw('cost * quantity'));
 
-        $operationalExpense = $expenseThisMonth - $expenseBahanBakuOnly;
+        $operationalExpense = max(0, $expenseThisMonth - $expenseBahanBakuOnly);
 
         $profitThisMonth = $revenueThisMonth - $hppThisMonth - $operationalExpense;
 
@@ -185,57 +188,108 @@ class Dashboard extends Component
 
         switch ($this->range) {
             case 'day':
+                // Fetch all data for today in one query
+                $rawData = CashJournal::operatingRevenues()
+                    ->whereDate('transaction_date', Carbon::today())
+                    ->get(['created_at', 'amount']);
+
+                // Group by hour in memory
+                $grouped = $rawData->groupBy(function ($item) {
+                    return $item->created_at->format('H');
+                });
+
                 for ($i = 0; $i <= 23; $i++) {
-                    $chartLabels[] = sprintf('%02d:00', $i);
-                    $chartData[] = CashJournal::operatingRevenues()
-                        ->whereDate('transaction_date', Carbon::today())
-                        ->whereTime('created_at', '>=', sprintf('%02d:00:00', $i))
-                        ->whereTime('created_at', '<=', sprintf('%02d:59:59', $i))
-                        ->sum('amount');
+                    $hour = sprintf('%02d', $i);
+                    $chartLabels[] = $hour.':00';
+                    $chartData[] = $grouped->has($hour) ? $grouped->get($hour)->sum('amount') : 0;
                 }
                 break;
 
             case 'month':
                 $daysInMonth = $now->daysInMonth;
+                // Fetch all data for this month in one query
+                $rawData = CashJournal::operatingRevenues()
+                    ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
+                    ->get(['transaction_date', 'amount']);
+
+                $grouped = $rawData->groupBy(function ($item) {
+                    return $item->transaction_date->format('j'); // Day of month without leading zeros
+                });
+
                 for ($i = 1; $i <= $daysInMonth; $i++) {
-                    $date = Carbon::createFromDate($now->year, $now->month, $i);
-                    $chartLabels[] = (string) $i;
-                    $chartData[] = CashJournal::operatingRevenues()
-                        ->whereDate('transaction_date', $date)
-                        ->sum('amount');
+                    $day = (string) $i;
+                    $chartLabels[] = $day;
+                    $chartData[] = $grouped->has($day) ? $grouped->get($day)->sum('amount') : 0;
                 }
                 break;
 
             case 'year':
+                // Fetch all data for this year in one query
+                $startOfYear = $now->copy()->startOfYear();
+                $endOfYear = $now->copy()->endOfYear();
+
+                $rawData = CashJournal::operatingRevenues()
+                    ->whereBetween('transaction_date', [$startOfYear, $endOfYear])
+                    ->get(['transaction_date', 'amount']);
+
+                $grouped = $rawData->groupBy(function ($item) {
+                    return $item->transaction_date->format('n'); // Month number without leading zeros
+                });
+
                 for ($i = 1; $i <= 12; $i++) {
                     $date = Carbon::createFromDate($now->year, $i, 1);
                     $chartLabels[] = $date->translatedFormat('M');
-                    $chartData[] = $date->gt($now) ? 0 : CashJournal::operatingRevenues()
-                        ->whereYear('transaction_date', $now->year)
-                        ->whereMonth('transaction_date', $i)
-                        ->sum('amount');
+                    $monthNum = (string) $i;
+
+                    // Future months logic preserved
+                    if ($date->gt($now)) {
+                        $chartData[] = 0;
+                    } else {
+                        $chartData[] = $grouped->has($monthNum) ? $grouped->get($monthNum)->sum('amount') : 0;
+                    }
                 }
                 break;
 
             case 'decade':
                 $currentYear = $now->year;
+                $startYear = $currentYear - 9;
+
+                // Fetch all data for the last 10 years
+                $rawData = CashJournal::operatingRevenues()
+                    ->whereYear('transaction_date', '>=', $startYear)
+                    ->whereYear('transaction_date', '<=', $currentYear)
+                    ->get(['transaction_date', 'amount']);
+
+                $grouped = $rawData->groupBy(function ($item) {
+                    return $item->transaction_date->format('Y');
+                });
+
                 for ($i = 9; $i >= 0; $i--) {
-                    $year = $currentYear - $i;
-                    $chartLabels[] = (string) $year;
-                    $chartData[] = CashJournal::operatingRevenues()
-                        ->whereYear('transaction_date', $year)
-                        ->sum('amount');
+                    $year = (string) ($currentYear - $i);
+                    $chartLabels[] = $year;
+                    $chartData[] = $grouped->has($year) ? $grouped->get($year)->sum('amount') : 0;
                 }
                 break;
 
             case 'week':
             default:
+                // Fetch all data for the last 7 days
+                $startDate = Carbon::today()->subDays(6);
+                $endDate = Carbon::today();
+
+                $rawData = CashJournal::operatingRevenues()
+                    ->whereBetween('transaction_date', [$startDate, $endDate])
+                    ->get(['transaction_date', 'amount']);
+
+                $grouped = $rawData->groupBy(function ($item) {
+                    return $item->transaction_date->format('Y-m-d');
+                });
+
                 for ($i = 6; $i >= 0; $i--) {
                     $date = Carbon::today()->subDays($i);
+                    $dateString = $date->format('Y-m-d');
                     $chartLabels[] = $date->translatedFormat('l');
-                    $chartData[] = CashJournal::operatingRevenues()
-                        ->whereDate('transaction_date', $date)
-                        ->sum('amount');
+                    $chartData[] = $grouped->has($dateString) ? $grouped->get($dateString)->sum('amount') : 0;
                 }
                 break;
         }
@@ -266,16 +320,16 @@ class Dashboard extends Component
             ->get();
 
         $aiMessage = null;
-        if (!Session::has('amerta_insight_dismissed')) {
+        if (! Session::has('amerta_insight_dismissed')) {
             if (Session::has('amerta_insight_quote')) {
                 $aiMessage = Session::get('amerta_insight_quote');
             } else {
                 try {
                     $business = Auth::user()->business;
                     if ($business) {
-                        $kolosal = app(KolosalService::class);
+                        $gemini = app(GeminiService::class);
                         $prompt = 'Berikan satu kalimat motivasi singkat, unik, dan semangat untuk pemilik bisnis ini. Jangan terlalu panjang, maksimal 15-20 kata. Gaya bahasa santai tapi profesional. jangan memakai emoji ataupun simbol';
-                        $aiMessage = $kolosal->sendChat($prompt, $business);
+                        $aiMessage = $gemini->sendChat($prompt, $business);
 
                         $aiMessage = trim($aiMessage, '"\'');
 
@@ -288,7 +342,6 @@ class Dashboard extends Component
                 }
             }
         }
-
 
         $initialCapital = CashJournal::where('business_id', $businessId)
             ->where('description', 'Modal Awal Bisnis')
@@ -307,7 +360,7 @@ class Dashboard extends Component
             'chartData',
             'expenseLabels',
             'expenseData',
-            'expenseAllocationQuery', 
+            'expenseAllocationQuery', // Pass full collection for legend
             'aiMessage',
             'businessHealth',
             'initialCapital'
