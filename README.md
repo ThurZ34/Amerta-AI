@@ -46,29 +46,11 @@ Amerta AI adalah website all-in-one yang dirancang untuk menjadi solusi digital 
     </tr>
     <tr>
       <td>
-        <strong>Dashboard Transaksi Serta Kesehatan Bisnis</strong><br>
-        Menampilkan transaksi terakhir yang dilakukan termasuk arus kas yang masuk dan keluar.
-      </td>
-      <td>
-        <img src="public/images/demo/dashboard2.png" alt="Dashboard" width="800" />
-      </td>
-    </tr>
-    <tr>
-      <td>
         <strong>Katalog Produk Bisnis</strong><br>
         Visualisasi berbagai jenis produk yang sudah dibuat beserta analisis profit dan margin dari produk tersebut.
       </td>
       <td>
         <img src="public/images/demo/katalog-produk.png" alt="Katalog Produk" width="800" />
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <strong>Fitur Bantuan AI Untuk Menambah Produk</strong><br>
-        Kemudahan bagi pengguna yang didapatkan dari masukan AI.
-      </td>
-      <td>
-        <img src="public/images/demo/ai-produk.png" alt="Fitur AI Tambah Produk" width="800" />
       </td>
     </tr>
     <tr>
@@ -92,7 +74,7 @@ Amerta AI adalah website all-in-one yang dirancang untuk menjadi solusi digital 
     <tr>
       <td>
         <strong>Pencatatan Riwayat Transaksi</strong><br>
-        Visualisasi riwayat yang sudah dilakukan oleh pengguna menggunakan pencatatan pemasukan dan pengeluaran.
+        Visualisasi riwayat yang sudah dilakukan oleh pengguna menggunakan catatan pemasukan dan pengeluaran.
       </td>
       <td>
         <img src="public/images/demo/riwayat-transaksi.png" alt="Riwayat Transaksi" width="800" />
