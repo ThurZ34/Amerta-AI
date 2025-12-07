@@ -64,6 +64,6 @@ class SurveyController extends Controller
 
         session()->flash('first_time_entry', true);
 
-        return redirect()->route('analisis.dashboard');
+        return redirect()->route('main_menu');
     }
 }

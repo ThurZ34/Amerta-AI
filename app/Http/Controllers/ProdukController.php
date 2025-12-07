@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produk;
-use App\Services\GeminiService;
+use App\Services\KolosalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProdukController extends Controller
 {
-    protected $geminiService;
+    protected $kolosalService;
 
-    public function __construct(GeminiService $geminiService)
+    public function __construct(KolosalService $kolosalService)
     {
-        $this->geminiService = $geminiService;
+        $this->kolosalService = $kolosalService;
     }
 
     public function suggestPrice(Request $request)
@@ -37,7 +37,7 @@ class ProdukController extends Controller
         }
 
         try {
-            $response = $this->geminiService->sendChat($prompt, $business);
+            $response = $this->kolosalService->sendChat($prompt, $business);
 
             $cleanResponse = str_replace(['```json', '```'], '', $response);
             $json = json_decode($cleanResponse, true);
@@ -105,7 +105,7 @@ class ProdukController extends Controller
             'harga_coret' => 'nullable|numeric|min:0',
             'promo_end_date' => 'nullable|date',
             'jenis_produk' => 'required|string|max:255',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($request->hasFile('gambar')) {
@@ -151,13 +151,13 @@ class ProdukController extends Controller
                   ->orWhere('promo_end_date', '<', now());
             })
             ->get();
-        
+
         $products->each(function ($produk) use ($month, $year) {
             $produk->total_terjual_bulan_ini = $produk->getTotalTerjualPerBulan($month, $year);
         });
 
         try {
-            $analysis = $this->geminiService->analyzeProductPromotions($business, $products);
+            $analysis = $this->kolosalService->analyzeProductPromotions($business, $products);
             return response()->json($analysis);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

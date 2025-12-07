@@ -29,7 +29,7 @@ class GoogleAuthController extends Controller
 
                 Auth::login($user);
 
-                return redirect('setup-bisnis');
+                return redirect('dashboard-selection');
             } else {
                 $newUser = User::create([
                     'name' => $googleUser->getName(),
