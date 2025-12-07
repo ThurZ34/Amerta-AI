@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Models\Business;
 use App\Models\Category;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SurveyController extends Controller
@@ -30,7 +29,7 @@ class SurveyController extends Controller
             'channel_penjualan' => 'required',
             'target_pasar' => 'required',
             'range_omset' => 'required',
-            'jumlah_tim' => 'required',
+            'jumlah_tim' => 'nullable',
             'tujuan_utama' => 'required',
         ]);
 
@@ -53,7 +52,7 @@ class SurveyController extends Controller
             'channel_penjualan' => $validated['channel_penjualan'],
             'target_pasar' => $validated['target_pasar'],
             'range_omset' => $validated['range_omset'],
-            'jumlah_tim' => $validated['jumlah_tim'],
+            'jumlah_tim' => $validated['jumlah_tim'] ?? null,
             'tujuan_utama' => $validated['tujuan_utama'],
         ]);
 
