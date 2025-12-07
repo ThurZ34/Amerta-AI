@@ -62,7 +62,7 @@ class DailyCheckinController extends Controller
             return redirect()->route('operasional.analisis-penjualan.show', $existing->id);
         }
 
-        $produks = Produk::all();
+        $produks = Produk::where('business_id', auth()->user()->business->id)->get();
 
         return view('daily-checkin.create', compact('produks', 'date'));
     }
@@ -178,7 +178,7 @@ class DailyCheckinController extends Controller
             ->with('items.produk')
             ->findOrFail($id);
 
-        $produks = Produk::all();
+        $produks = Produk::where('business_id', auth()->user()->business->id)->get();
 
         $totalRevenue = 0;
         $totalCost = 0;
@@ -201,7 +201,7 @@ class DailyCheckinController extends Controller
             ->with('items.produk')
             ->findOrFail($id);
 
-        $produks = Produk::where('business_id', auth()->user()->business->id)->get();
+        $produks = Produk::where('business_id', auth()->user()->business_id)->get();
 
         $existingSales = [];
         foreach ($dailySale->items as $item) {
@@ -238,10 +238,16 @@ class DailyCheckinController extends Controller
         DB::beginTransaction();
 
         try {
-            CashJournal::where('business_id', auth()->user()->business->id)
-                ->whereDate('transaction_date', $dailySale->date)
-                ->where('coa_id', $coaRevenue->id)
-                ->delete();
+            $hasKasirData = \App\Models\Riwayat::where('business_id', auth()->user()->business->id)
+                ->whereDate('tanggal_pembelian', $dailySale->date)
+                ->exists();
+
+            if (!$hasKasirData) {
+                CashJournal::where('business_id', auth()->user()->business->id)
+                    ->whereDate('transaction_date', $dailySale->date)
+                    ->where('coa_id', $coaRevenue->id)
+                    ->delete();
+            }
 
             DailySaleItem::where('daily_sale_id', $dailySale->id)->delete();
 
@@ -268,15 +274,17 @@ class DailyCheckinController extends Controller
                             'cost' => $produk->modal,
                         ]);
 
-                        CashJournal::create([
-                            'business_id' => auth()->user()->business->id,
-                            'transaction_date' => $dailySale->date,
-                            'coa_id' => $coaRevenue->id,
-                            'amount' => $revenue,
-                            'is_inflow' => true,
-                            'payment_method' => 'Kas',
-                            'description' => "Penjualan {$qty} unit {$produk->nama_produk}",
-                        ]);
+                        if (!$hasKasirData) {
+                            CashJournal::create([
+                                'business_id' => auth()->user()->business->id,
+                                'transaction_date' => $dailySale->date,
+                                'coa_id' => $coaRevenue->id,
+                                'amount' => $revenue,
+                                'is_inflow' => true,
+                                'payment_method' => 'Kas',
+                                'description' => "Penjualan {$qty} unit {$produk->nama_produk}",
+                            ]);
+                        }
 
                         $salesData[] = [
                             'name' => $produk->nama_produk,
