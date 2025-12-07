@@ -3,7 +3,6 @@
         ['label' => 'About', 'url' => '#about'],
         ['label' => 'Solutions', 'url' => '#problem-solution'],
         ['label' => 'Features', 'url' => '#features'],
-        ['label' => 'Pricing', 'url' => '#pricing'],
     ];
 
     $features = [
@@ -48,29 +47,7 @@
         ],
     ];
 
-    $plans = [
-        [
-            'name' => 'Starter',
-            'price' => '1.000.000',
-            'desc' => 'Perfect for individuals.',
-            'features' => ['5 Projects', 'Basic Analytics', 'Email Support'],
-            'popular' => false,
-        ],
-        [
-            'name' => 'Professional',
-            'price' => '2.000.000',
-            'desc' => 'For growing teams.',
-            'features' => ['Unlimited Projects', 'Advanced Analytics', 'Priority Support', 'Team Collaboration'],
-            'popular' => true,
-        ],
-        [
-            'name' => 'Enterprise',
-            'price' => 'Custom',
-            'desc' => 'Custom solutions.',
-            'features' => ['Dedicated Infrastructure', 'Custom Integrations', '24/7 Dedicated Support'],
-            'popular' => false,
-        ],
-    ];
+
 @endphp
 
 <!DOCTYPE html>
@@ -199,11 +176,8 @@
             <div class="flex justify-between h-16 items-center">
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
-                    <a href="#"
-                        class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight flex items-center gap-2">
-                        <span
-                            class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">A</span>
-                        Amerta
+                    <a href="#" class="flex items-center gap-2">
+                        <img src="{{ asset('images/amerta/Amerta-logo.png') }}" alt="Amerta Logo" class="h-10 w-auto">
                     </a>
                 </div>
 
@@ -215,8 +189,6 @@
                         class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Solutions') }}</a>
                     <a href="#features"
                         class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Features') }}</a>
-                    <a href="#pricing"
-                        class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm">{{ __('Pricing') }}</a>
 
                     <!-- Language Switcher -->
                     <div class="relative" x-data="{ open: false }">
@@ -404,8 +376,6 @@
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{{ __('Solutions') }}</a>
                     <a href="#features" @click="mobileOpen = false"
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{{ __('Features') }}</a>
-                    <a href="#pricing" @click="mobileOpen = false"
-                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{{ __('Pricing') }}</a>
                 </div>
 
                 @auth
@@ -523,24 +493,54 @@
                 </div>
                 <div
                     class="relative rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 aspect-square flex items-center justify-center">
-                    <p class="text-gray-400">About Us Image</p>
+                    <img src="{{ asset('images/stockimage.png') }}" alt="About Amerta" class="w-full h-full object-cover">
                 </div>
             </div>
             <div class="fade-in-right">
-                <h2 class="text-base text-indigo-600 font-semibold uppercase mb-2">{{ __('About Amerta') }}</h2>
+                <h2 class="text-base text-indigo-600 font-semibold uppercase mb-2">{{ __('About Amerta AI') }}</h2>
                 <h3 class="text-3xl font-extrabold text-slate-900 dark:text-white mb-6">
-                    {{ __('Empowering businesses to reach new heights') }}</h3>
+                    {{ __('Empowering MSMEs with AI-Powered Financial Management') }}</h3>
                 <p class="text-lg text-slate-600 dark:text-gray-400 mb-6">
-                    {{ __('Founded in 2025, Amerta was born from a simple idea: that powerful technology should be accessible to everyone.') }}
+                    {{ __('Amerta AI is an all-in-one digital solution designed specifically for Micro, Small, and Medium Enterprises (MSMEs) across Indonesia. We go beyond conventional Point-of-Sale (POS) or accounting applications to provide a universal platform that serves all types of businesses.') }}
                 </p>
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="border-l-4 border-indigo-500 pl-4">
-                        <p class="text-3xl font-bold text-slate-900 dark:text-white">0</p>
-                        <p class="text-sm text-slate-500">{{ __('Happy Clients') }}</p>
+                <p class="text-lg text-slate-600 dark:text-gray-400 mb-6">
+                    {{ __('Whether you run a retail store, online shop, barbershop, workshop, laundry service, clinic, or catering business, Amerta AI helps you tackle core challenges: financial stability, effective promotion, and comprehensive financial management.') }}
+                </p>
+
+                <!-- Key Benefits -->
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mt-1">
+                            <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-slate-900 dark:text-white">{{ __('Efficient Financial Management') }}</h4>
+                            <p class="text-sm text-slate-600 dark:text-gray-400">{{ __('Simplify your financial operations with comprehensive analytics and visualizations') }}</p>
+                        </div>
                     </div>
-                    <div class="border-l-4 border-purple-500 pl-4">
-                        <p class="text-3xl font-bold text-slate-900 dark:text-white">99.9%</p>
-                        <p class="text-sm text-slate-500">{{ __('Uptime Guarantee') }}</p>
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mt-1">
+                            <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-slate-900 dark:text-white">{{ __('Time-Saving Automation') }}</h4>
+                            <p class="text-sm text-slate-600 dark:text-gray-400">{{ __('Fast calculations and automated record-keeping to focus on growing your business') }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mt-1">
+                            <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-slate-900 dark:text-white">{{ __('Organized Business Operations') }}</h4>
+                            <p class="text-sm text-slate-600 dark:text-gray-400">{{ __('Daily reports with calendar visualization for clear sales tracking') }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -560,36 +560,38 @@
                     {{ __('We understand the hurdles you face. Here is how Amerta bridges the gap between problems and success.') }}
                 </p>
             </div>
-            @foreach ([['p_icon' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', 'p_text' => 'Managing multiple disconnected tools leads to data silos and lost productivity.', 's_icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 's_text' => 'Amerta provides a unified platform. Centralize your data and streamline workflows.'], ['p_icon' => 'M13 10V3L4 14h7v7l9-11h-7z', 'p_text' => 'Slow, clunky interfaces frustrate users and increase churn.', 's_icon' => 'M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 's_text' => 'We prioritize User Experience (UX). Our lightning-fast interface ensures high adoption.']] as $item)
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden lg:grid lg:grid-cols-2 {{ $loop->even ? 'fade-in-right' : 'fade-in-left' }}">
-                    <div class="p-8 lg:p-12 bg-red-50/50 dark:bg-red-900/10">
-                        <div class="flex items-center gap-3 mb-4 text-red-600 dark:text-red-400">
-                            <div
-                                class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="{{ $item['p_icon'] }}"></path>
-                                </svg></div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('The Problem') }}</h3>
-                        </div>
-                        <p class="text-gray-600 dark:text-gray-300">{{ __($item['p_text']) }}</p>
-                    </div>
+            <div class="space-y-6">
+                @foreach ([['p_icon' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', 'p_text' => 'Managing multiple disconnected tools leads to data silos and lost productivity.', 's_icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 's_text' => 'Amerta provides a unified platform. Centralize your data and streamline workflows.'], ['p_icon' => 'M13 10V3L4 14h7v7l9-11h-7z', 'p_text' => 'Slow, clunky interfaces frustrate users and increase churn.', 's_icon' => 'M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 's_text' => 'We prioritize User Experience (UX). Our lightning-fast interface ensures high adoption.']] as $item)
                     <div
-                        class="p-8 lg:p-12 bg-green-50/50 dark:bg-green-900/10 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-700">
-                        <div class="flex items-center gap-3 mb-4 text-green-600 dark:text-green-400">
-                            <div
-                                class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="{{ $item['s_icon'] }}"></path>
-                                </svg></div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('The Solution') }}</h3>
+                        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden lg:grid lg:grid-cols-2 {{ $loop->even ? 'fade-in-right' : 'fade-in-left' }}">
+                        <div class="p-8 lg:p-12 bg-red-50/50 dark:bg-red-900/10">
+                            <div class="flex items-center gap-3 mb-4 text-red-600 dark:text-red-400">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="{{ $item['p_icon'] }}"></path>
+                                    </svg></div>
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('The Problem') }}</h3>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300">{{ __($item['p_text']) }}</p>
                         </div>
-                        <p class="text-gray-600 dark:text-gray-300">{{ __($item['s_text']) }}</p>
+                        <div
+                            class="p-8 lg:p-12 bg-green-50/50 dark:bg-green-900/10 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center gap-3 mb-4 text-green-600 dark:text-green-400">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="{{ $item['s_icon'] }}"></path>
+                                    </svg></div>
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('The Solution') }}</h3>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300">{{ __($item['s_text']) }}</p>
+                        </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
     </div>
 
@@ -707,108 +709,14 @@
         </div>
     </div>
 
-    <!-- 5. Pricing Section -->
-    <div id="pricing" class="py-24 bg-gray-50 dark:bg-gray-950 text-slate-900 dark:text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16 fade-in-section">
-                <h2 class="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">
-                    {{ __('Pricing') }}</h2>
-                <p class="mt-2 text-3xl leading-8 font-extrabold text-slate-900 dark:text-white sm:text-4xl">
-                    {{ __('Simple, transparent pricing') }}
-                </p>
-                <p class="mt-4 max-w-2xl text-xl text-slate-600 dark:text-gray-400 mx-auto">
-                    {{ __('Choose the plan that fits your needs. No hidden fees.') }}
-                </p>
-            </div>
 
-            <!-- Mobile: Horizontal Scroll, Desktop: Grid -->
-            <div class="md:hidden relative">
-                <div class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-hide">
-                    @foreach ($plans as $plan)
-                        <div
-                            class="flex-shrink-0 w-[85vw] max-w-sm snap-center {{ $plan['popular'] ? 'bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-500 shadow-2xl' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' }} rounded-2xl p-8 relative fade-in-section">
-                            @if ($plan['popular'])
-                                <div
-                                    class="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase">
-                                    Popular</div>
-                            @endif
-                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ __($plan['name']) }}</h3>
-                            <p class="text-slate-500 dark:text-gray-400 mb-6">{{ __($plan['desc']) }}</p>
-                            <div class="flex items-baseline mb-8">
-                                <span
-                                    class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ $plan['name'] === 'Enterprise' ? $plan['price'] : 'Rp. ' . $plan['price'] }}</span>
-                                @if ($plan['name'] !== 'Enterprise')
-                                    <span class="text-slate-500 ml-2">/mo</span>
-                                @endif
-                            </div>
-                            <ul class="space-y-4 mb-8 text-slate-600 dark:text-gray-300">
-                                @foreach ($plan['features'] as $feat)
-                                    <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
-                                        </svg> {{ __($feat) }}</li>
-                                @endforeach
-                            </ul>
-                            <a href="{{ route('register') }}"
-                                class="block w-full py-3 px-4 {{ $plan['popular'] ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-100 dark:bg-gray-700 text-slate-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600' }} font-medium rounded-lg text-center transition-colors">{{ __('Get Started') }}</a>
-                        </div>
-                    @endforeach
-                </div>
-                <!-- Scroll Indicator -->
-                <div class="flex justify-center gap-2 mt-6">
-                    @foreach ($plans as $index => $plan)
-                        <div class="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"></div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Desktop: Grid Layout -->
-            <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach ($plans as $plan)
-                    <div
-                        class="{{ $plan['popular'] ? 'bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-500 transform md:-translate-y-4 shadow-2xl z-10' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' }} rounded-2xl p-8 relative fade-in-section">
-                        @if ($plan['popular'])
-                            <div
-                                class="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase">
-                                Popular</div>
-                        @endif
-                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ __($plan['name']) }}</h3>
-                        <p class="text-slate-500 dark:text-gray-400 mb-6">{{ __($plan['desc']) }}</p>
-                        <div class="flex items-baseline mb-8">
-                            <span
-                                class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ $plan['name'] === 'Enterprise' ? $plan['price'] : 'Rp. ' . $plan['price'] }}</span>
-                            @if ($plan['name'] !== 'Enterprise')
-                                <span class="text-slate-500 ml-2">/mo</span>
-                            @endif
-                        </div>
-                        <ul class="space-y-4 mb-8 text-slate-600 dark:text-gray-300">
-                            @foreach ($plan['features'] as $feat)
-                                <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg> {{ __($feat) }}</li>
-                            @endforeach
-                        </ul>
-                        <a href="{{ route('register') }}"
-                            class="block w-full py-3 px-4 {{ $plan['popular'] ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-100 dark:bg-gray-700 text-slate-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600' }} font-medium rounded-lg text-center transition-colors">{{ __('Get Started') }}</a>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
 
     <!-- Footer -->
     <footer class="bg-gray-900 dark:bg-black text-white py-12 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div class="col-span-1 md:col-span-1">
-                    <span class="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                        <span
-                            class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">A</span>
-                        Amerta
-                    </span>
+                    <img src="{{ asset('images/amerta/Amerta-logo.png') }}" alt="Amerta Logo" class="h-10 w-auto">
                     <p class="mt-4 text-gray-400 text-sm">
                         Making the world a better place through constructing elegant hierarchies.
                     </p>
@@ -819,9 +727,6 @@
                     <ul class="space-y-3">
                         <li><a href="#features"
                                 class="text-gray-400 hover:text-white transition-colors">{{ __('Features') }}</a>
-                        </li>
-                        <li><a href="#pricing"
-                                class="text-gray-400 hover:text-white transition-colors">{{ __('Pricing') }}</a>
                         </li>
                         <li><a href="#"
                                 class="text-gray-400 hover:text-white transition-colors">{{ __('Integrations') }}</a>
