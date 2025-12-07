@@ -18,7 +18,6 @@ class ProdukMonthlySalesTest extends TestCase
 
     public function test_can_calculate_total_terjual_per_bulan(): void
     {
-        // Create user and business
         $user = User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
@@ -47,7 +46,6 @@ class ProdukMonthlySalesTest extends TestCase
         $user->business_id = $business->id;
         $user->save();
 
-        // Create a product
         $produk = Produk::create([
             'business_id' => $business->id,
             'nama_produk' => 'Test Product',
@@ -58,7 +56,6 @@ class ProdukMonthlySalesTest extends TestCase
             'gambar' => 'test.jpg',
         ]);
 
-        // Create daily sales for December 2025
         $dailySale1 = DailySale::create([
             'business_id' => $business->id,
             'date' => '2025-12-01',
@@ -71,7 +68,6 @@ class ProdukMonthlySalesTest extends TestCase
             'ai_analysis' => 'Test analysis',
         ]);
 
-        // Create daily sale items
         DailySaleItem::create([
             'daily_sale_id' => $dailySale1->id,
             'produk_id' => $produk->id,
@@ -88,7 +84,6 @@ class ProdukMonthlySalesTest extends TestCase
             'cost' => 5000,
         ]);
 
-        // Create a sale in different month (should not be counted)
         $dailySale3 = DailySale::create([
             'business_id' => $business->id,
             'date' => '2025-11-15',
@@ -103,22 +98,18 @@ class ProdukMonthlySalesTest extends TestCase
             'cost' => 5000,
         ]);
 
-        // Test: Calculate total for December 2025
         $totalDecember = $produk->getTotalTerjualPerBulan('2025-12');
-        $this->assertEquals(15, $totalDecember); // 5 + 10 = 15
+        $this->assertEquals(15, $totalDecember);
 
-        // Test: Calculate total for November 2025
         $totalNovember = $produk->getTotalTerjualPerBulan('2025-11');
         $this->assertEquals(3, $totalNovember);
 
-        // Test: Calculate total for a month with no sales
         $totalJanuary = $produk->getTotalTerjualPerBulan('2025-01');
         $this->assertEquals(0, $totalJanuary);
     }
 
     public function test_produk_index_includes_monthly_sales(): void
     {
-        // Create user and business
         $user = User::create([
             'name' => 'Test User',
             'email' => 'test2@example.com',
@@ -147,7 +138,6 @@ class ProdukMonthlySalesTest extends TestCase
         $user->business_id = $business->id;
         $user->save();
 
-        // Create a product
         $produk = Produk::create([
             'business_id' => $business->id,
             'nama_produk' => 'Test Product',
@@ -158,7 +148,6 @@ class ProdukMonthlySalesTest extends TestCase
             'gambar' => 'test.jpg',
         ]);
 
-        // Create daily sale for current month
         $dailySale = DailySale::create([
             'business_id' => $business->id,
             'date' => now()->format('Y-m-d'),
@@ -173,13 +162,11 @@ class ProdukMonthlySalesTest extends TestCase
             'cost' => 5000,
         ]);
 
-        // Act: Visit produk index
         $response = $this->actingAs($user)->get(route('produk.index'));
 
-        // Assert: Response is successful and contains the product
         $response->assertStatus(200);
         $response->assertViewHas('produks');
-        
+
         $produks = $response->viewData('produks');
         $this->assertCount(1, $produks);
         $this->assertEquals(7, $produks->first()->total_terjual_bulan_ini);

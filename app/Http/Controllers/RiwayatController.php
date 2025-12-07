@@ -43,9 +43,6 @@ class RiwayatController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // DailySale logic removed from this list to prevent duplication.
-        // The Riwayat page should strictly show transaction history.
-
         $categories = Riwayat::where('business_id', $business->id)
             ->whereNotNull('kategori')
             ->where('jenis', 'pengeluaran'  )
@@ -138,13 +135,10 @@ class RiwayatController extends Controller
                 'cash_journal_id' => $cashJournal ? $cashJournal->id : null,
             ]);
 
-            // AUTOMATED DAILY CHECKIN LOGIC
-            // Jika ada items dari kasir, masukkan ke DailySale & DailySaleItem
             if ($request->has('items') && $request->jenis === 'pendapatan') {
                 $items = json_decode($request->items, true);
 
                 if (is_array($items) && count($items) > 0) {
-                    // Cari atau Buat Daily Sale untuk hari ini
                     $dailySale = DailySale::firstOrCreate(
                         [
                             'business_id' => $business->id,
@@ -163,12 +157,10 @@ class RiwayatController extends Controller
                                 'produk_id' => $produk->id,
                                 'quantity' => $item['qty'],
                                 'price' => $item['harga_jual'],
-                                'cost' => $produk->modal ?? 0, // Ambil modal dari items/produk
+                                'cost' => $produk->modal ?? 0,
                             ]);
                         }
                     }
-
-                    // Opsi: Trigger ulang AI Analysis jika diperlukan, atau biarkan update manual/nanti
                 }
             }
 

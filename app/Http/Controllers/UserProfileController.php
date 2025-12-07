@@ -32,11 +32,10 @@ class UserProfileController extends Controller
             'address' => ['nullable', 'string', 'max:500'],
             'birthday' => ['nullable', 'date'],
             'gender' => ['nullable', 'in:male,female'],
-            'photo' => ['nullable', 'image', 'max:2048'], // Max 2MB
+            'photo' => ['nullable', 'image', 'max:2048'], 
         ]);
 
         if ($request->hasFile('photo')) {
-            // Delete old photo if exists
             if ($user->photo && Storage::disk('public')->exists($user->photo)) {
                 Storage::disk('public')->delete($user->photo);
             }

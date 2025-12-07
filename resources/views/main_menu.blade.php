@@ -85,7 +85,7 @@
                    bg-bottom bg-no-repeat bg-cover
                    opacity-10">
         </div>
-    
+
 
     </div>
 
@@ -568,10 +568,8 @@
         </main>
     </div>
 
-    {{-- Script for Alpine Theme Logic handled at top, init is automatic with defer/module or included script --}}
     <script>
         document.addEventListener('alpine:init', () => {
-            // Theme Logic
             Alpine.data('themeManager', () => ({
                 darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) &&
                     window.matchMedia('(prefers-color-scheme: dark)').matches),
@@ -588,11 +586,9 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Use Laravel Session ID to track the welcome message state uniquely for each login session
             const sessionId = "{{ session()->getId() }}";
             const storageKey = 'welcome_shown_' + sessionId;
 
-            // Check if welcome message has already been shown for THIS session
             if (!localStorage.getItem(storageKey)) {
                 const userName = "{{ Auth::user()->name }}";
                 const isDarkMode = document.documentElement.classList.contains('dark');
@@ -611,11 +607,8 @@
                     toast: false
                 });
 
-                // Mark as shown for this session
                 localStorage.setItem(storageKey, 'true');
 
-                // Optional cleanup: Remove old keys from other sessions to keep localStorage clean (simple check)
-                // This is a basic cleanup strategy
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
                     if (key && key.startsWith('welcome_shown_') && key !== storageKey) {

@@ -454,7 +454,6 @@
                             this.errors.target_pasar = true;
                             isValid = false;
                         }
-                        // range_omset sekarang input manual, validasi string kosong saja
                         if (!f.range_omset.trim()) {
                             this.errors.range_omset = true;
                             isValid = false;
@@ -475,19 +474,15 @@
                     if (this.step > 1) this.step--;
                 },
 
-                // FUNGSI FORMATTER UANG
                 formatOmset(e) {
                     let value = e.target.value;
-                    // Hapus semua karakter non-angka
                     let number = value.replace(/\D/g, '');
 
                     if (number === '') {
                         this.formData.range_omset = '';
                     } else {
-                        // Format ke Rupiah (dengan titik)
                         this.formData.range_omset = new Intl.NumberFormat('id-ID').format(number);
                     }
-                    // Paksa update value input
                     e.target.value = this.formData.range_omset;
                 },
 
@@ -514,7 +509,6 @@
                         input.type = 'hidden';
                         input.name = key;
 
-                        // BERSIHKAN TITIK SEBELUM KIRIM KE SERVER
                         if (key === 'range_omset') {
                             input.value = this.formData[key].replace(/\./g, '');
                         } else {

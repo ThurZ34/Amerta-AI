@@ -16,19 +16,13 @@ class KolosalService
     public function __construct()
     {
         $this->apiKey = env('KOLOSAL_API_KEY');
-        // Pastikan base URL mengarah ke endpoint chat completions
         $this->baseUrl = env('KOLOSAL_BASE_URL', 'https://api.kolosal.ai/v1/chat/completions');
         $this->model = env('KOLOSAL_MODEL', 'Claude Sonnet 4.5');
     }
-
-    /**
-     * Fungsi 1: Chatbot Umum (Amerta)
-     */
     public function sendChat(string $message, Business $business, ?string $imagePath = null)
     {
         $categoryName = $business->category ? $business->category->name : 'Tidak ada';
 
-        // Prompt System sama persis dengan GeminiService
         $systemInstruction = "
             PERAN: Kamu adalah 'Amerta', asisten konsultan bisnis profesional untuk UMKM.
             PROFIL BISNIS PENGGUNA:
@@ -57,16 +51,13 @@ class KolosalService
             3. EKSEKUSI: Jika relevan (misal struk), baca detail angkanya dan berikan saran keuangan/stok.
         ";
 
-        // Siapkan konten User
         $userContent = [];
 
-        // Masukkan Text
         $userContent[] = [
             'type' => 'text',
             'text' => $message
         ];
 
-        // Masukkan Gambar (Jika ada)
         if ($imagePath && Storage::disk('public')->exists($imagePath)) {
             $mimeType = Storage::disk('public')->mimeType($imagePath);
             $imageData = base64_encode(Storage::disk('public')->get($imagePath));
@@ -80,9 +71,8 @@ class KolosalService
             ];
         }
 
-        // Kirim Request ke Kolosal
         $response = Http::withToken($this->apiKey)
-            ->timeout(60) // Tambahkan timeout biar aman
+            ->timeout(60)
             ->post($this->baseUrl, [
                 'model' => $this->model,
                 'messages' => [
@@ -104,17 +94,11 @@ class KolosalService
         return $response->json()['choices'][0]['message']['content'] ?? "Maaf, respon AI kosong.";
     }
 
-    /**
-     * Fungsi 2: Analisa Produk & Diskon
-     * (Sebelumnya tidak ada di KolosalService, ini saya tambahkan dari GeminiService)
-     */
     public function analyzeProductPromotions($business, $products)
     {
-        // Format product data for prompt (Logic Copy dari GeminiService)
         $productsData = "";
         foreach ($products as $p) {
             $sales = $p->total_terjual_bulan_ini ?? 0;
-            // $margin = $p->harga_jual - $p->modal; // (Optional calculation)
             $ageDays = $p->created_at ? round(now()->diffInDays($p->created_at)) : 30;
             $productsData .= "- ID: {$p->id} | Nama: {$p->nama_produk} | Harga: {$p->harga_jual} | Modal: {$p->modal} | Terjual Bulan Ini: {$sales} | Umur: {$ageDays} hari\n";
         }
@@ -158,10 +142,10 @@ class KolosalService
             ->post($this->baseUrl, [
                 'model' => $this->model,
                 'messages' => [
-                    ['role' => 'user', 'content' => $prompt] // Kirim sebagai single prompt
+                    ['role' => 'user', 'content' => $prompt]
                 ],
-                'temperature' => 0.2, // Rendah agar output JSON konsisten
-                'response_format' => ['type' => 'json_object'] // Force JSON mode (jika disupport model)
+                'temperature' => 0.2,
+                'response_format' => ['type' => 'json_object']
             ]);
 
         if ($response->failed()) {
@@ -215,7 +199,7 @@ class KolosalService
                         ]
                     ]
                 ],
-                'temperature' => 0.1, // Sangat rendah untuk akurasi data
+                'temperature' => 0.1, 
             ]);
 
         if ($response->failed()) {

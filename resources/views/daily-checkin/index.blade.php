@@ -12,41 +12,38 @@
         baseAction: '{{ route('operasional.analisis-penjualan.store') }}',
         formAction: '{{ route('operasional.analisis-penjualan.store') }}',
         method: 'POST',
-    
+
         init() {
             this.resetSalesData();
         },
-    
+
         resetSalesData() {
             this.salesData = {
                 @foreach ($produks as $produk)
                         {{ $produk->id }}: 0, @endforeach
             };
         },
-    
+
         openInputModal(dateYmd, dateReadable, existingItems = null, id = null) {
             this.targetDate = dateYmd;
             this.targetDateDisplay = dateReadable;
-    
+
             if (existingItems && id) {
-                // Update Mode (including Draft from Kasir)
                 this.resetSalesData();
-                // Merge existing items
                 for (const [productId, qty] of Object.entries(existingItems)) {
                     this.salesData[productId] = parseInt(qty);
                 }
                 this.formAction = '{{ url('/operasional/analisis-penjualan') }}/' + id;
                 this.method = 'PUT';
             } else {
-                // Create Mode
                 this.resetSalesData();
                 this.formAction = this.baseAction;
                 this.method = 'POST';
             }
-    
+
             this.createModalOpen = true;
         },
-    
+
         closeModal() {
             this.createModalOpen = false;
         }

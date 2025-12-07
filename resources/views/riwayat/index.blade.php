@@ -266,7 +266,7 @@
                 showModal: false,
                 isEditing: false,
                 editId: null,
-                filterType: 'all', // 'all', 'pemasukan', 'pengeluaran'
+                filterType: 'all', 
                 currentPage: 1,
                 itemsPerPage: 5,
                 formData: { nama_barang: '', kategori: '', tanggal_pembelian: '', total_harga: '', keterangan: '', bukti_pembayaran: '', jenis: 'pengeluaran' },
@@ -278,13 +278,11 @@
                     return this.riwayats.filter(r => r.jenis === 'pendapatan').reduce((acc, curr) => acc + parseFloat(curr.total_harga), 0);
                 },
 
-                // --- Filter Logic ---
                 get filteredRiwayats() {
                     if (this.filterType === 'all') return this.riwayats;
                     return this.riwayats.filter(r => r.jenis === this.filterType);
                 },
 
-                // --- Pagination Logic ---
                 get totalPages() {
                     return Math.ceil(this.filteredRiwayats.length / this.itemsPerPage);
                 },
@@ -299,7 +297,6 @@
                     }
                 },
 
-                // --- SweetAlert Confirm ---
                 confirmDelete(id) {
                     Swal.fire({
                         title: 'Hapus data ini?',

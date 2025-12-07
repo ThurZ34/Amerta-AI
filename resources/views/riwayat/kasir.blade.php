@@ -376,8 +376,6 @@
 
                 get productsFilteredCount() {
                     const term = this.search.toLowerCase();
-                    // We can't easily count hidden DOM elements with x-show, so this is an approximation based on data if we had full JS list
-                    // or just rely on CSS
                     return document.querySelectorAll('.group[x-show]:not([style="display: none;"])').length;
                 },
 
@@ -388,9 +386,6 @@
                 get total() {
                     return this.cart.reduce((acc, item) => {
                         let price = item.harga_coret > 0 ? item.harga_coret : item.harga_jual;
-                        // Use original logic: price * qty. 
-                        // Note: User data passed harga_jual. Let's assume passed data is correct. 
-                        // If we want to support promo price from cart logic, we defined it above.
                         return acc + (item.harga_jual * item.qty);
                     }, 0);
                 },
@@ -406,8 +401,7 @@
                     let amounts = [];
                     const t = this.total;
                     if (t > 0) {
-                        amounts.push(t); // Exact
-                        // Round up to nearest 5k, 10k, 50k, 100k
+                        amounts.push(t);
                         [5000, 10000, 20000, 50000, 100000].forEach(denom => {
                             if (t < denom) amounts.push(denom);
                             else {
@@ -424,21 +418,17 @@
                     if (existingItem) {
                         existingItem.qty++;
                     } else {
-                        // Clone object
                         this.cart.push({
                             ...product,
                             qty: 1
                         });
                     }
 
-                    // Haptic feedback
                     if (window.navigator && window.navigator.vibrate) {
                         window.navigator.vibrate(50);
                     }
 
-                    // On mobile, show cart hint
                     if (window.innerWidth < 768) {
-                        // toast or animation?
                     }
                 },
 
@@ -476,16 +466,12 @@
                         hour: '2-digit',
                         minute: '2-digit'
                     });
-                    // Create description: "Kasir 14:30 - 2x Kopi, 1x Roti"
                     const itemsDesc = this.cart.map(item => `${item.qty}x ${item.nama_produk}`).join(', ');
                     return `Kasir ${time} - ${itemsDesc}`;
                 },
 
                 submitTransaction(e) {
                     if (this.cart.length === 0) return;
-
-                    // Optional: SweetAlert Confirmation
-                    // Swal.fire(...)
 
                     e.target.submit();
                 }
