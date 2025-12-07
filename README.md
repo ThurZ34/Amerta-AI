@@ -1,59 +1,146 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Amerta AI - Manajemen Keuangan Dengan Fitur AI
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<div align="center">
+  <br>
+  <img src="public/images/amerta/Amerta-logo.png" alt="Amerta Logo" width="150" height="auto" />
+  <br><br>
+  <p><b>Website pembantu UMKM dalam mengatur keuangan, disertai asisten AI untuk kemudahan</b></p>
+  
+  <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/Livewire-EE6983?style=for-the-badge&logo=livewire&logoColor=white" />
+  <img src="https://img.shields.io/badge/Alpine.js-73C7C7?style=for-the-badge&logo=alpinelinux&logoColor=light" />
 
-## About Laravel
+  <br><br>
+  <a href="INSTALLATION.md">Instalasi</a> |
+  <a href="CONTRIBUTION.md">Kontribusi</a> |
+  <a href="TECHSTACK.md">Tech Stack</a>
+</div>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Pengenalan
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+<div>
+Amerta AI adalah website all-in-one yang dirancang untuk menjadi solusi digital universal bagi seluruh jenis Usaha Mikro, Kecil, dan Menengah (UMKM) di Indonesia, melampaui batasan aplikasi Point-of-Sale (POS) atau akuntansi konvensional. Target kami adalah membantu UMKM sektor barang (toko, online shop) maupun sektor jasa (barbershop, bengkel, laundry, klinik, katering) mengatasi masalah inti: stabilitas keuangan, promosi yang efektif, dan manajemen keuangan.
+</div>
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Fitur Utama Amerta AI
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+<div>
+  <table>
+    <tr>
+      <th align="left">Deskripsi Fitur</th>
+      <th align="left">Tampilan Visual</th>
+    </tr>
+    <tr>
+      <td>
+        <strong>Dashboard Data & Grafik</strong><br>
+        Visualisasi data keuangan dari bisnis yang dimiliki memudahkan pengguna menganalisis hasil penjualan serta pengeluaran berdasarkan waktunya.
+      </td>
+      <td>
+        <img src="public/images/demo/dashboard1.png" alt="Dashboard" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Dashboard Transaksi Serta Kesehatan Bisnis</strong><br>
+        Menampilkan transaksi terakhir yang dilakukan termasuk arus kas yang masuk dan keluar.
+      </td>
+      <td>
+        <img src="public/images/demo/dashboard2.png" alt="Dashboard" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Katalog Produk Bisnis</strong><br>
+        Visualisasi berbagai jenis produk yang sudah dibuat beserta analisis profit dan margin dari produk tersebut.
+      </td>
+      <td>
+        <img src="public/images/demo/katalog-produk.png" alt="Katalog Produk" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Fitur Bantuan AI Untuk Menambah Produk</strong><br>
+        Kemudahan bagi pengguna yang didapatkan dari masukan AI.
+      </td>
+      <td>
+        <img src="public/images/demo/ai-produk.png" alt="Fitur AI Tambah Produk" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Laporan Harian Penjualan Produk</strong><br>
+        Tiap tiap tanggal dalam kalender untuk mencatat produk yang terjual beserta total omset dan profit yang didapat.
+      </td>
+      <td>
+        <img src="public/images/demo/laporan.png" alt="Laporan Harian" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Detail Laporan Penjualan Produk</strong><br>
+        Menampilkan detail laporan produk yang terjual berdasarkan tanggalnya. Dan insight yang diberikan AI untuk menambah wawasan bagi penjual produk.
+      </td>
+      <td>
+        <img src="public/images/demo/detail-laporan.png" alt="Detail Laporan" width="800" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Pencatatan Riwayat Transaksi</strong><br>
+        Visualisasi riwayat yang sudah dilakukan oleh pengguna menggunakan pencatatan pemasukan dan pengeluaran.
+      </td>
+      <td>
+        <img src="public/images/demo/riwayat-transaksi.png" alt="Riwayat Transaksi" width="800" />
+      </td>
+    </tr>
+  </table>
+</div>
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Dampak dan Keunggulan
 
-### Premium Partners
+### Dampak Nyata Yang Didapatkan
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+<div>
+  <ul>
+    <li>
+      <strong>Efisiensi Manajemen Keuangan</strong><br>
+      Memberikan kemudahan bagi pelaku bisnis dalam mengatur keuangan berkat tampilan analisa keuangan
+    </li>
+    <li>
+      <strong>Menghemat Waktu</strong><br>
+      Fungsionalitas yang mendukung kecepatan dalam menghitung dan mencatat data keuangan
+    </li>
+    <li>
+      <strong>Operasi Bisnis Yang Rapi</strong><br>
+      Dengan fitur laporan harian menyajikan laporan penjualan dengan visualisasi menggunakan kalender
+    </li>
+  </ul>
+</div>
 
-## Contributing
+### Keunggulan Dari Sistem Ini
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+<div>
+  <ul>
+    <li>
+      <strong>Untuk Semua Jenis Usaha</strong><br>
+      Mendukung berbagai jenis usaha termasuk produk barang maupun jasa.
+    </li>
+    <li>
+      <strong>Promosi Otomatis Berbasis Data</strong><br>
+      Dengan fitur Amerta Studio pengguna tidak perlu repot untuk memikirkan langkah-langkah dalam membuat promosi produk ataupun jasanya.
+    </li>
+    <li>
+      <strong>Ringan dan Mudah Digunakan</strong><br>
+      Dengan hanya menekan, pengguna sudah bisa mencatat keuangan mereka tanpa perlu mengetik lagi.
+    </li>
+  </ul>
+</div>
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
