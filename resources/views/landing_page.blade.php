@@ -169,6 +169,19 @@
         .animation-delay-4000 {
             animation-delay: 4s;
         }
+
+        /* Hide scrollbar for mobile pricing carousel */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari and Opera */
+        }
     </style>
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia(
@@ -317,7 +330,7 @@
                 </div>
 
                 <!-- Mobile Menu Button and Controls -->
-                <div class="md:hidden flex items-center gap-4">
+                <div class="md:hidden flex items-center gap-2">
                     <!-- Mobile Language Switcher -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" @click.away="open = false" type="button"
@@ -365,13 +378,88 @@
 
                     <!-- Mobile Menu Toggle -->
                     <button @click="mobileOpen = !mobileOpen"
-                        class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
                 </div>
+            </div>
+
+            <!-- Mobile Menu Panel -->
+            <div x-show="mobileOpen" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-1"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-1"
+                 class="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md"
+                 style="display: none;">
+                <div class="px-4 pt-2 pb-3 space-y-1">
+                    <a href="#about" @click="mobileOpen = false"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{{ __('About') }}</a>
+                    <a href="#problem-solution" @click="mobileOpen = false"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{{ __('Solutions') }}</a>
+                    <a href="#features" @click="mobileOpen = false"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{{ __('Features') }}</a>
+                    <a href="#pricing" @click="mobileOpen = false"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{{ __('Pricing') }}</a>
+                </div>
+                
+                @auth
+                    <!-- Mobile User Menu -->
+                    <div class="pt-4 pb-3 border-t border-gray-200 dark:border-gray-800">
+                        <div class="flex items-center px-4 mb-3">
+                            @if (Auth::user()->photo)
+                                <img class="h-10 w-10 rounded-full object-cover"
+                                    src="{{ asset('storage/' . Auth::user()->photo) }}"
+                                    alt="{{ Auth::user()->name }}">
+                            @else
+                                <img class="h-10 w-10 rounded-full"
+                                    src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&color=7F9CF5&background=EBF4FF"
+                                    alt="{{ Auth::user()->name }}">
+                            @endif
+                            <div class="ml-3">
+                                <div class="text-base font-medium text-gray-800 dark:text-white">{{ Auth::user()->name }}</div>
+                                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ Auth::user()->email }}</div>
+                            </div>
+                        </div>
+                        <div class="px-2 space-y-1">
+                            @if (Auth::user()->business_id)
+                                <a href="{{ url('/main_menu') }}" @click="mobileOpen = false"
+                                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    {{ __('Main Menu') }}
+                                </a>
+                            @else
+                                <a href="{{ route('dashboard-selection') }}" @click="mobileOpen = false"
+                                    class="block px-3 py-2 rounded-md text-base font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors flex items-center justify-between">
+                                    {{ __('Setup Bisnis') }}
+                                    <span class="flex h-2 w-2 relative">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                    </span>
+                                </a>
+                            @endif
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    {{ __('Sign out') }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <!-- Mobile Auth Links -->
+                    <div class="pt-4 pb-3 border-t border-gray-200 dark:border-gray-800 px-2 space-y-1">
+                        <a href="{{ route('login') }}" @click="mobileOpen = false"
+                            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{{ __('Log in') }}</a>
+                        <a href="{{ route('register') }}" @click="mobileOpen = false"
+                            class="block px-3 py-2 rounded-md text-base font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors text-center">{{ __('Get Started') }}</a>
+                    </div>
+                @endauth
             </div>
         </div>
     </nav>
@@ -509,7 +597,7 @@
         <div class="max-w-7xl mx-auto px-4">
             <div class="text-center mb-16 fade-in-section">
                 <h2 class="text-base text-indigo-600 font-semibold uppercase">{{ __('Features') }}</h2>
-                <p class="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{{ __('Everything you need') }}
+                <p class="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{{ __('Everything you need to succeed') }}
                 </p>
             </div>
 
@@ -633,7 +721,50 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Mobile: Horizontal Scroll, Desktop: Grid -->
+            <div class="md:hidden relative">
+                <div class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-hide">
+                    @foreach ($plans as $plan)
+                        <div
+                            class="flex-shrink-0 w-[85vw] max-w-sm snap-center {{ $plan['popular'] ? 'bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-500 shadow-2xl' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' }} rounded-2xl p-8 relative fade-in-section">
+                            @if ($plan['popular'])
+                                <div
+                                    class="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase">
+                                    Popular</div>
+                            @endif
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ __($plan['name']) }}</h3>
+                            <p class="text-slate-500 dark:text-gray-400 mb-6">{{ __($plan['desc']) }}</p>
+                            <div class="flex items-baseline mb-8">
+                                <span
+                                    class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ $plan['name'] === 'Enterprise' ? $plan['price'] : 'Rp. ' . $plan['price'] }}</span>
+                                @if ($plan['name'] !== 'Enterprise')
+                                    <span class="text-slate-500 ml-2">/mo</span>
+                                @endif
+                            </div>
+                            <ul class="space-y-4 mb-8 text-slate-600 dark:text-gray-300">
+                                @foreach ($plan['features'] as $feat)
+                                    <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg> {{ __($feat) }}</li>
+                                @endforeach
+                            </ul>
+                            <a href="{{ route('register') }}"
+                                class="block w-full py-3 px-4 {{ $plan['popular'] ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-100 dark:bg-gray-700 text-slate-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600' }} font-medium rounded-lg text-center transition-colors">{{ __('Get Started') }}</a>
+                        </div>
+                    @endforeach
+                </div>
+                <!-- Scroll Indicator -->
+                <div class="flex justify-center gap-2 mt-6">
+                    @foreach ($plans as $index => $plan)
+                        <div class="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Desktop: Grid Layout -->
+            <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($plans as $plan)
                     <div
                         class="{{ $plan['popular'] ? 'bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-500 transform md:-translate-y-4 shadow-2xl z-10' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700' }} rounded-2xl p-8 relative fade-in-section">
@@ -653,7 +784,7 @@
                         </div>
                         <ul class="space-y-4 mb-8 text-slate-600 dark:text-gray-300">
                             @foreach ($plan['features'] as $feat)
-                                <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-3" fill="none"
+                                <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none"
                                         stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5 13l4 4L19 7"></path>
@@ -661,7 +792,7 @@
                             @endforeach
                         </ul>
                         <a href="{{ route('register') }}"
-                            class="block w-full py-3 px-4 {{ $plan['popular'] ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-100 dark:bg-gray-700 text-slate-900 dark:text-white hover:bg-gray-200' }} font-medium rounded-lg text-center transition-colors">{{ __('Get Started') }}</a>
+                            class="block w-full py-3 px-4 {{ $plan['popular'] ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-100 dark:bg-gray-700 text-slate-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600' }} font-medium rounded-lg text-center transition-colors">{{ __('Get Started') }}</a>
                     </div>
                 @endforeach
             </div>

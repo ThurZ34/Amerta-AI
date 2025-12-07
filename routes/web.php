@@ -72,7 +72,7 @@ Route::middleware(['auth'])->group(function () {
 
             // Kasir
             Route::get('/kasir', [RiwayatController::class, 'kasir'])->name('kasir');
-            
+
             // Riwayat Keuangan
             Route::post('/riwayat-keuangan/scan', [RiwayatController::class, 'scan'])->name('riwayat-keuangan.scan');
             Route::get('/riwayat-keuangan', [RiwayatController::class, 'index'])->name('riwayat-keuangan.index');

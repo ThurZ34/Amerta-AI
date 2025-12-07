@@ -185,7 +185,7 @@
                 @foreach ($chats as $chat)
                     @if ($chat->role == 'user')
                         <div class="flex items-end gap-3 justify-end fade-in-up">
-                            <div class="bg-indigo-600 text-white p-4 rounded-2xl rounded-tr-none max-w-[85%] sm:max-w-[75%] text-sm shadow-md flex flex-col gap-2 relative group"
+                            <div class="bg-indigo-600 text-white px-5 py-3 rounded-2xl rounded-tr-none max-w-[85%] sm:max-w-[75%] w-fit text-sm shadow-md flex flex-col gap-2 relative group"
                                 x-data="{
                                     expanded: false,
                                     isOverflowing: false,
@@ -205,26 +205,28 @@
                                 @endif
 
                                 <div x-ref="userContent"
-                                    class="whitespace-pre-wrap overflow-hidden transition-[height] duration-500 ease-in-out"
+                                    class="whitespace-pre-wrap break-words overflow-hidden transition-[height] duration-500 ease-in-out"
                                     :style="isOverflowing ? ('height: ' + (expanded ? $refs.userContent.scrollHeight + 'px' :
                                         '120px')) : ''">
-                                    {{ $chat->message }}</div>
+                                    {{ $chat->message }}
+                                </div>
 
                                 <div x-show="!expanded && isOverflowing"
-                                    class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-indigo-600 via-indigo-600/95 to-transparent pointer-events-none rounded-b-2xl rounded-tr-none transition-opacity duration-300 z-10">
+                                    class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-indigo-600 via-indigo-600/95 to-transparent pointer-events-none rounded-b-2xl rounded-tr-none transition-opacity duration-300 z-10">
                                 </div>
 
                                 <div x-show="isOverflowing"
-                                    class="absolute bottom-0 inset-x-0 flex justify-center py-1 z-20 cursor-pointer"
+                                    class="absolute -bottom-3 inset-x-0 flex justify-center py-1 z-20 cursor-pointer"
                                     @click="expanded = !expanded">
                                     <div
-                                        class="text-white/70 hover:text-white transition-colors bg-indigo-600/50 rounded-full px-2 hover:bg-indigo-700/50 backdrop-blur-[2px]">
-                                        <svg x-show="!expanded" class="w-6 h-6 animate-pulse" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
+                                        class="text-white/70 hover:text-white transition-colors bg-indigo-600 shadow-sm border border-indigo-500 rounded-full px-2 py-0.5 text-xs flex items-center gap-1">
+                                        <span x-text="expanded ? 'Tutup' : 'Selengkapnya'"></span>
+                                        <svg x-show="!expanded" class="w-3 h-3" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                                                d="M19 9l-7 7-7-7" />
                                         </svg>
-                                        <svg x-show="expanded" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                        <svg x-show="expanded" class="w-3 h-3" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor" x-cloak>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M5 15l7-7 7 7" />
