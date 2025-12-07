@@ -66,7 +66,7 @@ class CashJournal extends Model
     {
         return $query->where('is_inflow', true)
                      ->whereHas('coa', function($q) {
-                         $q->where('type', '!=', 'EQUITY');
+                         $q->whereIn('type', ['REVENUE', 'INFLOW']); // Fix: Include INFLOW for compatibility
                      });
     }
 

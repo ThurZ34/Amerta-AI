@@ -148,11 +148,13 @@ class Dashboard extends Component
         $cashBalance = $totalInflow - $totalOutflow;
 
         $revenueThisMonth = CashJournal::operatingRevenues()
+            ->where('business_id', $businessId)
             ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
             ->where('description', '!=', 'Modal Awal Bisnis')
             ->sum('amount');
 
         $expenseThisMonth = CashJournal::outflows()
+            ->where('business_id', $businessId)
             ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
             ->sum('amount');
 
@@ -163,8 +165,9 @@ class Dashboard extends Component
             ->whereNotNull('cash_journal_id')
             ->sum('total_harga');
 
-        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth) {
-            $q->whereBetween('date', [$startOfMonth, $endOfMonth]);
+        $hppThisMonth = DailySaleItem::whereHas('dailySale', function ($q) use ($startOfMonth, $endOfMonth, $businessId) {
+            $q->where('business_id', $businessId)
+              ->whereBetween('date', [$startOfMonth, $endOfMonth]);
         })
             ->sum(DB::raw('cost * quantity'));
 
