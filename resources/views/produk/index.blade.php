@@ -453,12 +453,12 @@
                 modal: {{ $errors->any() && !session('success') ? "'create'" : 'null' }},
                 form: {
                     id: null,
-                    nama_produk: '',
-                    modal: 0,
-                    harga_jual: 0,
-                    harga_coret: 0,
-                    promo_end_date: null,
-                    jenis_produk: ''
+                    nama_produk: '{{ old('nama_produk', '') }}',
+                    modal: {{ old('modal', 0) }},
+                    harga_jual: {{ old('harga_jual', 0) }},
+                    harga_coret: {{ old('harga_coret', 0) }},
+                    promo_end_date: '{{ old('promo_end_date', '') }}',
+                    jenis_produk: '{{ old('jenis_produk', '') }}'
                 },
                 search: '',
                 imagePreview: null,
